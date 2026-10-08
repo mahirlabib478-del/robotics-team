@@ -2,6 +2,7 @@ import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getPublicGallery } from "@/lib/public-data";
 
 const categories = [
   ["Robot Development", "Build stages, fabrication and assembly."],
@@ -14,7 +15,8 @@ const categories = [
   ["Media Coverage", "Published coverage from verified media sources."],
 ];
 
-export default function GalleryPage() {
+export default async function GalleryPage() {
+  const items = await getPublicGallery();
   return (
     <main className="min-h-screen">
       <SiteHeader />
@@ -36,10 +38,10 @@ export default function GalleryPage() {
           ))}
         </div>
         <div className="mt-12">
-          <EmptyState
+          {items.length ? <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item) => <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]"><img src={item.source_url} alt={item.alt_text} className="aspect-video w-full object-cover" /><div className="p-5"><p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{item.category}</p><h2 className="mt-2 font-bold">{item.title}</h2>{item.caption ? <p className="mt-2 text-sm text-slate-400">{item.caption}</p> : null}</div></article>)}</div> : <EmptyState
             title="Media archive is ready for approved assets."
             description="Images, YouTube embeds, captions, alt text and publication status are supported. Large videos should remain on YouTube or another approved media host rather than being stored directly on the web server."
-          />
+          />}
         </div>
       </section>
       <SiteFooter />
