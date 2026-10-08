@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { signOutAdmin } from "@/app/actions/admin-auth";
 import { requireAdmin } from "@/lib/admin-auth";
