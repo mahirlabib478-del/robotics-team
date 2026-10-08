@@ -38,7 +38,29 @@ export default async function GalleryPage() {
           ))}
         </div>
         <div className="mt-12">
-          {items.length ? <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((item) => { if (!item.source_url) return null; return <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">{item.source_type === "image" ? <img src={item.source_url} alt={item.alt_text} className="aspect-video w-full object-cover" /> : <a href={item.source_url} target="_blank" rel="noreferrer" className="flex aspect-video items-center justify-center border-b border-white/10 bg-[#07111f] px-6 text-center text-sm font-semibold text-[#8deaff] hover:bg-[#102033]">Watch on YouTube ↗</a>}<div className="p-5"><p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{item.category}</p><h2 className="mt-2 font-bold">{item.title}</h2>{item.caption ? <p className="mt-2 text-sm text-slate-400">{item.caption}</p> : null}</div></article>)}</article>;\n            })}</div> : <EmptyState
+          {items.length ? (
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {items.map((item) => {
+                if (!item.source_url) return null;
+                return (
+                  <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">
+                    {item.source_type === "image" ? (
+                      <img src={item.source_url} alt={item.alt_text} className="aspect-video w-full object-cover" />
+                    ) : (
+                      <a href={item.source_url} target="_blank" rel="noreferrer" className="flex aspect-video items-center justify-center border-b border-white/10 bg-[#07111f] px-6 text-center text-sm font-semibold text-[#8deaff] hover:bg-[#102033]">
+                        Watch on YouTube ↗
+                      </a>
+                    )}
+                    <div className="p-5">
+                      <p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{item.category}</p>
+                      <h2 className="mt-2 font-bold">{item.title}</h2>
+                      {item.caption ? <p className="mt-2 text-sm text-slate-400">{item.caption}</p> : null}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ): <EmptyState
             title="Media archive is ready for approved assets."
             description="Images, YouTube embeds, captions, alt text and publication status are supported. Large videos should remain on YouTube or another approved media host rather than being stored directly on the web server."
           />}
