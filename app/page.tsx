@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
-import { robots } from "@/lib/data";
+import { getPublicRobots, getPublicStats } from "@/lib/public-data";
 
 const capabilityCards = [
   ["01", "Mechanical Engineering", "Chassis, mechanisms, fabrication and competition-ready mechanical systems."],
@@ -11,7 +11,8 @@ const capabilityCards = [
   ["04", "Competition Operations", "Testing, documentation, logistics and international competition readiness."],
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [robots, stats] = await Promise.all([getPublicRobots(), getPublicStats()]);
   return (
     <main className="min-h-screen overflow-hidden">
       <SiteHeader />
@@ -55,7 +56,7 @@ export default function Home() {
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {["Robots Built", "National Awards", "International Participations", "Active Members"].map((label) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-[#07111f] p-6">
-                <div className="font-mono text-3xl font-bold text-slate-500">—</div>
+                <div className="font-mono text-3xl font-bold text-[#19d3ff]">{[stats.robots, stats.nationalAwards, stats.internationalParticipations, stats.activeMembers][["Robots Built", "National Awards", "International Participations", "Active Members"].indexOf(label)]}</div>
                 <div className="mt-2 text-sm text-slate-400">{label}</div>
                 <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">Awaiting verified data</div>
               </div>
