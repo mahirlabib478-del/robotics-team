@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { archiveTeamMember, createTeamMember } from "@/app/actions/admin-operations";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
