@@ -3,9 +3,10 @@ import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { competitions } from "@/lib/data";
+import { getPublicCompetitions } from "@/lib/public-data";
 
-export default function CompetitionsPage() {
+export default async function CompetitionsPage() {
+  const competitions = await getPublicCompetitions();
   return (
     <main className="min-h-screen">
       <SiteHeader />
