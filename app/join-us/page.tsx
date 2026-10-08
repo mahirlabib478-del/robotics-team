@@ -28,7 +28,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
         <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-400">Apply through a structured engineering-team intake covering your division, skills, projects, portfolio and weekly availability.</p>
 
         {params.submitted ? <div className="mt-8 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5 text-sm text-emerald-200">Application received. The operations team can now review it through the private recruitment workflow.</div> : null}
-        {params.error ? <div className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">We could not submit the application. Please verify the required fields and try again; if the issue persists, contact the team.</div> : null}
+        {params.error ? <div className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">{params.error === "closed" ? "Recruitment applications are currently closed." : params.error === "rate" ? "Too many submission attempts from this network. Please wait before trying again." : params.error === "invalid" ? "Please use valid HTTPS links and do not fill the hidden verification field." : "We could not submit the application. Please verify the required fields and try again; if the issue persists, contact the team."}</div> : null}
 
         <div className="mt-10 rounded-2xl border border-white/10 bg-[#0b1727] p-7">
           <div className="mb-8 flex flex-wrap gap-2">
