@@ -1,6 +1,6 @@
 "use server";
 
-import { createHash, createHmac } from "node:crypto";
+import { createHmac } from "node:crypto";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -17,10 +17,6 @@ function adminClientOrRedirect(target: string) {
     console.error("Public submission configuration error:", error);
     redirect(target);
   }
-}
-
-function submissionKey(secret: string, formType: "recruitment" | "contact") {
-  return createHmac("sha256", secret).update(formType).update(":").update("ip-placeholder").digest("hex");
 }
 
 async function getRequesterFingerprint(formType: "recruitment" | "contact") {
