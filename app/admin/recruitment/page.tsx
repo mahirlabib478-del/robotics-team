@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { updateRecruitmentApplication, updateRecruitmentSettings } from "@/app/actions/admin-operations";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
