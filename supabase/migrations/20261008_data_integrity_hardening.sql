@@ -109,3 +109,14 @@ create policy internal_audit_read on public.audit_logs
 for select to authenticated
 using ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[])));
 
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'robot_media_source_https') then
+    alter table public.robot_media add constraint robot_media_source_https check (source_url ~ '^https://');
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'competition_evidence_https') then
+    alter table public.competition_evidence add constraint competition_evidence_https check (href ~ '^https://');
+  end if;
+end
+$$;
