@@ -1,16 +1,128 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+import { SectionHeading } from "@/components/section-heading";
+import { robots } from "@/lib/data";
 
-const stats=[["12+","Robots Built"],["25+","National Awards"],["5+","International Participations"],["40+","Team Members"]];
-const robots=["BattleBot","Soccer Bot","Sumo Robot","Autonomous Robot","Drone","Robotic Boat"];
+const capabilityCards = [
+  ["01", "Mechanical Engineering", "Chassis, mechanisms, fabrication and competition-ready mechanical systems."],
+  ["02", "Embedded & Electronics", "Power, motor control, sensing and robust embedded architectures."],
+  ["03", "Software & AI", "Computer vision, autonomy, control software and engineering tooling."],
+  ["04", "Competition Operations", "Testing, documentation, logistics and international competition readiness."],
+];
 
-export default function Home(){return <main className="min-h-screen overflow-hidden">
-  <header className="border-b border-white/10 bg-[#07111f]/90 backdrop-blur-md"><div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5"><Link href="/" className="text-lg font-bold tracking-[.18em]">TEAM STELLAR</Link><nav className="hidden gap-7 text-sm text-slate-300 md:flex"><Link href="#robots">Robots</Link><Link href="#achievements">Achievements</Link><Link href="#team">Team</Link><Link href="#research">Research</Link><Link href="#sponsors">Sponsors</Link><Link href="#contact">Contact</Link></nav><Link href="#contact" className="rounded-full border border-[#19d3ff]/40 px-4 py-2 text-sm font-semibold text-white">Partner With Us</Link></div></header>
-  <section className="relative"><div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(20,121,255,.22),transparent_35%),radial-gradient(circle_at_30%_70%,rgba(25,211,255,.10),transparent_30%)]"/><div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-24 lg:grid-cols-[1.15fr_.85fr]"><div><p className="mb-5 text-sm font-semibold uppercase tracking-[.3em] text-[#19d3ff]">BRAC University Robotics Team</p><h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl lg:text-8xl">Engineering Robots.<br/><span className="text-[#19d3ff]">Competing Beyond Borders.</span></h1><p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">Team Stellar builds, tests and competes with robotics systems across mechanical, embedded, software and autonomous engineering.</p><div className="mt-9 flex flex-wrap gap-3"><Link href="#robots" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold">Explore Our Robots</Link><Link href="#achievements" className="rounded-full border border-white/15 px-6 py-3 font-semibold">View Achievements</Link></div></div><div className="aspect-[4/5] rounded-3xl border border-white/10 bg-[linear-gradient(135deg,#102033,#07111f)] p-5 shadow-2xl"><div className="flex h-full items-end rounded-2xl border border-white/5 bg-[radial-gradient(circle_at_50%_40%,rgba(25,211,255,.16),transparent_35%)] p-6"><div><p className="text-xs uppercase tracking-[.25em] text-slate-400">Team Stellar</p><p className="mt-2 text-2xl font-bold">Real engineering. Real competition.</p><p className="mt-3 text-sm text-slate-400">Replace this visual panel with verified team/robot footage when media assets are available.</p></div></div></div></div></section>
-  <section className="border-y border-white/10 bg-[#0b1727]"><div className="mx-auto grid max-w-7xl grid-cols-2 px-6 py-10 md:grid-cols-4">{stats.map(([n,l])=><div key={l} className="border-white/10 px-5 py-5 first:border-0 md:border-l"><div className="text-4xl font-black">{n}</div><div className="mt-2 text-sm text-slate-400">{l}</div></div>)}</div></section>
-  <section id="robots" className="mx-auto max-w-7xl px-6 py-24"><p className="text-sm font-semibold uppercase tracking-[.25em] text-[#19d3ff]">Engineering Archive</p><h2 className="mt-3 text-4xl font-bold">Featured Robots</h2><div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{robots.map((r,i)=><article key={r} className="group rounded-2xl border border-white/10 bg-[#0b1727] p-6 transition hover:-translate-y-1 hover:border-[#19d3ff]/40"><div className="flex aspect-[16/10] items-end rounded-xl bg-[linear-gradient(135deg,#14253a,#08111d)] p-5"><span className="text-xs uppercase tracking-[.2em] text-slate-500">Robot media {String(i+1).padStart(2,"0")}</span></div><h3 className="mt-5 text-xl font-bold">{r}</h3><p className="mt-2 text-sm text-slate-400">Technical specification, development history and competition record.</p><Link href="/robots" className="mt-5 inline-block text-sm font-semibold text-[#19d3ff]">View Details →</Link></article>)}</div></section>
-  <section id="achievements" className="border-y border-white/10 bg-[#0b1727]"><div className="mx-auto max-w-7xl px-6 py-24"><p className="text-sm font-semibold uppercase tracking-[.25em] text-[#19d3ff]">Proof, not claims</p><h2 className="mt-3 text-4xl font-bold">Recent Achievements</h2><p className="mt-5 max-w-2xl text-slate-400">Every published competition record will carry structured evidence such as certificates, official result sources and event media.</p></div></section>
-  <section id="team" className="mx-auto max-w-7xl px-6 py-24"><h2 className="text-4xl font-bold">Built by Engineers</h2><p className="mt-4 max-w-2xl text-slate-400">Mechanical Design · Electronics & Embedded Systems · Software & AI · Control & Automation · Manufacturing · Media · Operations</p></section>
-  <section id="research" className="border-y border-white/10 bg-[#0b1727]"><div className="mx-auto max-w-7xl px-6 py-24"><h2 className="text-4xl font-bold">Research & Knowledge</h2><p className="mt-4 max-w-2xl text-slate-400">Development reports, technical articles, competition post-mortems, AI vision experiments and engineering knowledge will live here.</p></div></section>
-  <section id="sponsors" className="mx-auto max-w-7xl px-6 py-24"><h2 className="text-4xl font-bold">Support Bangladesh’s Next Generation of Robotics Competitors.</h2><p className="mt-5 max-w-2xl text-slate-400">A dedicated partnership platform will connect Team Stellar with sponsors, technology partners and international opportunities.</p><Link href="#contact" className="mt-8 inline-block rounded-full bg-[#ff7a00] px-6 py-3 font-bold">Become a Partner</Link></section>
-  <footer id="contact" className="border-t border-white/10 bg-[#050c15]"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-10 md:flex-row md:items-center md:justify-between"><div><div className="font-bold tracking-[.18em]">TEAM STELLAR</div><p className="mt-2 text-sm text-slate-500">BRAC University Robotics Team</p></div><div className="text-sm text-slate-500">Professional robotics. Documented engineering. Global ambition.</div></div></footer>
-</main>}
+export default function Home() {
+  return (
+    <main className="min-h-screen overflow-hidden">
+      <SiteHeader />
+
+      <section className="relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(20,121,255,.22),transparent_35%),radial-gradient(circle_at_25%_70%,rgba(25,211,255,.09),transparent_30%)]" />
+        <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-24 lg:grid-cols-[1.1fr_.9fr]">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#19d3ff]">BRAC University Robotics Team</p>
+            <h1 className="mt-5 max-w-5xl text-5xl font-black tracking-tight sm:text-6xl lg:text-8xl">
+              Engineering Robots.
+              <br />
+              <span className="text-[#19d3ff]">Competing Beyond Borders.</span>
+            </h1>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
+              Team Stellar designs, builds, tests and documents robotics systems across mechanical engineering, embedded electronics, software, AI and autonomous control.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link href="/robots" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold transition hover:bg-[#1479ff]/85">Explore Our Robots</Link>
+              <Link href="/achievements" className="rounded-full border border-white/15 px-6 py-3 font-semibold transition hover:border-white/30">View Achievements</Link>
+              <Link href="/sponsors" className="rounded-full border border-[#ff7a00]/50 px-6 py-3 font-semibold text-[#ffb36f] transition hover:bg-[#ff7a00]/10">Partner With Us</Link>
+            </div>
+            <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
+          </div>
+
+          <div className="aspect-[4/5] rounded-3xl border border-white/10 bg-[#0b1727] p-5 shadow-2xl">
+            <div className="flex h-full items-end rounded-2xl border border-white/5 bg-[radial-gradient(circle_at_50%_35%,rgba(25,211,255,.16),transparent_35%)] p-6">
+              <div>
+                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Hero Media Placeholder</p>
+                <p className="mt-2 text-2xl font-bold">Replace with verified robot action footage.</p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">The production hero is intentionally media-ready without inventing a robot photo or competition result.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#0b1727]">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          <SectionHeading eyebrow="Verified record" title="The numbers will come from the archive." description="No fabricated team statistics are shown. Once verified records are entered, this section can expose robots built, awards, international participations and active members directly from the database." />
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {["Robots Built", "National Awards", "International Participations", "Active Members"].map((label) => (
+              <div key={label} className="rounded-2xl border border-white/10 bg-[#07111f] p-6">
+                <div className="font-mono text-3xl font-bold text-slate-500">—</div>
+                <div className="mt-2 text-sm text-slate-400">{label}</div>
+                <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">Awaiting verified data</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <SectionHeading eyebrow="Engineering archive" title="Robots, preserved as engineering records." description="Every published robot will have structured specifications, development history, competition history and carefully controlled technical disclosure." />
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {robots.length ? robots.slice(0, 6).map((robot) => (
+            <article key={robot.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+              <p className="text-xs uppercase tracking-[0.18em] text-[#19d3ff]">{robot.category}</p>
+              <h3 className="mt-3 text-xl font-bold">{robot.name}</h3>
+              <p className="mt-2 text-sm text-slate-400">{robot.summary}</p>
+              <Link href={`/robots/${robot.slug}`} className="mt-5 inline-block text-sm font-semibold text-[#19d3ff]">View Technical Record →</Link>
+            </article>
+          )) : (
+            <div className="sm:col-span-2 lg:col-span-3 rounded-2xl border border-dashed border-white/10 bg-[#0b1727] p-8">
+              <p className="font-semibold">Robot archive ready for verified records.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">The schema is in place; real robot specifications, photographs, CAD renders and competition footage can now be added without changing the public information architecture.</p>
+              <Link href="/robots" className="mt-5 inline-block text-sm font-semibold text-[#19d3ff]">Open Robot Archive →</Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#0b1727]">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <SectionHeading eyebrow="Capabilities" title="One team, multiple engineering disciplines." />
+          <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
+            {capabilityCards.map(([number, title, description]) => (
+              <div key={number} className="bg-[#07111f] p-7">
+                <span className="font-mono text-xs text-[#19d3ff]">{number}</span>
+                <h3 className="mt-4 text-xl font-bold">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-400">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <SectionHeading eyebrow="Proof, not claims" title="Competition records built for credibility." description="The archive is designed around official competition names, organizers, dates, locations, robot entries, results and evidence links—not an unstructured photo gallery." />
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/competitions" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold hover:border-[#19d3ff]/50">Competition Database</Link>
+          <Link href="/achievements" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold hover:border-[#19d3ff]/50">Achievement Stories</Link>
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#0b1727]">
+        <div className="mx-auto max-w-7xl px-6 py-24">
+          <SectionHeading eyebrow="International mission" title="Built for the next competition, not just the last one." description="Upcoming targets, robot preparation status, travel readiness and international participation details will be published here when officially confirmed." />
+          <div className="mt-8 rounded-2xl border border-dashed border-white/10 p-8">
+            <p className="font-semibold">Mission data not published yet.</p>
+            <p className="mt-2 text-sm text-slate-500">No target competition, country or date is invented before team confirmation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <SectionHeading eyebrow="Partnership" title="Support Bangladesh’s next generation of international robotics competitors." description="Sponsor and technology partnerships can support competition travel, manufacturing, electronics, research and media while giving partners a professional engineering portfolio to engage with." />
+        <Link href="/sponsors" className="mt-8 inline-flex rounded-full bg-[#ff7a00] px-6 py-3 font-bold text-white transition hover:bg-[#ff7a00]/90">Explore Partnership →</Link>
+      </section>
+
+      <SiteFooter />
+    </main>
+  );
+}
