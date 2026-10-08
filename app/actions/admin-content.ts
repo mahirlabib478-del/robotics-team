@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { requireAdmin, requireRole } from "@/lib/admin-auth";
+import { requireAdmin, requireAnyRole, requireRole } from "@/lib/admin-auth";
 
 function value(formData: FormData, name: string, max = 5000) {
   const raw = formData.get(name);
@@ -91,11 +91,25 @@ async function transition(
   action: string,
 ) {
   const { supabase, profile } = await requireAdmin();
-  const { requireAnyRole } = await import("@/lib/admin-auth");
   requireAnyRole(allowedRoles, profile.role);
 
   const id = entityId(formData);
   if (!id) redirect(`/admin/${table}?error=invalid-id`);
+
+  const { data: current, error: readError } = await supabase
+    .from(table)
+    .select("publish_status")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (readError || !current) redirect(`/admin/${table}?error=not-found`);
+
+  const allowedTransition =
+    (target === "review" && current.publish_status === "draft") ||
+    (target === "published" && current.publish_status === "review") ||
+    (target === "archived" && current.publish_status !== "archived");
+
+  if (!allowedTransition) redirect(`/admin/${table}?error=invalid-transition`);
 
   const { error } = await supabase
     .from(table)
