@@ -7,7 +7,7 @@ import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 export default async function AdminTeamPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
-  const { data: members } = await supabase.from("team_members").select("id,name,role,division,department,semester,tenure,alumni,publish_status").order("updated_at", { ascending: false });
+  const { data: members } = await supabase.from("team_members").select("id,name,slug,role,division,department,semester,tenure,skills,projects,photo_url,alumni,publish_status").order("updated_at", { ascending: false });
   const params = await searchParams;
 
   return (
@@ -48,12 +48,16 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
                   <form action={updateTeamMember} className="mt-4 grid gap-3">
                     <input type="hidden" name="id" value={member.id} />
                     <input name="name" defaultValue={member.name} placeholder="Name" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
-                    <input name="slug" placeholder="Slug" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="slug" defaultValue={member.slug} placeholder="Slug" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="role" defaultValue={member.role} placeholder="Role" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="division" defaultValue={member.division} placeholder="Division" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="department" defaultValue={member.department ?? ""} placeholder="Department" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="semester" defaultValue={member.semester ?? ""} placeholder="Semester" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="tenure" defaultValue={member.tenure} placeholder="Tenure" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="skills" defaultValue={(member.skills ?? []).join(", ")} placeholder="Skills (comma separated)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="projects" defaultValue={(member.projects ?? []).join(", ")} placeholder="Projects (comma separated)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="photo_url" defaultValue={member.photo_url ?? ""} placeholder="Photo URL" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <label className="flex items-center gap-2 text-xs text-slate-400"><input type="checkbox" name="alumni" defaultChecked={member.alumni} /> Alumni</label>
                     <div className="flex flex-wrap gap-2">
                       <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
                       {member.publish_status !== "archived" ? <button formAction={archiveTeamMember} className="rounded-full border px-3 py-2 text-xs">Archive member</button> : null}
