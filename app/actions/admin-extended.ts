@@ -23,14 +23,14 @@ export async function transitionContent(f: FormData) {
   if (!paths[table] || !/^[0-9a-f-]{36}$/i.test(id) || !["review", "published", "archived"].includes(target)) go(path, "invalid");
 
   const submitRoles = table === "research_posts"
-    ? ["super_admin", "team_lead", "technical_lead", "media"] as const
+    ? ["super_admin", "team_lead", "technical_lead", "media"]
     : table === "gallery_items"
-      ? ["super_admin", "team_lead", "media"] as const
-      : ["super_admin", "team_lead"] as const;
+      ? ["super_admin", "team_lead", "media"]
+      : ["super_admin", "team_lead"];
   requireAnyRole(submitRoles, profile.role);
 
   const { data, error: readError } = await supabase.from(table).select("publish_status").eq("id", id).maybeSingle();
-  if (readError || !data) go(path, "not-found");
+  if (readError || !data) { go(path, "not-found"); return; }
   const current = data.publish_status as string;
   const allowed =
     (target === "review" && current === "draft") ||
