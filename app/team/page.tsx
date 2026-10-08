@@ -2,9 +2,11 @@ import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { divisions, teamMembers } from "@/lib/data";
+import { divisions } from "@/lib/data";
+import { getPublicTeamMembers } from "@/lib/public-data";
 
-export default function TeamPage() {
+export default async function TeamPage() {
+  const teamMembers = await getPublicTeamMembers();
   const leadership = ["Faculty Advisor", "Team Lead / Captain", "Technical Lead", "Operations Lead", "Finance / Sponsorship Lead"];
 
   return (
