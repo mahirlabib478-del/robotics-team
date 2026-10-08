@@ -2,6 +2,13 @@ import type { CompetitionRecord, Robot, TeamMember } from "@/lib/types";
 import { robots as fallbackRobots, competitions as fallbackCompetitions, teamMembers as fallbackTeamMembers } from "@/lib/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+function safePublicLink(value: unknown): { label: string; href: string } | null {
+  if (!value || typeof value !== "object") return null;
+  const item = value as Record<string, unknown>;
+  if (typeof item.label !== "string" || typeof item.href !== "string") return null;
+  try { const url = new URL(item.href); if (url.protocol !== "https:") return null; return { label: item.label.slice(0, 80), href: url.toString() }; } catch { return null; }
+}
+
 export async function getPublicRobots(): Promise<Robot[]> {
   try {
     const supabase = await createSupabaseServerClient();
@@ -33,7 +40,7 @@ export async function getPublicTeamMembers(): Promise<TeamMember[]>{
     const supabase=await createSupabaseServerClient();
     const {data,error}=await supabase.from("team_members").select("slug,name,role,division,department,semester,skills,projects,tenure,alumni,photo_url,public_links").eq("publish_status","published").eq("visibility","public").order("alumni",{ascending:true}).order("name",{ascending:true});
     if(error||!data)return fallbackTeamMembers;
-    return data.map((m)=>({slug:m.slug,name:m.name,role:m.role,division:m.division,department:m.department??undefined,semester:m.semester??undefined,skills:m.skills??[],projects:m.projects??[],tenure:m.tenure,alumni:m.alumni,photo:m.photo_url??undefined,links:Array.isArray(m.public_links)?m.public_links as {label:string;href:string}[]:[]}));
+    return data.map((m)=>({slug:m.slug,name:m.name,role:m.role,division:m.division,department:m.department??undefined,semester:m.semester??undefined,skills:m.skills??[],projects:m.projects??[],tenure:m.tenure,alumni:m.alumni,photo:m.photo_url??undefined,links:Array.isArray(m.public_links)?m.public_links.map(safePublicLink).filter((x): x is {label:string;href:string} => Boolean(x)):[]}));
   }catch{return fallbackTeamMembers;}
 }
 export async function getPublicResearchPost(slug:string){try{const supabase=await createSupabaseServerClient();const {data}=await supabase.from("research_posts").select("slug,title,excerpt,body,category,author_name").eq("slug",slug).eq("publish_status","published").eq("visibility","public").maybeSingle();return data??null}catch{return null}}
