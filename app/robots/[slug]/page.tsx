@@ -29,7 +29,7 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
           {[
             ["Version", robot.version],
             ["Development Year", String(robot.developmentYear)],
-            ["Weight", robot.weightKg ? `${robot.weightKg} kg` : "Not published"],
+            ["Weight", robot.weightKg != null ? `${robot.weightKg} kg` : "Not published"],
             ["Dimensions", robot.dimensions ?? "Not published"],
           ].map(([label, value]) => (
             <div key={label} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5">
@@ -42,11 +42,11 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
         <section className="mt-16">
           <h2 className="text-3xl font-bold">Technical Specification</h2>
           <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-            {Object.entries(robot.specifications).map(([label, value]) => (
+            {Object.entries(robot.specifications).length ? Object.entries(robot.specifications).map(([label, value]) => (
               <div key={label} className="grid gap-2 border-b border-white/10 bg-[#0b1727] px-6 py-4 last:border-0 sm:grid-cols-[220px_1fr]">
                 <span className="text-sm text-slate-500">{label}</span><span className="text-sm text-slate-200">{value}</span>
               </div>
-            ))}
+            )) : <div className="bg-[#0b1727] px-6 py-5 text-sm text-slate-500">Technical specifications are not published yet.</div>}
           </div>
         </section>
 
