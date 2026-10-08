@@ -13,10 +13,16 @@ const capabilityCards = [
 
 export default async function Home() {
   const [robots, stats] = await Promise.all([getPublicRobots(), getPublicStats()]);
+  const statCards = [
+    ["Robots Built", stats.robots],
+    ["National Awards", stats.nationalAwards],
+    ["International Participations", stats.internationalParticipations],
+    ["Active Members", stats.activeMembers],
+  ] as const;
+
   return (
     <main className="min-h-screen overflow-hidden">
       <SiteHeader />
-
       <section className="relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(20,121,255,.22),transparent_35%),radial-gradient(circle_at_25%_70%,rgba(25,211,255,.09),transparent_30%)]" />
         <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-24 lg:grid-cols-[1.1fr_.9fr]">
@@ -37,7 +43,6 @@ export default async function Home() {
             </div>
             <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
           </div>
-
           <div className="aspect-[4/5] rounded-3xl border border-white/10 bg-[#0b1727] p-5 shadow-2xl">
             <div className="flex h-full items-end rounded-2xl border border-white/5 bg-[radial-gradient(circle_at_50%_35%,rgba(25,211,255,.16),transparent_35%)] p-6">
               <div>
@@ -54,11 +59,13 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <SectionHeading eyebrow="Verified record" title="The numbers will come from the archive." description="No fabricated team statistics are shown. Once verified records are entered, this section can expose robots built, awards, international participations and active members directly from the database." />
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {["Robots Built", "National Awards", "International Participations", "Active Members"].map((label) => (
+            {statCards.map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-[#07111f] p-6">
-                <div className="font-mono text-3xl font-bold text-[#19d3ff]">{[stats.robots, stats.nationalAwards, stats.internationalParticipations, stats.activeMembers][["Robots Built", "National Awards", "International Participations", "Active Members"].indexOf(label)]}</div>
+                <div className="font-mono text-3xl font-bold text-[#19d3ff]">{value}</div>
                 <div className="mt-2 text-sm text-slate-400">{label}</div>
-                <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">Awaiting verified data</div>
+                <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">
+                  {value > 0 ? "Verified published records" : "Awaiting verified data"}
+                </div>
               </div>
             ))}
           </div>
