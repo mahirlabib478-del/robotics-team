@@ -12,9 +12,6 @@ export async function submitRecruitmentApplication(formData: FormData) {
   const website = value(formData, "website", 120);
   if (website) redirect("/join-us?error=invalid");
 
-  const website = value(formData, "website", 120);
-  if (website) redirect("/contact?error=invalid");
-
   const name = value(formData, "name", 120);
   const department = value(formData, "department", 160);
   const semester = value(formData, "semester", 80);
@@ -58,6 +55,9 @@ export async function submitRecruitmentApplication(formData: FormData) {
 }
 
 export async function submitContactMessage(formData: FormData) {
+  const website = value(formData, "website", 120);
+  if (website) redirect("/contact?error=invalid");
+
   const name = value(formData, "name", 120);
   const email = value(formData, "email", 254);
   const organization = value(formData, "organization", 160);
