@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -35,10 +36,23 @@ export default async function ResearchPage() {
           ))}
         </div>
         <div className="mt-12">
-          {posts.length ? <div className="grid gap-5 md:grid-cols-2">{posts.map((post) => <article key={post.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6"><p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{post.category}</p><h2 className="mt-2 text-2xl font-bold">{post.title}</h2><p className="mt-3 text-sm leading-6 text-slate-400">{post.excerpt}</p></article>)}</div> : <EmptyState
-            title="Research records are ready for verified publication."
-            description="The content model supports draft, review, published and archived states. Add approved articles and project reports through the future management portal; confidential source code and competition-sensitive engineering details stay private."
-          />}
+          {posts.length ? (
+            <div className="grid gap-5 md:grid-cols-2">
+              {posts.map((post) => (
+                <article key={post.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6 transition hover:-translate-y-0.5 hover:border-[#19d3ff]/30">
+                  <p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{post.category}</p>
+                  <h2 className="mt-2 text-2xl font-bold">{post.title}</h2>
+                  <p className="mt-3 text-sm leading-6 text-slate-400">{post.excerpt}</p>
+                  <Link href={`/research/${post.slug}`} className="mt-5 inline-block text-sm font-semibold text-[#19d3ff]">Read article →</Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="Research records are ready for verified publication."
+              description="The content model supports draft, review, published and archived states. Add approved articles and project reports through the future management portal; confidential source code and competition-sensitive engineering details stay private."
+            />
+          )}
         </div>
       </section>
       <SiteFooter />
