@@ -40,6 +40,11 @@ export async function signInAdmin(formData: FormData) {
     redirect("/admin/login?error=unauthorized");
   }
 
+  if (process.env.REQUIRE_ADMIN_MFA === "true") {
+    const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (assurance?.currentLevel !== "aal2") redirect("/admin/mfa");
+  }
+
   redirect("/admin");
 }
 
@@ -47,4 +52,23 @@ export async function signOutAdmin() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/admin/login");
+}
+
+
+export async function verifyAdminMfa(formData: FormData) {
+  const code = field(formData, "code", 12);
+  if (!/^\d{6}$/.test(code)) redirect("/admin/mfa?error=invalid");
+
+  const supabase = await createSupabaseServerClient();
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const factor = factors?.totp?.find((item) => item.status === "verified");
+  if (!factor) redirect("/admin/login?error=mfa");
+
+  const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: factor.id });
+  if (challengeError || !challenge) redirect("/admin/mfa?error=challenge");
+
+  const { error } = await supabase.auth.mfa.verify({ factorId: factor.id, challengeId: challenge.id, code });
+  if (error) redirect("/admin/mfa?error=invalid");
+
+  redirect("/admin");
 }
