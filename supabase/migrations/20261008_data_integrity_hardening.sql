@@ -96,3 +96,16 @@ drop trigger if exists public_submission_rate_limits_set_updated_at on public.pu
 create trigger public_submission_rate_limits_set_updated_at before update on public.public_submission_rate_limits for each row execute function public.set_updated_at();
 
 revoke all on function public.set_updated_at() from public, anon, authenticated;
+
+
+-- Tighten internal read access to avoid exposing staff identities/audit metadata to viewer accounts.
+drop policy if exists admin_profiles_read on public.profiles;
+create policy admin_profiles_read on public.profiles
+for select to authenticated
+using ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[])));
+
+drop policy if exists internal_audit_read on public.audit_logs;
+create policy internal_audit_read on public.audit_logs
+for select to authenticated
+using ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[])));
+
