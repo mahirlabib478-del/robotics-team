@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { createSponsor, transitionContent } from "@/app/actions/admin-extended";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
