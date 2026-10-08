@@ -10,7 +10,11 @@ function value(formData: FormData, name: string, maxLength = 5000) {
   return typeof raw === "string" ? raw.trim().slice(0, maxLength) : "";
 }
 
-function isSafeHttpsUrl(value: string) {\n  try { return new URL(value).protocol === "https:"; } catch { return false; }\n}\n\nfunction adminClientOrRedirect(target: string) {
+function isSafeHttpsUrl(value: string) {
+  try { return new URL(value).protocol === "https:"; } catch { return false; }
+}
+
+function adminClientOrRedirect(target: string) {
   try {
     return createSupabaseAdminClient();
   } catch (error) {
@@ -69,7 +73,8 @@ export async function submitRecruitmentApplication(formData: FormData) {
   const weeklyAvailability = value(formData, "weekly_availability", 500);
   const whyJoin = value(formData, "why_join", 3000);
 
-  if (!name || !department || !semester || !studentId || !preferredDivision || !whyJoin) redirect("/join-us?error=missing");\n  if (githubOrPortfolio && !isSafeHttpsUrl(githubOrPortfolio)) redirect("/join-us?error=invalid");
+  if (!name || !department || !semester || !studentId || !preferredDivision || !whyJoin) redirect("/join-us?error=missing");
+  if (githubOrPortfolio && !isSafeHttpsUrl(githubOrPortfolio)) redirect("/join-us?error=invalid");
 
   const supabase = adminClientOrRedirect("/join-us?error=config");
   const { data: settings, error: settingsError } = await supabase
