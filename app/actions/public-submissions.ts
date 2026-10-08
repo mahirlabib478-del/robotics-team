@@ -9,6 +9,12 @@ function value(formData: FormData, name: string, maxLength = 5000) {
 }
 
 export async function submitRecruitmentApplication(formData: FormData) {
+  const website = value(formData, "website", 120);
+  if (website) redirect("/join-us?error=invalid");
+
+  const website = value(formData, "website", 120);
+  if (website) redirect("/contact?error=invalid");
+
   const name = value(formData, "name", 120);
   const department = value(formData, "department", 160);
   const semester = value(formData, "semester", 80);
