@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createRobot } from "@/app/actions/admin-content";
+import { archiveRobot, createRobot, publishRobot, submitRobotForReview } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
 
 export default async function AdminRobotsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
