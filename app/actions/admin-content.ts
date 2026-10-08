@@ -155,3 +155,51 @@ export async function publishCompetition(formData: FormData) {
 export async function archiveCompetition(formData: FormData) {
   return transition(formData, "competitions", "archived", ["super_admin", "team_lead"], "archive_competition");
 }
+
+
+export async function updateRobot(formData: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireRole("technical_lead", profile.role);
+  const id = entityId(formData);
+  const name = value(formData, "name", 160);
+  const slug = value(formData, "slug", 120).toLowerCase();
+  const category = value(formData, "category", 120);
+  const version = value(formData, "version", 80);
+  const status = value(formData, "status", 80);
+  const year = Number(value(formData, "development_year", 10));
+  const summary = value(formData, "summary", 2000);
+  if (!id || !name || !slug || !category || !version || !status || !Number.isInteger(year) || !summary) redirect("/admin/robots?error=missing");
+  const { error } = await supabase.from("robots").update({
+    name, slug, category, version, status, development_year: year, summary,
+    weight_kg: Number(value(formData, "weight_kg", 20)) || null,
+    dimensions: value(formData, "dimensions", 160) || null,
+    updated_by: profile.id, updated_at: new Date().toISOString(),
+  }).eq("id", id);
+  if (error) redirect("/admin/robots?error=save");
+  await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_robot", entity_type: "robot", entity_id: id });
+  redirect("/admin/robots?saved=1");
+}
+
+export async function updateCompetition(formData: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireRole("technical_lead", profile.role);
+  const id = entityId(formData);
+  const officialName = value(formData, "official_name", 200);
+  const slug = value(formData, "slug", 120).toLowerCase();
+  const organizer = value(formData, "organizer", 180);
+  const year = Number(value(formData, "year", 10));
+  const segment = value(formData, "segment", 120);
+  const robotName = value(formData, "robot_name", 160);
+  const level = value(formData, "level", 30);
+  const result = value(formData, "result", 40);
+  if (!id || !officialName || !slug || !organizer || !Number.isInteger(year) || !segment || !robotName || !level || !result) redirect("/admin/competitions?error=missing");
+  const { error } = await supabase.from("competitions").update({
+    official_name: officialName, slug, organizer, year, segment, robot_name: robotName, level, result,
+    city: value(formData, "city", 100) || null, country: value(formData, "country", 100) || null,
+    event_date: value(formData, "event_date", 20) || null, report: value(formData, "report", 4000) || null,
+    updated_by: profile.id, updated_at: new Date().toISOString(),
+  }).eq("id", id);
+  if (error) redirect("/admin/competitions?error=save");
+  await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_competition", entity_type: "competition", entity_id: id });
+  redirect("/admin/competitions?saved=1");
+}
