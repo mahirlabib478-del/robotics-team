@@ -7,7 +7,7 @@ import { requireAdmin, requireRole } from "@/lib/admin-auth";
 export default async function AdminRobotsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
-  const { data: robots } = await supabase.from("robots").select("id,name,category,version,status,development_year,publish_status").order("updated_at", { ascending: false });
+  const { data: robots } = await supabase.from("robots").select("id,name,slug,category,version,status,development_year,weight_kg,dimensions,summary,publish_status").order("updated_at", { ascending: false });
   const params = await searchParams;
 
   return (
