@@ -41,3 +41,39 @@ export async function createRobot(formData: FormData) {
 
   redirect("/admin/robots?saved=1");
 }
+
+
+export async function createCompetition(formData: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireRole("technical_lead", profile.role);
+
+  const officialName = value(formData, "official_name", 200);
+  const slug = value(formData, "slug", 120).toLowerCase();
+  const organizer = value(formData, "organizer", 180);
+  const year = Number(value(formData, "year", 10));
+  const segment = value(formData, "segment", 120);
+  const robotName = value(formData, "robot_name", 160);
+  const level = value(formData, "level", 30);
+  const result = value(formData, "result", 40);
+
+  if (!officialName || !slug || !organizer || !Number.isInteger(year) || !segment || !robotName || !level || !result) {
+    redirect("/admin/competitions?error=missing");
+  }
+
+  const { error } = await supabase.from("competitions").insert({
+    official_name: officialName, slug, organizer, year, segment, robot_name: robotName, level, result,
+    city: value(formData, "city", 100) || null,
+    country: value(formData, "country", 100) || null,
+    event_date: value(formData, "event_date", 20) || null,
+    report: value(formData, "report", 4000) || null,
+    publish_status: "draft", visibility: "public",
+    created_by: profile.id, updated_by: profile.id,
+  });
+
+  if (error) {
+    console.error("Competition insert failed:", error);
+    redirect("/admin/competitions?error=save");
+  }
+
+  redirect("/admin/competitions?saved=1");
+}
