@@ -3,9 +3,11 @@ import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { robotCategories, robots } from "@/lib/data";
+import { robotCategories } from "@/lib/data";
+import { getPublicRobots } from "@/lib/public-data";
 
-export default function RobotsPage() {
+export default async function RobotsPage() {
+  const robots = await getPublicRobots();
   return (
     <main className="min-h-screen">
       <SiteHeader />
