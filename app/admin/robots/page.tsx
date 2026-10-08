@@ -64,11 +64,6 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                     </div>
                   </form>
                 </details>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {false ? <form action={submitRobotForReview}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full border px-3 py-2 text-xs">Submit for review</button></form> : null}
-                  {robot.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={publishRobot}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950">Publish</button></form> : null}
-                  {robot.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={archiveRobot}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full border px-3 py-2 text-xs">Archive</button></form> : null}
-                </div>
               </article>
             ))}
           </div>
