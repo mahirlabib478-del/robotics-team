@@ -12,6 +12,18 @@ function listValue(formData: FormData, name: string) {
   return value(formData, name, 2000).split(",").map((item) => item.trim()).filter(Boolean).slice(0, 30);
 }
 
+function validSlug(slug: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+function validHttpsUrl(url: string) {
+  try {
+    return new URL(url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export async function createTeamMember(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
@@ -22,7 +34,9 @@ export async function createTeamMember(formData: FormData) {
   const division = value(formData, "division", 160);
   const tenure = value(formData, "tenure", 120);
 
-  if (!name || !slug || !role || !division || !tenure) redirect("/admin/team?error=missing");
+  const photoUrl = value(formData, "photo_url", 1000);
+  if (!name || !slug || !validSlug(slug) || !role || !division || !tenure) redirect("/admin/team?error=missing");
+  if (photoUrl && !validHttpsUrl(photoUrl)) redirect("/admin/team?error=invalid-url");
 
   const { error } = await supabase.from("team_members").insert({
     name, slug, role, division, tenure,
@@ -30,7 +44,7 @@ export async function createTeamMember(formData: FormData) {
     semester: value(formData, "semester", 80) || null,
     skills: listValue(formData, "skills"),
     projects: listValue(formData, "projects"),
-    photo_url: value(formData, "photo_url", 1000) || null,
+    photo_url: photoUrl || null,
     public_links: [],
     alumni: formData.get("alumni") === "on",
     publish_status: "draft",
@@ -129,13 +143,15 @@ export async function updateTeamMember(formData: FormData) {
   const role = value(formData, "role", 160);
   const division = value(formData, "division", 160);
   const tenure = value(formData, "tenure", 120);
-  if (!/^[0-9a-f-]{36}$/i.test(id) || !name || !slug || !role || !division || !tenure) redirect("/admin/team?error=missing");
+  const photoUrl = value(formData, "photo_url", 1000);
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !name || !slug || !validSlug(slug) || !role || !division || !tenure) redirect("/admin/team?error=missing");
+  if (photoUrl && !validHttpsUrl(photoUrl)) redirect("/admin/team?error=invalid-url");
   const { error } = await supabase.from("team_members").update({
     name, slug, role, division, tenure,
     department: value(formData, "department", 160) || null,
     semester: value(formData, "semester", 80) || null,
     skills: listValue(formData, "skills"), projects: listValue(formData, "projects"),
-    photo_url: value(formData, "photo_url", 1000) || null,
+    photo_url: photoUrl || null,
     alumni: formData.get("alumni") === "on", updated_at: new Date().toISOString(),
   }).eq("id", id);
   if (error) redirect("/admin/team?error=save");
