@@ -8,6 +8,15 @@ function value(formData: FormData, name: string, maxLength = 5000) {
   return typeof raw === "string" ? raw.trim().slice(0, maxLength) : "";
 }
 
+function adminClientOrRedirect(target: string) {
+  try {
+    return createSupabaseAdminClient();
+  } catch (error) {
+    console.error("Public submission configuration error:", error);
+    redirect(target);
+  }
+}
+
 export async function submitRecruitmentApplication(formData: FormData) {
   const website = value(formData, "website", 120);
   if (website) redirect("/join-us?error=invalid");
@@ -23,32 +32,25 @@ export async function submitRecruitmentApplication(formData: FormData) {
   const weeklyAvailability = value(formData, "weekly_availability", 500);
   const whyJoin = value(formData, "why_join", 3000);
 
-  if (!name || !department || !semester || !studentId || !preferredDivision || !whyJoin) {
-    redirect("/join-us?error=missing");
-  }
+  if (!name || !department || !semester || !studentId || !preferredDivision || !whyJoin) redirect("/join-us?error=missing");
 
-  try {
-    const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from("recruitment_applications").insert({
-      name,
-      department,
-      semester,
-      student_id: studentId,
-      preferred_division: preferredDivision,
-      skills,
-      previous_projects: previousProjects,
-      github_or_portfolio: githubOrPortfolio,
-      weekly_availability: weeklyAvailability,
-      why_join: whyJoin,
-    });
+  const supabase = adminClientOrRedirect("/join-us?error=config");
+  const { error } = await supabase.from("recruitment_applications").insert({
+    name,
+    department,
+    semester,
+    student_id: studentId,
+    preferred_division: preferredDivision,
+    skills,
+    previous_projects: previousProjects,
+    github_or_portfolio: githubOrPortfolio,
+    weekly_availability: weeklyAvailability,
+    why_join: whyJoin,
+  });
 
-    if (error) {
-      console.error("Recruitment application insert failed:", error);
-      redirect("/join-us?error=submit");
-    }
-  } catch (error) {
-    console.error("Recruitment submission failed:", error);
-    redirect("/join-us?error=config");
+  if (error) {
+    console.error("Recruitment application insert failed:", error);
+    redirect("/join-us?error=submit");
   }
 
   redirect("/join-us?submitted=1");
@@ -64,27 +66,20 @@ export async function submitContactMessage(formData: FormData) {
   const subject = value(formData, "subject", 200);
   const message = value(formData, "message", 5000);
 
-  if (!name || !email || !subject || !message || !email.includes("@")) {
-    redirect("/contact?error=missing");
-  }
+  if (!name || !email || !subject || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) redirect("/contact?error=missing");
 
-  try {
-    const supabase = createSupabaseAdminClient();
-    const { error } = await supabase.from("contact_messages").insert({
-      name,
-      email,
-      organization,
-      subject,
-      message,
-    });
+  const supabase = adminClientOrRedirect("/contact?error=config");
+  const { error } = await supabase.from("contact_messages").insert({
+    name,
+    email,
+    organization,
+    subject,
+    message,
+  });
 
-    if (error) {
-      console.error("Contact message insert failed:", error);
-      redirect("/contact?error=submit");
-    }
-  } catch (error) {
-    console.error("Contact submission failed:", error);
-    redirect("/contact?error=config");
+  if (error) {
+    console.error("Contact message insert failed:", error);
+    redirect("/contact?error=submit");
   }
 
   redirect("/contact?submitted=1");
