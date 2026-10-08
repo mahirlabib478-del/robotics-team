@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { archiveTeamMember, createTeamMember, updateTeamMember } from "@/app/actions/admin-operations";
+import { archiveTeamMember, createTeamMember, publishTeamMember, submitTeamMemberForReview, updateTeamMember } from "@/app/actions/admin-operations";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
 export default async function AdminTeamPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
@@ -60,7 +60,9 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
                     <label className="flex items-center gap-2 text-xs text-slate-400"><input type="checkbox" name="alumni" defaultChecked={member.alumni} /> Alumni</label>
                     <div className="flex flex-wrap gap-2">
                       <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
-                      {member.publish_status !== "archived" ? <button formAction={archiveTeamMember} className="rounded-full border px-3 py-2 text-xs">Archive member</button> : null}
+                      {member.publish_status === "draft" ? <button formAction={submitTeamMemberForReview} className="rounded-full border px-3 py-2 text-xs">Submit review</button> : null}
+                      {member.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={publishTeamMember} className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950">Publish</button> : null}
+                      {member.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={archiveTeamMember} className="rounded-full border px-3 py-2 text-xs">Archive member</button> : null}
                     </div>
                   </form>
                 </details>
