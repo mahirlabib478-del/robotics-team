@@ -77,3 +77,67 @@ export async function createCompetition(formData: FormData) {
 
   redirect("/admin/competitions?saved=1");
 }
+
+function entityId(formData: FormData) {
+  const id = value(formData, "id", 80);
+  return /^[0-9a-f-]{36}$/i.test(id) ? id : "";
+}
+
+async function transition(
+  formData: FormData,
+  table: "robots" | "competitions",
+  target: "review" | "published" | "archived",
+  allowedRoles: import("@/lib/types").UserRole[],
+  action: string,
+) {
+  const { supabase, profile } = await requireAdmin();
+  const { requireAnyRole } = await import("@/lib/admin-auth");
+  requireAnyRole(allowedRoles, profile.role);
+
+  const id = entityId(formData);
+  if (!id) redirect(`/admin/${table}?error=invalid-id`);
+
+  const { error } = await supabase
+    .from(table)
+    .update({ publish_status: target, updated_by: profile.id, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    console.error(`${table} transition failed:`, error);
+    redirect(`/admin/${table}?error=transition`);
+  }
+
+  await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action,
+    entity_type: table === "robots" ? "robot" : "competition",
+    entity_id: id,
+    metadata: { publish_status: target },
+  });
+
+  redirect(`/admin/${table}?saved=1`);
+}
+
+export async function submitRobotForReview(formData: FormData) {
+  return transition(formData, "robots", "review", ["super_admin", "team_lead", "technical_lead"], "submit_robot_for_review");
+}
+
+export async function publishRobot(formData: FormData) {
+  return transition(formData, "robots", "published", ["super_admin", "team_lead"], "publish_robot");
+}
+
+export async function archiveRobot(formData: FormData) {
+  return transition(formData, "robots", "archived", ["super_admin", "team_lead"], "archive_robot");
+}
+
+export async function submitCompetitionForReview(formData: FormData) {
+  return transition(formData, "competitions", "review", ["super_admin", "team_lead", "technical_lead"], "submit_competition_for_review");
+}
+
+export async function publishCompetition(formData: FormData) {
+  return transition(formData, "competitions", "published", ["super_admin", "team_lead"], "publish_competition");
+}
+
+export async function archiveCompetition(formData: FormData) {
+  return transition(formData, "competitions", "archived", ["super_admin", "team_lead"], "archive_competition");
+}
