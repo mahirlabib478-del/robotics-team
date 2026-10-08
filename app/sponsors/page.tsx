@@ -1,9 +1,11 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getPublicSponsors } from "@/lib/public-data";
 
 const packages = ["Title Partner", "Platinum Partner", "Gold Partner", "Technology Partner", "Travel Partner", "Manufacturing Partner", "Media Partner"];
 
-export default function SponsorsPage() {
+export default async function SponsorsPage() {
+  const sponsors = await getPublicSponsors();
   return (
     <main className="min-h-screen">
       <SiteHeader />
@@ -12,6 +14,7 @@ export default function SponsorsPage() {
         <h1 className="mt-4 text-5xl font-black tracking-tight">Sponsors & Partners</h1>
         <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-400">Support Bangladesh’s next generation of international robotics competitors through technology, manufacturing, travel, media and strategic partnerships.</p>
 
+        {sponsors.length ? <section className="mt-12"><h2 className="text-3xl font-bold">Verified Partners</h2><div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{sponsors.map((s) => <article key={s.id} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6"><h3 className="font-bold">{s.name}</h3><p className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-500">{s.partnership_type ?? "Partner"}</p>{s.description ? <p className="mt-3 text-sm leading-6 text-slate-400">{s.description}</p> : null}</article>)}</div></section> : null}
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
           {[
             ["Team Impact", "Support hands-on engineering, research and competition preparation."],
