@@ -24,11 +24,11 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
               ["name","Name",true],["slug","Slug",true],["role","Role",true],["division","Division",true],
               ["department","Department",false],["semester","Semester",false],["tenure","Active tenure",true],
               ["skills","Skills (comma separated)",false],["projects","Projects / robots (comma separated)",false],["photo_url","Photo URL",false]
-            ].map(([name,label,required]) => (
+            ].map(([name,label,required]) => ((([name,label,required]) => (
               <label key={name} className="grid gap-2 text-sm text-slate-300">{label}
-                <input name={name} required={required} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" />
+                <input name={String(name)} required={Boolean(required)} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" />
               </label>
-            ))}
+            )))}
             <label className="flex items-center gap-3 text-sm text-slate-300"><input type="checkbox" name="alumni" /> Alumni</label>
             <button className="rounded-full bg-[#1479ff] px-5 py-3 font-semibold">Create draft</button>
           </form>
