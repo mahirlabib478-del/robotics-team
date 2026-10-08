@@ -1,3 +1,48 @@
-import Link from "next/link";
-const categories=["Robot Development","Workshop","Testing","National Competitions","International Competitions","Awards","Team Activities","Media Coverage"];
-export default function GalleryPage(){return <main className="min-h-screen bg-[#07111f] text-[#f5f8fc]"><div className="mx-auto max-w-6xl px-6 py-20"><Link href="/" className="text-sm text-[#19d3ff]">← Team Stellar</Link><h1 className="mt-14 text-5xl font-black">Gallery & Media</h1><p className="mt-5 max-w-3xl text-slate-400">A curated media archive organized by engineering, competition and team activity.</p><div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{categories.map(x=><div key={x} className="aspect-[4/3] rounded-2xl border border-white/10 bg-[#0b1727] p-5"><span className="text-sm font-semibold">{x}</span></div>)}</div></div></main>}
+import { EmptyState } from "@/components/empty-state";
+import { SectionHeading } from "@/components/section-heading";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
+
+const categories = [
+  ["Robot Development", "Build stages, fabrication and assembly."],
+  ["Workshop", "Hands-on engineering and team learning."],
+  ["Testing", "Bench tests, field tests and controlled trials."],
+  ["National Competitions", "Verified competition media from Bangladesh."],
+  ["International Competitions", "International event footage and team moments."],
+  ["Awards", "Podiums, certificates and official recognition."],
+  ["Team Activities", "Training, planning and team culture."],
+  ["Media Coverage", "Published coverage from verified media sources."],
+];
+
+export default function GalleryPage() {
+  return (
+    <main className="min-h-screen">
+      <SiteHeader />
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <SectionHeading
+          eyebrow="Media archive"
+          title="Gallery & Media"
+          description="A curated visual archive organized around engineering work, competition, awards and team activity. YouTube is preferred for video delivery so the site does not become a large video-hosting server."
+        />
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.map(([title, description]) => (
+            <article key={title} className="group aspect-[4/3] rounded-2xl border border-white/10 bg-[#0b1727] p-6 transition hover:-translate-y-0.5 hover:border-[#19d3ff]/30">
+              <div className="flex h-full flex-col justify-end">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#19d3ff]">Media category</p>
+                <h2 className="mt-2 font-bold">{title}</h2>
+                <p className="mt-2 text-xs leading-5 text-slate-500">{description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="mt-12">
+          <EmptyState
+            title="Media archive is ready for approved assets."
+            description="Images, YouTube embeds, captions, alt text and publication status are supported. Large videos should remain on YouTube or another approved media host rather than being stored directly on the web server."
+          />
+        </div>
+      </section>
+      <SiteFooter />
+    </main>
+  );
+}
