@@ -150,14 +150,14 @@ create policy internal_sponsors_read on public.sponsors for select to authentica
 create policy leadership_sponsors_write on public.sponsors for all to authenticated using ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[])));
 
 create policy own_profile_read on public.profiles for select to authenticated using ((select auth.uid()) = id);
-create policy admin_profiles_read on public.profiles for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','viewer']::public.user_role[])));
+create policy admin_profiles_read on public.profiles for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[])));
 create policy super_admin_profiles_write on public.profiles for all to authenticated using ((select private.has_any_role(array['super_admin']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin']::public.user_role[])));
 create policy internal_recruitment_read on public.recruitment_settings for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','viewer']::public.user_role[])));
 create policy hr_recruitment_settings_write on public.recruitment_settings for all to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[])));
 create policy hr_applications_write on public.recruitment_applications for all to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin','team_lead','hr_operations']::public.user_role[])));
 create policy staff_contact_read on public.contact_messages for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[])));
 create policy staff_contact_update on public.contact_messages for update to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[])));
-create policy internal_audit_read on public.audit_logs for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','technical_lead','media','hr_operations','viewer']::public.user_role[])));
+create policy internal_audit_read on public.audit_logs for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[])));
 create policy admin_audit_insert on public.audit_logs for insert to authenticated with check ((select private.has_any_role(array['super_admin','team_lead','technical_lead','media','hr_operations']::public.user_role[])));
 
 -- Public recruitment/contact inserts are intentionally handled by server-side actions with validation and rate limiting.
@@ -228,6 +228,8 @@ $$;
 
 do $$
 begin
+  alter table public.robot_media add constraint robot_media_source_https check (source_url ~ '^https://');
+  alter table public.competition_evidence add constraint competition_evidence_https check (href ~ '^https://');
   alter table public.robots add constraint robots_weight_nonnegative check (weight_kg is null or weight_kg >= 0);
   alter table public.robots add constraint robots_year_reasonable check (development_year between 1900 and 2100);
   alter table public.robots add constraint robots_slug_format check (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$');
