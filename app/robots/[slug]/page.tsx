@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { robots } from "@/lib/data";
+import { getPublicRobot } from "@/lib/public-data";
 
 interface RobotDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -9,7 +9,7 @@ interface RobotDetailPageProps {
 
 export default async function RobotDetailPage({ params }: RobotDetailPageProps) {
   const { slug } = await params;
-  const robot = robots.find((item) => item.slug === slug);
+  const robot = await getPublicRobot(slug);
   if (!robot) notFound();
 
   return (
