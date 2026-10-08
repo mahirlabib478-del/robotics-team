@@ -28,7 +28,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <p className="mt-6 text-sm leading-7 text-slate-500">Public contact details can be added once the team confirms its official email, social channels and partnership contact person.</p>
           </div>
 
-          <form action={submitContactMessage} className="rounded-2xl border border-white/10 bg-[#0b1727] p-7">
+          <form action={submitContactMessage} className="rounded-2xl border border-white/10 bg-[#0b1727] p-7"><input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Name" name="name" required />
               <Field label="Email" name="email" type="email" required />
