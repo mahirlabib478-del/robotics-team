@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { archiveRobot, createRobot, publishRobot, submitRobotForReview } from "@/app/actions/admin-content";
+import { archiveRobot, createRobot, publishRobot, submitRobotForReview, updateRobot } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
 
 export default async function AdminRobotsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
@@ -43,8 +43,29 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                   <span className="text-xs uppercase text-slate-600">{robot.publish_status}</span>
                 </div>
                 <p className="mt-3 text-sm text-slate-400">{robot.status}</p>
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-[#19d3ff]">Edit / workflow</summary>
+                  <form action={updateRobot} className="mt-4 grid gap-3">
+                    <input type="hidden" name="id" value={robot.id} />
+                    <input name="name" defaultValue={robot.name} placeholder="Official name" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="slug" defaultValue={robot.slug} placeholder="Slug" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="category" defaultValue={robot.category} placeholder="Category" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="version" defaultValue={robot.version} placeholder="Version" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="status" defaultValue={robot.status} placeholder="Status" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="development_year" defaultValue={robot.development_year} placeholder="Development year" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="weight_kg" placeholder="Weight (kg)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="dimensions" placeholder="Dimensions" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <textarea name="summary" required rows={3} placeholder="Summary" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <div className="flex flex-wrap gap-2">
+                      <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
+                      {robot.publish_status === "draft" ? <button formAction={submitRobotForReview} className="rounded-full border px-3 py-2 text-xs">Submit review</button> : null}
+                      {robot.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={publishRobot} className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950">Publish</button> : null}
+                      {robot.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={archiveRobot} className="rounded-full border px-3 py-2 text-xs">Archive</button> : null}
+                    </div>
+                  </form>
+                </details>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {robot.publish_status === "draft" ? <form action={submitRobotForReview}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full border px-3 py-2 text-xs">Submit for review</button></form> : null}
+                  {false ? <form action={submitRobotForReview}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full border px-3 py-2 text-xs">Submit for review</button></form> : null}
                   {robot.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={publishRobot}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950">Publish</button></form> : null}
                   {robot.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={archiveRobot}><input type="hidden" name="id" value={robot.id} /><button className="rounded-full border px-3 py-2 text-xs">Archive</button></form> : null}
                 </div>
