@@ -32,3 +32,7 @@ export function requireRole(role: UserRole, actual: UserRole) {
   };
   if (hierarchy[actual] < hierarchy[role]) redirect("/admin?error=forbidden");
 }
+
+export function requireAnyRole(roles: UserRole[], actual: UserRole) {
+  if (!roles.includes(actual)) redirect("/admin?error=forbidden");
+}
