@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { createCompetition } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
