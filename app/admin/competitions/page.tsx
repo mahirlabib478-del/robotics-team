@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { createCompetition } from "@/app/actions/admin-content";
+import { archiveCompetition, createCompetition, publishCompetition, submitCompetitionForReview, updateCompetition } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
 
 export default async function AdminCompetitionsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
@@ -42,6 +42,19 @@ export default async function AdminCompetitionsPage({ searchParams }: { searchPa
               <article key={item.id} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5">
                 <div className="flex justify-between gap-4"><div><h2 className="font-bold">{item.official_name}</h2><p className="mt-1 text-xs text-slate-500">{item.year} · {item.city ?? "—"}, {item.country ?? "—"} · {item.level}</p></div><span className="text-xs uppercase text-slate-600">{item.publish_status}</span></div>
                 <p className="mt-3 text-sm text-slate-400">{item.robot_name} · {item.result}</p>
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-[#19d3ff]">Edit / workflow</summary>
+                  <form action={updateCompetition} className="mt-4 grid gap-3">
+                    <input type="hidden" name="id" value={item.id} />
+                    <label className="grid gap-1 text-xs text-slate-400">Official name<input name="official_name" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Slug<input name="slug" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Organizer<input name="organizer" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Year<input name="year" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">City<input name="city" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Country<input name="country" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Segment<input name="segment" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Robot<input name="robot_name" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Event date<input name="event_date" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label><label className="grid gap-1 text-xs text-slate-400">Report<input name="report" defaultValue={String((item as any)[n] ?? "")} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" /></label>
+                    <div className="flex flex-wrap gap-2">
+                      <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
+                      {item.publish_status === "draft" ? <button formAction={submitCompetitionForReview} className="rounded-full border px-3 py-2 text-xs">Submit review</button> : null}
+                      {item.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={publishCompetition} className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-slate-950">Publish</button> : null}
+                      {item.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <button formAction={archiveCompetition} className="rounded-full border px-3 py-2 text-xs">Archive</button> : null}
+                    </div>
+                  </form>
+                </details>
               </article>
             ))}
           </div>
