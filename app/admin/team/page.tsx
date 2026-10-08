@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { archiveTeamMember, createTeamMember } from "@/app/actions/admin-operations";
+import { archiveTeamMember, createTeamMember, updateTeamMember } from "@/app/actions/admin-operations";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
 export default async function AdminTeamPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
@@ -43,7 +43,23 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
                   <span className="text-xs uppercase text-slate-500">{member.publish_status}</span>
                 </div>
                 <p className="mt-3 text-sm text-slate-400">{member.department ?? "—"} · {member.semester ?? "—"} {member.alumni ? "· Alumni" : ""}</p>
-                {member.publish_status !== "archived" ? <form action={archiveTeamMember} className="mt-4"><input type="hidden" name="id" value={member.id} /><button className="rounded-full border px-3 py-2 text-xs">Archive member</button></form> : null}
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-[#19d3ff]">Edit member</summary>
+                  <form action={updateTeamMember} className="mt-4 grid gap-3">
+                    <input type="hidden" name="id" value={member.id} />
+                    <input name="name" defaultValue={member.name} placeholder="Name" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="slug" placeholder="Slug" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="role" defaultValue={member.role} placeholder="Role" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="division" defaultValue={member.division} placeholder="Division" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="department" defaultValue={member.department ?? ""} placeholder="Department" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="semester" defaultValue={member.semester ?? ""} placeholder="Semester" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="tenure" defaultValue={member.tenure} placeholder="Tenure" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <div className="flex flex-wrap gap-2">
+                      <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
+                      {member.publish_status !== "archived" ? <button formAction={archiveTeamMember} className="rounded-full border px-3 py-2 text-xs">Archive member</button> : null}
+                    </div>
+                  </form>
+                </details>
               </article>
             ))}
           </div>
