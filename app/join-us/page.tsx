@@ -37,7 +37,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
             ))}
           </div>
 
-          <form action={submitRecruitmentApplication} className="grid gap-5 md:grid-cols-2">
+          <form action={submitRecruitmentApplication} className="grid gap-5 md:grid-cols-2"><input name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
             <Field label="Full name" name="name" required />
             <Field label="Department" name="department" required />
             <Field label="Semester" name="semester" required />
