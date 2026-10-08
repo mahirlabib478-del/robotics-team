@@ -7,3 +7,49 @@ export async function createResearchPost(f:FormData){const {supabase,profile}=aw
 export async function createGalleryItem(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","media"],profile.role);const title=v(f,"title",220),category=v(f,"category",120),source_type=v(f,"source_type",20),source_url=v(f,"source_url",1200),alt_text=v(f,"alt_text",300);if(!title||!category||!source_url||!alt_text||!["image","youtube"].includes(source_type))go("/admin/gallery","missing");const {error}=await supabase.from("gallery_items").insert({title,category,source_type,source_url,alt_text,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/gallery","save")}go("/admin/gallery")}
 export async function createSponsor(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead"],profile.role);const name=v(f,"name",180);if(!name)go("/admin/sponsors","missing");const {error}=await supabase.from("sponsors").insert({name,partnership_type:v(f,"partnership_type",120)||null,logo_url:v(f,"logo_url",1200)||null,website_url:v(f,"website_url",1200)||null,description:v(f,"description",1200)||null,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/sponsors","save")}go("/admin/sponsors")}
 export async function updateContactMessage(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","hr_operations","media"],profile.role);const id=v(f,"id",80),status=v(f,"status",40);if(!/^[0-9a-f-]{36}$/i.test(id)||!["New","In Progress","Resolved"].includes(status))go("/admin/messages","invalid");const {error}=await supabase.from("contact_messages").update({status,handled_by:status==="Resolved"?profile.id:null,handled_at:status==="Resolved"?new Date().toISOString():null}).eq("id",id);if(error)go("/admin/messages","save");go("/admin/messages")}
+
+
+export async function transitionContent(f: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  const table = v(f, "table", 40);
+  const target = v(f, "target", 20);
+  const id = v(f, "id", 80);
+  const paths: Record<string, string> = {
+    research_posts: "/admin/research",
+    gallery_items: "/admin/gallery",
+    sponsors: "/admin/sponsors",
+  };
+  const path = paths[table] ?? "/admin";
+  if (!paths[table] || !/^[0-9a-f-]{36}$/i.test(id) || !["review", "published", "archived"].includes(target)) go(path, "invalid");
+
+  const submitRoles = table === "research_posts"
+    ? ["super_admin", "team_lead", "technical_lead", "media"] as const
+    : table === "gallery_items"
+      ? ["super_admin", "team_lead", "media"] as const
+      : ["super_admin", "team_lead"] as const;
+  requireAnyRole(submitRoles, profile.role);
+
+  const { data, error: readError } = await supabase.from(table).select("publish_status").eq("id", id).maybeSingle();
+  if (readError || !data) go(path, "not-found");
+  const current = data.publish_status as string;
+  const allowed =
+    (target === "review" && current === "draft") ||
+    (target === "published" && current === "review" && ["super_admin", "team_lead"].includes(profile.role)) ||
+    (target === "archived" && current !== "archived" && ["super_admin", "team_lead"].includes(profile.role));
+  if (!allowed) go(path, "invalid-transition");
+
+  const update: Record<string, unknown> = { publish_status: target };
+  if (table !== "gallery_items") update.updated_at = new Date().toISOString();
+  const { error } = await supabase.from(table).update(update).eq("id", id);
+  if (error) { console.error(error); go(path, "transition"); }
+
+  const { error: auditError } = await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action: "transition_content",
+    entity_type: table,
+    entity_id: id,
+    metadata: { from: current, to: target },
+  });
+  if (auditError) console.error(auditError);
+  go(path);
+}
