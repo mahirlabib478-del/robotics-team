@@ -1,6 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
+import type { UserRole } from "@/lib/types";
 function v(f:FormData,n:string,m=5000){const x=f.get(n);return typeof x==="string"?x.trim().slice(0,m):""}
 function go(p:string,e?:string){redirect(e?p+"?error="+e:p+"?saved=1")}
 export async function createResearchPost(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","technical_lead","media"],profile.role);const title=v(f,"title",220),slug=v(f,"slug",120).toLowerCase(),excerpt=v(f,"excerpt",500),body=v(f,"body",12000),category=v(f,"category",120);if(!title||!slug||!excerpt||!body||!category)go("/admin/research","missing");const {error}=await supabase.from("research_posts").insert({title,slug,excerpt,body,category,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/research","save")}go("/admin/research")}
@@ -22,7 +23,7 @@ export async function transitionContent(f: FormData) {
   const path = paths[table] ?? "/admin";
   if (!paths[table] || !/^[0-9a-f-]{36}$/i.test(id) || !["review", "published", "archived"].includes(target)) go(path, "invalid");
 
-  const submitRoles = table === "research_posts"
+  const submitRoles: UserRole[] = table === "research_posts"
     ? ["super_admin", "team_lead", "technical_lead", "media"]
     : table === "gallery_items"
       ? ["super_admin", "team_lead", "media"]
