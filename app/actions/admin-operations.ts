@@ -142,3 +142,38 @@ export async function updateTeamMember(formData: FormData) {
   await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_team_member", entity_type: "team_member", entity_id: id });
   redirect("/admin/team?saved=1");
 }
+
+
+async function transitionTeamMember(formData: FormData, target: "review" | "published") {
+  const { supabase, profile } = await requireAdmin();
+  const id = value(formData, "id", 80);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) redirect("/admin/team?error=invalid-id");
+  if (target === "published") requireAnyRole(["super_admin", "team_lead"], profile.role);
+  else requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
+
+  const { data: current, error: readError } = await supabase.from("team_members").select("publish_status").eq("id", id).maybeSingle();
+  if (readError || !current) redirect("/admin/team?error=save");
+
+  if (target === "review" && current.publish_status !== "draft") redirect("/admin/team?error=transition");
+  if (target === "published" && current.publish_status !== "review") redirect("/admin/team?error=transition");
+
+  const { error } = await supabase.from("team_members").update({ publish_status: target, updated_at: new Date().toISOString() }).eq("id", id);
+  if (error) redirect("/admin/team?error=save");
+
+  await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action: target === "review" ? "submit_team_member_review" : "publish_team_member",
+    entity_type: "team_member",
+    entity_id: id,
+  });
+
+  redirect("/admin/team?saved=1");
+}
+
+export async function submitTeamMemberForReview(formData: FormData) {
+  return transitionTeamMember(formData, "review");
+}
+
+export async function publishTeamMember(formData: FormData) {
+  return transitionTeamMember(formData, "published");
+}
