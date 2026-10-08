@@ -8,6 +8,22 @@ function value(formData: FormData, name: string, max = 5000) {
   return typeof raw === "string" ? raw.trim().slice(0, max) : "";
 }
 
+function validSlug(slug: string) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+function validHttpsUrl(url: string) {
+  try {
+    return new URL(url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+const robotStatuses = ["Competition Ready", "In Development", "Retired", "Prototype"] as const;
+const competitionLevels = ["National", "International"] as const;
+const competitionResults = ["Champion", "Runner-up", "Podium", "Finalist", "Participation"] as const;
+
 export async function createRobot(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
@@ -20,7 +36,7 @@ export async function createRobot(formData: FormData) {
   const year = Number(value(formData, "development_year", 10));
   const summary = value(formData, "summary", 2000);
 
-  if (!name || !slug || !category || !version || !status || !Number.isInteger(year) || !summary) {
+  if (!name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) {
     redirect("/admin/robots?error=missing");
   }
 
@@ -56,7 +72,7 @@ export async function createCompetition(formData: FormData) {
   const level = value(formData, "level", 30);
   const result = value(formData, "result", 40);
 
-  if (!officialName || !slug || !organizer || !Number.isInteger(year) || !segment || !robotName || !level || !result) {
+  if (!officialName || !slug || !validSlug(slug) || !organizer || !Number.isInteger(year) || year < 1900 || year > 2100 || !segment || !robotName || !competitionLevels.includes(level as (typeof competitionLevels)[number]) || !competitionResults.includes(result as (typeof competitionResults)[number])) {
     redirect("/admin/competitions?error=missing");
   }
 
@@ -168,7 +184,7 @@ export async function updateRobot(formData: FormData) {
   const status = value(formData, "status", 80);
   const year = Number(value(formData, "development_year", 10));
   const summary = value(formData, "summary", 2000);
-  if (!id || !name || !slug || !category || !version || !status || !Number.isInteger(year) || !summary) redirect("/admin/robots?error=missing");
+  if (!id || !name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) redirect("/admin/robots?error=missing");
   const { error } = await supabase.from("robots").update({
     name, slug, category, version, status, development_year: year, summary,
     weight_kg: Number(value(formData, "weight_kg", 20)) || null,
@@ -192,7 +208,7 @@ export async function updateCompetition(formData: FormData) {
   const robotName = value(formData, "robot_name", 160);
   const level = value(formData, "level", 30);
   const result = value(formData, "result", 40);
-  if (!id || !officialName || !slug || !organizer || !Number.isInteger(year) || !segment || !robotName || !level || !result) redirect("/admin/competitions?error=missing");
+  if (!id || !officialName || !slug || !validSlug(slug) || !organizer || !Number.isInteger(year) || year < 1900 || year > 2100 || !segment || !robotName || !competitionLevels.includes(level as (typeof competitionLevels)[number]) || !competitionResults.includes(result as (typeof competitionResults)[number])) redirect("/admin/competitions?error=missing");
   const { error } = await supabase.from("competitions").update({
     official_name: officialName, slug, organizer, year, segment, robot_name: robotName, level, result,
     city: value(formData, "city", 100) || null, country: value(formData, "country", 100) || null,
