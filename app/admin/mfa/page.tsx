@@ -1,9 +1,12 @@
 import { verifyAdminMfa } from "@/app/actions/admin-auth";
+import { requireAdminSession } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMfaPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const params = await searchParams;
+  await requireAdminSession();
+
   return (
     <main className="min-h-screen bg-[#07111f] px-6 py-20 text-[#f5f8fc]">
       <div className="mx-auto max-w-md">
