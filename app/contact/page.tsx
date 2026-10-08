@@ -18,7 +18,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
         <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-400">For sponsorship, technology partnerships, competition coordination, media and general team inquiries, use the structured form below.</p>
 
         {params.submitted ? <div className="mt-8 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5 text-sm text-emerald-200">Message received. The appropriate team member can review it from the private operations portal.</div> : null}
-        {params.error ? <div className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">We could not submit your message. Please check the required fields and try again.</div> : null}
+        {params.error ? <div className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">{params.error === "rate" ? "Too many messages were submitted from this network. Please wait before trying again." : params.error === "invalid" ? "Your submission could not be verified. Please try again." : "We could not submit your message. Please check the required fields and try again."}</div> : null}
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[.8fr_1.2fr]">
           <div className="rounded-2xl border border-white/10 bg-[#0b1727] p-7">
