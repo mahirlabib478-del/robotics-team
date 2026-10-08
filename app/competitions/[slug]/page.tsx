@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { competitions } from "@/lib/data";
+import { getPublicCompetition } from "@/lib/public-data";
 
 interface CompetitionDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -9,7 +9,7 @@ interface CompetitionDetailPageProps {
 
 export default async function CompetitionDetailPage({ params }: CompetitionDetailPageProps) {
   const { slug } = await params;
-  const record = competitions.find((item) => item.slug === slug);
+  const record = await getPublicCompetition(slug);
   if (!record) notFound();
 
   return (
