@@ -136,7 +136,6 @@ export async function updateTeamMember(formData: FormData) {
     semester: value(formData, "semester", 80) || null,
     skills: listValue(formData, "skills"), projects: listValue(formData, "projects"),
     photo_url: value(formData, "photo_url", 1000) || null,
-    public_links: [],
     alumni: formData.get("alumni") === "on", updated_at: new Date().toISOString(),
   }).eq("id", id);
   if (error) redirect("/admin/team?error=save");
