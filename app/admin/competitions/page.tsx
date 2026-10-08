@@ -7,7 +7,7 @@ import { requireAdmin, requireRole } from "@/lib/admin-auth";
 export default async function AdminCompetitionsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
-  const { data: items } = await supabase.from("competitions").select("id,official_name,year,city,country,level,segment,robot_name,result,publish_status").order("year", { ascending: false });
+  const { data: items } = await supabase.from("competitions").select("id,official_name,slug,organizer,year,city,country,level,segment,robot_name,result,event_date,report,publish_status").order("year", { ascending: false });
   const params = await searchParams;
 
   return (
