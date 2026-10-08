@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -27,7 +28,35 @@ export default async function TeamPage() {
           </div>
         </section>
         <section className="mt-14">
-          {teamMembers.length ? <p className="text-sm text-slate-400">Verified member profiles are published below.</p> : <EmptyState title="Member directory is ready." description="Names, roles, departments, semesters, skills, projects, tenure and public profile links will be added only from verified team records. Alumni are retained for continuity." />}
+          {teamMembers.length ? (
+            <div>
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h2 className="text-2xl font-bold">Verified Members</h2>
+                  <p className="mt-2 text-sm text-slate-500">Published profiles are limited to information approved for public disclosure.</p>
+                </div>
+                <span className="text-xs uppercase tracking-[0.16em] text-slate-600">{teamMembers.filter((member) => !member.alumni).length} active · {teamMembers.filter((member) => member.alumni).length} alumni</span>
+              </div>
+              <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {teamMembers.map((member) => (
+                  <article key={member.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+                    {member.photo ? <img src={member.photo} alt={`${member.name} profile`} className="h-16 w-16 rounded-2xl object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-[#07111f] text-xl font-black text-[#19d3ff]">{member.name.charAt(0).toUpperCase()}</div>}
+                    <h3 className="mt-4 text-xl font-bold">{member.name}</h3>
+                    <p className="mt-1 text-sm text-[#8deaff]">{member.role}</p>
+                    <p className="mt-1 text-xs text-slate-500">{member.division}{member.department ? ` · ${member.department}` : ""}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {member.skills.slice(0, 5).map((skill) => <span key={skill} className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-slate-400">{skill}</span>)}
+                    </div>
+                    <p className="mt-4 text-xs text-slate-600">{member.alumni ? "Alumni" : "Active member"} · {member.tenure}</p>
+                    {member.links?.length ? <div className="mt-4 flex flex-wrap gap-3">{member.links.map((link) => <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#19d3ff] hover:text-white">{link.label} ↗</a>)}</div> : null}
+                    {member.projects.length ? <p className="mt-4 text-sm leading-6 text-slate-500"><span className="text-slate-400">Projects:</span> {member.projects.slice(0, 3).join(", ")}</p> : null}
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <EmptyState title="Member directory is ready." description="Names, roles, departments, semesters, skills, projects, tenure and public profile links will be added only from verified team records. Alumni are retained for continuity." />
+          )}
         </section>
       </section>
       <SiteFooter />
