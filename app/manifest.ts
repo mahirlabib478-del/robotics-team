@@ -1,0 +1,1 @@
+import type { MetadataRoute } from "next"; export default function manifest():MetadataRoute.Manifest{return {name:"Team Stellar",short_name:"Team Stellar",description:"BRAC University Robotics Team",start_url:"/",display:"standalone",background_color:"#07111f",theme_color:"#07111f"}}
