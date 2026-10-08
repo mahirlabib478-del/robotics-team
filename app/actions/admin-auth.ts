@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdminSession } from "@/lib/admin-auth";
 
 function field(formData: FormData, name: string, max = 254) {
   const value = formData.get(name);
@@ -29,6 +30,11 @@ export async function signInAdmin(formData: FormData) {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) redirect("/admin/login?error=invalid");
 
+  if (allowedDomain && (!userData.user.email || !userData.user.email.toLowerCase().endsWith(`@${allowedDomain}`))) {
+    await supabase.auth.signOut();
+    redirect("/admin/login?error=domain");
+  }
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
@@ -54,12 +60,11 @@ export async function signOutAdmin() {
   redirect("/admin/login");
 }
 
-
 export async function verifyAdminMfa(formData: FormData) {
   const code = field(formData, "code", 12);
   if (!/^\d{6}$/.test(code)) redirect("/admin/mfa?error=invalid");
 
-  const supabase = await createSupabaseServerClient();
+  const { supabase } = await requireAdminSession();
   const { data: factors } = await supabase.auth.mfa.listFactors();
   const factor = factors?.totp?.find((item) => item.status === "verified");
   if (!factor) redirect("/admin/login?error=mfa");
@@ -67,7 +72,11 @@ export async function verifyAdminMfa(formData: FormData) {
   const { data: challenge, error: challengeError } = await supabase.auth.mfa.challenge({ factorId: factor.id });
   if (challengeError || !challenge) redirect("/admin/mfa?error=challenge");
 
-  const { error } = await supabase.auth.mfa.verify({ factorId: factor.id, challengeId: challenge.id, code });
+  const { error } = await supabase.auth.mfa.verify({
+    factorId: factor.id,
+    challengeId: challenge.id,
+    code,
+  });
   if (error) redirect("/admin/mfa?error=invalid");
 
   redirect("/admin");
