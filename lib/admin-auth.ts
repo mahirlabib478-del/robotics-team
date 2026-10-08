@@ -9,6 +9,10 @@ export async function requireAdminSession() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect("/admin/login");
+  if (!user.email_confirmed_at) {
+    await supabase.auth.signOut();
+    redirect("/admin/login?error=email");
+  }
 
   const allowedDomain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
   if (allowedDomain && (!user.email || !user.email.toLowerCase().endsWith(`@${allowedDomain}`))) {
