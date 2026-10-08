@@ -12,14 +12,6 @@ function validSlug(slug: string) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
-function validHttpsUrl(url: string) {
-  try {
-    return new URL(url).protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 const robotStatuses = ["Competition Ready", "In Development", "Retired", "Prototype"] as const;
 const competitionLevels = ["National", "International"] as const;
 const competitionResults = ["Champion", "Runner-up", "Podium", "Finalist", "Participation"] as const;
