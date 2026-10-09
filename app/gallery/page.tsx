@@ -64,7 +64,7 @@ export default async function GalleryPage() {
                 return (
                   <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">
                     {item.source_type === "image" ? (
-                      <img src={item.source_url} alt={item.alt_text} className="aspect-video w-full object-cover" />
+                      <img src={item.source_url} alt={item.alt_text} loading="lazy" decoding="async" className="aspect-video w-full object-cover" />
                     ) : embedUrl ? (
                       <iframe
                         src={embedUrl}
