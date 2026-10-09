@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+// Avoid generating production metadata URLs that point at localhost when the site URL is unset.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 const metadataBase = (() => {
   if (!siteUrl) return undefined;
