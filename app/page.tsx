@@ -39,9 +39,9 @@ export default async function Home() {
               Team Stellar designs, builds, tests and documents robotics systems across mechanical engineering, embedded electronics, software, AI and autonomous control.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/robots" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold transition hover:bg-[#1479ff]/85">Explore Our Robots</Link>
-              <Link href="/achievements" className="rounded-full border border-white/15 px-6 py-3 font-semibold transition hover:border-white/30">View Achievements</Link>
-              <Link href="/sponsors" className="rounded-full border border-[#ff7a00]/50 px-6 py-3 font-semibold text-[#ffb36f] transition hover:bg-[#ff7a00]/10">Partner With Us</Link>
+              <Link href="/robots" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold transition hover:bg-[#1479ff]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Explore Our Robots</Link>
+              <Link href="/achievements" className="rounded-full border border-white/15 px-6 py-3 font-semibold transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">View Achievements</Link>
+              <Link href="/sponsors" className="rounded-full border border-[#ff7a00]/50 px-6 py-3 font-semibold text-[#ffb36f] transition hover:bg-[#ff7a00]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Partner With Us</Link>
             </div>
             <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
           </div>

@@ -151,4 +151,20 @@ assert.match(robotDetail, /core fields documented/, "Robot detail must expose a 
 assert.match(robotDetail, /Only published values are shown; missing values are not inferred\./, "Robot detail must not imply missing specifications are verified");
 assert.match(robotDetail, /Publication checklist:/, "Robot detail must explain how specification completeness is assessed");
 
+
+const [siteFooter, homePage, sitemapSource, robotsSource] = await Promise.all([
+  read("components/site-footer.tsx"),
+  read("app/page.tsx"),
+  read("app/sitemap.ts"),
+  read("app/robots.ts"),
+]);
+assert.match(siteFooter, /nav aria-label="Explore Team Stellar"/, "Footer explore links must be exposed as a named navigation landmark");
+assert.match(siteFooter, /nav aria-label="Connect with Team Stellar"/, "Footer contact links must be exposed as a named navigation landmark");
+for (const route of ["/about", "/robots", "/competitions", "/achievements", "/team", "/research", "/gallery", "/sponsors", "/join-us", "/contact"]) {
+  assert.ok(siteFooter.includes(`href="${route}"`), `Footer must link to the public route ${route}`);
+  assert.ok(sitemapSource.includes(`path: "${route}"`), `Sitemap must include the public route ${route}`);
+}
+assert.match(homePage, /focus-visible:outline-2/, "Homepage calls to action must have visible keyboard focus styling");
+assert.match(robotsSource, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must discourage indexing admin and API routes");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
