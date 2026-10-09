@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
@@ -5,6 +6,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { divisions } from "@/lib/data";
 import { getPublicTeamMembers } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Team",
+  description: "Meet the publicly listed members and divisions of Team Stellar, the BRAC University Robotics Team.",
+};
 
 export default async function TeamPage() {
   const teamMembers = await getPublicTeamMembers();
