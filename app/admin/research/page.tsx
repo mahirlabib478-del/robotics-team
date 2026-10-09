@@ -1,14 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { createResearchPost, transitionContent } from "@/app/actions/admin-extended";
+import { createResearchPost, updateResearchPost, transitionContent } from "@/app/actions/admin-extended";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
 export default async function AdminResearchPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
   const [{ data: items }, params] = await Promise.all([
-    supabase.from("research_posts").select("id,title,category,publish_status").order("updated_at", { ascending: false }),
+    supabase.from("research_posts").select("id,title,slug,category,excerpt,body,publish_status").order("updated_at", { ascending: false }),
     searchParams,
   ]);
 
@@ -34,7 +34,7 @@ export default async function AdminResearchPage({ searchParams }: { searchParams
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0"><h2 className="break-words font-bold">{item.title}</h2><p className="mt-1 text-xs text-slate-500">{item.category} · {item.publish_status}</p></div>
               </div>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <details className="mt-4"><summary className="cursor-pointer text-sm text-[#19d3ff]">Edit research</summary><form action={updateResearchPost} className="mt-3 grid gap-3"><input type="hidden" name="id" value={item.id}/><input name="title" required maxLength={220} defaultValue={item.title} placeholder="Title" className="min-w-0 rounded-xl bg-[#07111f] p-3"/><input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" defaultValue={item.slug} placeholder="Slug" className="min-w-0 rounded-xl bg-[#07111f] p-3"/><input name="category" required defaultValue={item.category} placeholder="Category" className="min-w-0 rounded-xl bg-[#07111f] p-3"/><input name="excerpt" required maxLength={500} defaultValue={item.excerpt} placeholder="Excerpt" className="min-w-0 rounded-xl bg-[#07111f] p-3"/><textarea name="body" required maxLength={12000} rows={7} defaultValue={item.body} placeholder="Article body" className="min-w-0 rounded-xl bg-[#07111f] p-3"/><button className="w-fit rounded-full bg-[#1479ff] px-4 py-2 text-sm font-semibold">Save edits</button></form></details><div className="mt-4 flex flex-wrap gap-2">
                 {item.publish_status === "draft" ? <form action={transitionContent}><input type="hidden" name="table" value="research_posts" /><input type="hidden" name="target" value="review" /><input type="hidden" name="id" value={item.id} /><button className="rounded-full border border-white/10 px-3 py-2 text-xs">Submit review</button></form> : null}
                 {item.publish_status === "review" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={transitionContent}><input type="hidden" name="table" value="research_posts" /><input type="hidden" name="target" value="published" /><input type="hidden" name="id" value={item.id} /><button className="rounded-full bg-emerald-400 px-3 py-2 text-xs font-semibold text-black">Publish</button></form> : null}
                 {item.publish_status !== "archived" && (profile.role === "team_lead" || profile.role === "super_admin") ? <form action={transitionContent}><input type="hidden" name="table" value="research_posts" /><input type="hidden" name="target" value="archived" /><input type="hidden" name="id" value={item.id} /><button className="rounded-full border border-white/10 px-3 py-2 text-xs">Archive</button></form> : null}
