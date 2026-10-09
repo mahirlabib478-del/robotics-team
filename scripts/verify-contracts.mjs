@@ -14,7 +14,7 @@ const [operations, recruitmentPage, schema, statusMigration, publicData, adminCl
 function quotedValues(source, expression, label) {
   const match = source.match(expression);
   assert.ok(match, `Could not locate ${label}`);
-  return [...match[1].matchAll(/'([^']+)'/g)].map((item) => item[1]).sort();
+  return [...match[1].matchAll(/[\"']([^\"']+)[\"']/g)].map((item) => item[1]).sort();
 }
 
 const actionStatuses = quotedValues(
