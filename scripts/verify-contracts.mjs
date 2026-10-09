@@ -60,6 +60,19 @@ assert.match(publicData, /engineering:\s*undefined/, "Public robot projection mu
 assert.match(publicSubmissions, /await enforceRateLimit\("recruitment", 3\)/, "Recruitment submissions must be rate limited");
 assert.match(publicSubmissions, /await enforceRateLimit\("contact", 5\)/, "Contact submissions must be rate limited");
 assert.match(publicSubmissions, /createHmac\("sha256", secret\)/, "Rate-limit fingerprints must be keyed hashes");
+assert.match(publicSubmissions, /if \(!secret \|\| secret\.length < 32\)[\s\S]*?return null/, "Public forms must fail closed when the rate-limit secret is missing or weak");
+assert.match(publicSubmissions, /if \(!key\) return false/, "Public forms must reject requests when fingerprint generation fails");
+assert.match(publicSubmissions, /if \(error\)[\s\S]*?return false/, "Public forms must reject requests when the rate-limit RPC fails");
+assert.match(publicSubmissions, /return data === true/, "Public forms must accept only an explicit true rate-limit result");
+assert.match(publicSubmissions, /\.update\(formType\)\.update\(":"\)\.update\(normalizedIp\)/, "Rate-limit fingerprints must be separated by form type and never require storing raw IP addresses");
+for (const [formType, limit, table] of [
+  ["recruitment", 3, "recruitment_applications"],
+  ["contact", 5, "contact_messages"],
+]) {
+  const limitCheck = publicSubmissions.indexOf(`if (!(await enforceRateLimit("${formType}", ${limit})))`);
+  const insertCall = publicSubmissions.indexOf(`.from("${table}").insert(`);
+  assert.ok(limitCheck >= 0 && insertCall > limitCheck, `${formType} inserts must happen only after a successful rate-limit check`);
+}
 assert.match(publicSubmissions, /const ip = realIp \\|\\| forwarded\\?\\.at\\(-1\\) \\|\\| "unknown"/, "Rate-limit fingerprint must not trust the requester-controlled leftmost forwarded address");
 assert.ok(publicSubmissions.includes('requestHeaders.get("x-forwarded-for")?.split(",").map'), "Forwarded address chain must be parsed explicitly");
 assert.match(joinPage, /statusAvailable && settings\?\.applications_open === true && !deadlinePassed/, "Recruitment form must fail closed when status is unavailable or expired");
