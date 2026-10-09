@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -15,11 +16,12 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <article className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+      <article className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20">
+        <Link href="/robots" className="inline-flex text-sm font-semibold text-[#19d3ff] hover:text-white">← All robots</Link>
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">{robot.category}</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black tracking-tight sm:text-6xl">{robot.name}</h1>
+            <h1 className="break-words text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">{robot.name}</h1>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-400">{robot.summary}</p>
           </div>
           <span className="rounded-full border border-[#19d3ff]/30 bg-[#19d3ff]/5 px-4 py-2 text-sm text-[#8deaff]">{robot.status}</span>

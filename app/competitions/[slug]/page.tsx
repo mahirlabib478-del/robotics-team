@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -15,10 +16,11 @@ export default async function CompetitionDetailPage({ params }: CompetitionDetai
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <article className="mx-auto max-w-5xl px-6 py-20">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">{record.level} · {record.segment}</p>
-        <h1 className="mt-4 text-5xl font-black tracking-tight">{record.competition}</h1>
-        <p className="mt-4 text-lg text-slate-400">{record.organizer} · {record.location} · {record.year}</p>
+      <article className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-20">
+        <Link href="/competitions" className="inline-flex text-sm font-semibold text-[#19d3ff] hover:text-white">← All competitions</Link>
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">{record.level} · {record.segment}</p>
+        <h1 className="mt-4 break-words text-3xl font-black tracking-tight sm:text-5xl">{record.competition}</h1>
+        <p className="mt-4 break-words text-base leading-7 text-slate-400 sm:text-lg">{record.organizer} · {record.location} · {record.year}</p>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
