@@ -109,19 +109,30 @@ export async function updateRecruitmentApplication(formData: FormData) {
   const allowedStatuses = ["Submitted", "Screening", "Shortlisted", "Interview", "Selected", "Rejected", "Withdrawn"];
   if (!/^[0-9a-f-]{36}$/i.test(id) || !allowedStatuses.includes(status)) redirect("/admin/recruitment?error=invalid");
 
+  const { data: current, error: readError } = await supabase
+    .from("recruitment_applications")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
+  if (readError || !current) redirect("/admin/recruitment?error=not-found");
+
   const { error } = await supabase.from("recruitment_applications").update({
     status, reviewed_by: profile.id, reviewed_at: new Date().toISOString(),
   }).eq("id", id);
 
-  if (error) redirect("/admin/recruitment?error=save");
+  if (error) {
+    console.error("Recruitment application update failed:", error);
+    redirect("/admin/recruitment?error=save");
+  }
 
-  await supabase.from("audit_logs").insert({
+  const { error: auditError } = await supabase.from("audit_logs").insert({
     actor_id: profile.id,
     action: "update_recruitment_application",
     entity_type: "recruitment_application",
     entity_id: id,
-    metadata: { status },
+    metadata: { from: current.status, to: status },
   });
+  if (auditError) console.error("Recruitment application audit write failed:", auditError);
 
   redirect("/admin/recruitment?saved=1");
 }
