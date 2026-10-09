@@ -97,7 +97,10 @@ export async function updateRecruitmentSettings(formData: FormData) {
   const open = formData.get("applications_open") === "on";
   const stage = value(formData, "stage", 120);
   const description = value(formData, "description", 2000);
-  const deadline = value(formData, "deadline", 40) || null;
+  const deadlineInput = value(formData, "deadline", 40);
+  const parsedDeadline = deadlineInput ? new Date(deadlineInput) : null;
+  if (parsedDeadline && Number.isNaN(parsedDeadline.getTime())) redirect("/admin/recruitment?error=invalid-deadline");
+  const deadline = parsedDeadline ? parsedDeadline.toISOString() : null;
 
   const { error } = await supabase.from("recruitment_settings").upsert({
     id: true, applications_open: open, stage: stage || (open ? "Applications Open" : "Applications Closed"),
@@ -114,7 +117,8 @@ export async function updateRecruitmentApplication(formData: FormData) {
 
   const id = value(formData, "id", 80);
   const status = value(formData, "status", 80);
-  if (!/^[0-9a-f-]{36}$/i.test(id) || !status) redirect("/admin/recruitment?error=invalid");
+  const allowedStatuses = ["Submitted", "Screening", "Interview", "Selected", "Rejected"];
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !allowedStatuses.includes(status)) redirect("/admin/recruitment?error=invalid");
 
   const { error } = await supabase.from("recruitment_applications").update({
     status, reviewed_by: profile.id, reviewed_at: new Date().toISOString(),
