@@ -107,4 +107,13 @@ assert.match(adminOperations, /if \(current\.publish_status === "published" && !
 assert.match(publicSubmissions, /Public submission rate-limit check failed[\s\S]*?return false/, "Rate limiting must fail closed if the database check fails");
 assert.match(publicSubmissions, /if \(!secret \|\| secret\.length < 32\)[\s\S]*?return null/, "Public submissions must fail closed without a sufficiently strong fingerprint secret");
 
+assert.match(adminAuth, /user\.email\.toLowerCase\(\)\.endsWith\(`@\$\{allowedDomain\}`\)/, "Admin email-domain restriction must match the complete domain suffix");
+assert.match(adminExtended, /function safeYouTube\([\s\S]*?hostname\.toLowerCase\(\)[\s\S]*?host === "youtu\.be"[\s\S]*?host === "youtube\.com"[\s\S]*?\[A-Za-z0-9_-\]\{11\}/, "Gallery YouTube links must use an allowlisted host and valid video ID");
+assert.match(adminExtended, /export async function transitionContent\([\s\S]*?const paths: Record<string, string> = \{[\s\S]*?research_posts:[\s\S]*?gallery_items:[\s\S]*?sponsors:/, "Generic publishing transitions must use an allowlisted content table");
+assert.match(adminExtended, /target === "published" && current === "review" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Extended content can only be published from review by leadership");
+assert.match(adminExtended, /target === "archived" && current !== "archived" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Extended content archiving must be restricted to leadership");
+assert.match(adminExtended, /if \(current\.publish_status === "archived"\) go\("\/admin\/gallery", "archived"\)/, "Archived gallery items must not be edited");
+assert.match(adminExtended, /if \(current\.publish_status === "archived"\) go\("\/admin\/sponsors", "archived"\)/, "Archived sponsors must not be edited");
+assert.match(adminOperations, /if \(current\.publish_status === "archived"\) redirect\("\/admin\/team\?error=archived"\)/, "Archived team records must not be edited");
+
 console.log("Contract checks passed: recruitment statuses/deadlines, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
