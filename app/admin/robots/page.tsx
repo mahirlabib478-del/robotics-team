@@ -53,9 +53,9 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                     <input name="version" defaultValue={robot.version} placeholder="Version" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="status" defaultValue={robot.status} placeholder="Status" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="development_year" defaultValue={robot.development_year} placeholder="Development year" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
-                    <input name="weight_kg" placeholder="Weight (kg)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
-                    <input name="dimensions" placeholder="Dimensions" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
-                    <textarea name="summary" required rows={3} placeholder="Summary" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="weight_kg" type="number" min="0" step="0.01" defaultValue={robot.weight_kg ?? ""} placeholder="Weight (kg)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <input name="dimensions" defaultValue={robot.dimensions ?? ""} placeholder="Dimensions" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <textarea name="summary" required rows={3} defaultValue={robot.summary ?? ""} placeholder="Summary" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <div className="flex flex-wrap gap-2">
                       <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
                       {robot.publish_status === "draft" ? <button formAction={submitRobotForReview} className="rounded-full border px-3 py-2 text-xs">Submit review</button> : null}
