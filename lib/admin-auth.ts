@@ -54,15 +54,17 @@ export async function requireAdmin() {
 }
 
 export function requireRole(role: UserRole, actual: UserRole) {
-  const hierarchy: Record<UserRole, number> = {
-    viewer: 10,
-    media: 20,
-    hr_operations: 20,
-    technical_lead: 20,
-    team_lead: 30,
-    super_admin: 40,
+  // These are capability roles, not a flat seniority ladder: media and HR
+  // must not inherit technical-lead access merely because they share a tier.
+  const grants: Record<UserRole, UserRole[]> = {
+    viewer: ["viewer", "media", "hr_operations", "technical_lead", "team_lead", "super_admin"],
+    media: ["media", "team_lead", "super_admin"],
+    hr_operations: ["hr_operations", "team_lead", "super_admin"],
+    technical_lead: ["technical_lead", "team_lead", "super_admin"],
+    team_lead: ["team_lead", "super_admin"],
+    super_admin: ["super_admin"],
   };
-  if (hierarchy[actual] < hierarchy[role]) redirect("/admin?error=forbidden");
+  if (!grants[role].includes(actual)) redirect("/admin?error=forbidden");
 }
 
 export function requireAnyRole(roles: UserRole[], actual: UserRole) {
