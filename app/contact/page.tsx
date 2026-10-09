@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { submitContactMessage } from "@/app/actions/public-submissions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+
+export const metadata: Metadata = {
+  title: "Contact Team Stellar",
+  description: "Contact Team Stellar for partnerships, events, collaboration, and general inquiries.",
+};
 
 // Keep the public inquiry form comfortable on narrow mobile screens.
 interface ContactPageProps {
