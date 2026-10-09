@@ -39,9 +39,9 @@ function safeYouTubeUrl(value: unknown): string | undefined {
 export async function getPublicRobots(): Promise<Robot[]> {
   try {
     const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase.from("robots").select("slug,name,category,version,weight_kg,dimensions,status,development_year,summary,specifications,engineering,sensitive_fields_hidden").eq("publish_status","published").eq("visibility","public").order("development_year",{ascending:false});
+    const { data, error } = await supabase.from("robots").select("slug,name,category,version,weight_kg,dimensions,status,development_year,summary,specifications,sensitive_fields_hidden").eq("publish_status","published").eq("visibility","public").order("development_year",{ascending:false});
     if (error || !data) return fallbackRobots;
-    return data.map((r)=>({slug:r.slug,name:r.name,category:r.category,version:r.version,weightKg:r.weight_kg==null?undefined:Number(r.weight_kg),dimensions:r.dimensions??undefined,status:r.status as Robot["status"],developmentYear:r.development_year,summary:r.summary,specifications:(r.specifications??{}) as Record<string,string>,engineering:(r.engineering??{}) as Robot["engineering"],sensitiveFieldsHidden:r.sensitive_fields_hidden??[]}));
+    return data.map((r)=>({slug:r.slug,name:r.name,category:r.category,version:r.version,weightKg:r.weight_kg==null?undefined:Number(r.weight_kg),dimensions:r.dimensions??undefined,status:r.status as Robot["status"],developmentYear:r.development_year,summary:r.summary,specifications:(r.specifications??{}) as Record<string,string>,engineering:undefined,sensitiveFieldsHidden:r.sensitive_fields_hidden??[]}));
   } catch { return fallbackRobots; }
 }
 export async function getPublicRobot(slug:string){return (await getPublicRobots()).find((item)=>item.slug===slug)??null;}
