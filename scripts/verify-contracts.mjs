@@ -302,6 +302,10 @@ for (const table of guardedContentTables) {
   assert.match(publishWorkflowMigration, new RegExp(`create trigger ${table}_publish_workflow_guard before insert or update or delete on public\\.${table}`), `Upgrade migration must guard ${table} publish workflow`);
   assert.match(freshSchema, new RegExp(`create trigger ${table}_publish_workflow_guard before insert or update or delete on public\\.${table}`), `Fresh-install schema must guard ${table} publish workflow`);
 }
+const teamMembersDefinition = freshSchema.match(/create table public\\.team_members \\(([\\s\\S]*?)\\n\\);/);
+assert.ok(teamMembersDefinition, "Fresh-install schema must define the team_members table");
+const teamMemberColumns = [...teamMembersDefinition[1].matchAll(/^\\s*([a-z_]+)\\s+/gm)].map((match) => match[1]);
+assert.equal(new Set(teamMemberColumns).size, teamMemberColumns.length, "Fresh-install team_members schema must not declare duplicate columns");
 for (const source of [publishWorkflowMigration, freshSchema]) {
   assert.match(source, /new\.publish_status = 'published'[\s\S]*old\.publish_status <> 'review' or not is_leader/, "Database must restrict publication to leadership and reviewed records");
   assert.match(source, /old\.publish_status = 'published'[\s\S]*new\.publish_status <> 'published'[\s\S]*not is_leader/, "Unpublishing must be leadership-controlled");
