@@ -221,7 +221,7 @@ grant execute on function public.check_public_submission_rate_limit(text, intege
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
-set search_path = public
+set search_path = ''
 as $$
 begin
   new.updated_at = now();
