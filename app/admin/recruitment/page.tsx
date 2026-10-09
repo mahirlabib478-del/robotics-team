@@ -4,7 +4,7 @@ import Link from "next/link";
 import { updateRecruitmentApplication, updateRecruitmentSettings } from "@/app/actions/admin-operations";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
-const statuses = ["Submitted", "Screening", "Interview", "Selected", "Rejected"];
+const statuses = ["Submitted", "Screening", "Shortlisted", "Interview", "Selected", "Rejected", "Withdrawn"];
 
 export default async function AdminRecruitmentPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
@@ -16,15 +16,15 @@ export default async function AdminRecruitmentPage({ searchParams }: { searchPar
   const params = await searchParams;
 
   return (
-    <main className="min-h-screen bg-[#07111f] px-6 py-12 text-[#f5f8fc]">
+    <main className="min-h-screen bg-[#07111f] px-4 py-10 text-[#f5f8fc] sm:px-6 sm:py-12">
       <div className="mx-auto max-w-7xl">
         <Link href="/admin" className="text-sm text-[#19d3ff]">← Admin</Link>
-        <h1 className="mt-6 text-4xl font-black">Recruitment</h1>
+        <h1 className="mt-6 text-3xl font-black sm:text-4xl">Recruitment</h1>
         <p className="mt-3 max-w-2xl text-slate-400">Control the public recruitment stage and review applications inside the private portal.</p>
-        {params.error ? <p className="mt-5 rounded-xl border border-orange-300/20 p-4 text-sm text-orange-200">Could not save the recruitment change.</p> : null}
-        {params.saved ? <p className="mt-5 rounded-xl border border-emerald-300/20 p-4 text-sm text-emerald-200">Saved.</p> : null}
+        {params.error ? <p role="alert" className="mt-5 rounded-xl border border-orange-300/20 p-4 text-sm text-orange-200">{params.error === "invalid-deadline" ? "Enter a valid application deadline." : params.error === "invalid" ? "The application status or record ID is invalid." : "Could not save the recruitment change. Check the form and permissions."}</p> : null}
+        {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-300/20 p-4 text-sm text-emerald-200">Recruitment change saved.</p> : null}
 
-        <form action={updateRecruitmentSettings} className="mt-10 grid gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-7">
+        <form action={updateRecruitmentSettings} className="mt-10 grid min-w-0 gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-4 sm:p-7">
           <h2 className="text-xl font-bold">Recruitment status</h2>
           <label className="flex items-center gap-3 text-sm text-slate-300"><input type="checkbox" name="applications_open" defaultChecked={settings?.applications_open ?? false} /> Applications open</label>
           <label className="grid gap-2 text-sm text-slate-300">Stage<input name="stage" defaultValue={settings?.stage ?? "Applications Closed"} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3" /></label>
@@ -37,7 +37,7 @@ export default async function AdminRecruitmentPage({ searchParams }: { searchPar
           <h2 className="text-2xl font-bold">Applications</h2>
           <div className="mt-5 grid gap-4">
             {(applications ?? []).map((application) => (
-              <article key={application.id} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+              <article key={application.id} className="min-w-0 rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-bold">{application.name}</h3>

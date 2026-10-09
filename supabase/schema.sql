@@ -243,7 +243,7 @@ begin
   alter table public.gallery_items add constraint gallery_youtube_host check (source_type <> 'youtube' or lower(split_part(split_part(source_url, '://', 2), '/', 1)) in ('youtube.com', 'www.youtube.com', 'youtu.be', 'www.youtu.be'));
   alter table public.sponsors add constraint sponsors_logo_https check (logo_url is null or logo_url ~ '^https://');
   alter table public.sponsors add constraint sponsors_website_https check (website_url is null or website_url ~ '^https://');
-  alter table public.recruitment_applications add constraint recruitment_status_valid check (status in ('Submitted','Shortlisted','Interview','Selected','Rejected','Withdrawn'));
+  alter table public.recruitment_applications add constraint recruitment_status_valid check (status in ('Submitted','Screening','Shortlisted','Interview','Selected','Rejected','Withdrawn'));
   alter table public.contact_messages add constraint contact_status_valid check (status in ('New','In Progress','Resolved'));
 end
 $$;

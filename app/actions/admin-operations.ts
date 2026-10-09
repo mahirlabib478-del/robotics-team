@@ -127,7 +127,7 @@ export async function updateRecruitmentApplication(formData: FormData) {
 
   const id = value(formData, "id", 80);
   const status = value(formData, "status", 80);
-  const allowedStatuses = ["Submitted", "Screening", "Interview", "Selected", "Rejected"];
+  const allowedStatuses = ["Submitted", "Screening", "Shortlisted", "Interview", "Selected", "Rejected", "Withdrawn"];
   if (!/^[0-9a-f-]{36}$/i.test(id) || !allowedStatuses.includes(status)) redirect("/admin/recruitment?error=invalid");
 
   const { error } = await supabase.from("recruitment_applications").update({
