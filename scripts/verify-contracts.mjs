@@ -222,4 +222,15 @@ for (const route of ["/about", "/robots", "/competitions", "/achievements", "/te
 assert.match(homePage, /focus-visible:outline-2/, "Homepage calls to action must have visible keyboard focus styling");
 assert.match(robotsSource, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must discourage indexing admin and API routes");
 
+
+const auditIntegrityMigration = await read("supabase/migrations/20261009_audit_log_integrity.sql");
+assert.ok(auditIntegrityMigration.includes("actor_id = (select auth.uid())"), "Audit-log inserts must be attributed to the authenticated actor");
+assert.ok(auditIntegrityMigration.includes("create or replace function public.prevent_audit_log_mutation()"), "Audit-log mutation guard function must exist");
+assert.ok(auditIntegrityMigration.includes("before update or delete on public.audit_logs"), "Audit logs must reject both updates and deletes");
+assert.ok(auditIntegrityMigration.includes("Audit logs are append-only"), "Audit-log mutation guard must fail explicitly");
+assert.ok(auditIntegrityMigration.includes("revoke all on function public.prevent_audit_log_mutation() from public, anon, authenticated"), "Audit-log guard function must not be directly executable by client roles");
+assert.ok(schema.includes("actor_id = (select auth.uid())"), "Fresh-install audit inserts must bind actor_id to auth.uid()");
+assert.ok(schema.includes("create or replace function public.prevent_audit_log_mutation()"), "Fresh-install schema must include the append-only audit guard");
+assert.ok(schema.includes("before update or delete on public.audit_logs"), "Fresh-install schema must guard audit-log updates and deletes");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
