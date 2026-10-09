@@ -21,7 +21,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading
           eyebrow="About Team Stellar"
           title="A robotics team built around engineering, competition and continuity."

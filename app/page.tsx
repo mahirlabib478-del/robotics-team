@@ -25,10 +25,10 @@ export default async function Home() {
       <SiteHeader />
       <section className="relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(20,121,255,.22),transparent_35%),radial-gradient(circle_at_25%_70%,rgba(25,211,255,.09),transparent_30%)]" />
-        <div className="relative mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-24 lg:grid-cols-[1.1fr_.9fr]">
+        <div className="relative mx-auto grid min-h-[70vh] max-w-7xl items-center gap-8 px-4 py-16 sm:gap-12 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_.9fr]">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#19d3ff]">BRAC University Robotics Team</p>
-            <h1 className="mt-5 max-w-5xl text-5xl font-black tracking-tight sm:text-6xl lg:text-8xl">
+            <h1 className="mt-5 max-w-5xl text-4xl sm:text-4xl font-black tracking-tight sm:text-6xl lg:text-8xl">
               Engineering Robots.
               <br />
               <span className="text-[#19d3ff]">Competing Beyond Borders.</span>
@@ -72,11 +72,11 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
         <SectionHeading eyebrow="Engineering archive" title="Robots, preserved as engineering records." description="Every published robot will have structured specifications, development history, competition history and carefully controlled technical disclosure." />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {robots.length ? robots.slice(0, 6).map((robot) => (
-            <article key={robot.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+            <article key={robot.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
               <p className="text-xs uppercase tracking-[0.18em] text-[#19d3ff]">{robot.category}</p>
               <h3 className="mt-3 text-xl font-bold">{robot.name}</h3>
               <p className="mt-2 text-sm text-slate-400">{robot.summary}</p>
@@ -93,7 +93,7 @@ export default async function Home() {
       </section>
 
       <section className="border-y border-white/10 bg-[#0b1727]">
-        <div className="mx-auto max-w-7xl px-6 py-24">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
           <SectionHeading eyebrow="Capabilities" title="One team, multiple engineering disciplines." />
           <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
             {capabilityCards.map(([number, title, description]) => (
@@ -107,7 +107,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
         <SectionHeading eyebrow="Proof, not claims" title="Competition records built for credibility." description="The archive is designed around official competition names, organizers, dates, locations, robot entries, results and evidence links—not an unstructured photo gallery." />
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/competitions" className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold hover:border-[#19d3ff]/50">Competition Database</Link>
@@ -116,7 +116,7 @@ export default async function Home() {
       </section>
 
       <section className="border-y border-white/10 bg-[#0b1727]">
-        <div className="mx-auto max-w-7xl px-6 py-24">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
           <SectionHeading eyebrow="International mission" title="Built for the next competition, not just the last one." description="Upcoming targets, robot preparation status, travel readiness and international participation details will be published here when officially confirmed." />
           <div className="mt-8 rounded-2xl border border-dashed border-white/10 p-8">
             <p className="font-semibold">Mission data not published yet.</p>
@@ -125,7 +125,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
         <SectionHeading eyebrow="Partnership" title="Support Bangladesh’s next generation of international robotics competitors." description="Sponsor and technology partnerships can support competition travel, manufacturing, electronics, research and media while giving partners a professional engineering portfolio to engage with." />
         <Link href="/sponsors" className="mt-8 inline-flex rounded-full bg-[#ff7a00] px-6 py-3 font-bold text-white transition hover:bg-[#ff7a00]/90">Explore Partnership →</Link>
       </section>

@@ -15,11 +15,11 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <article className="mx-auto max-w-7xl px-6 py-20">
+      <article className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">{robot.category}</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <h1 className="text-5xl font-black tracking-tight sm:text-6xl">{robot.name}</h1>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tight sm:text-6xl">{robot.name}</h1>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-400">{robot.summary}</p>
           </div>
           <span className="rounded-full border border-[#19d3ff]/30 bg-[#19d3ff]/5 px-4 py-2 text-sm text-[#8deaff]">{robot.status}</span>
@@ -43,7 +43,7 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
           <h2 className="text-3xl font-bold">Technical Specification</h2>
           <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
             {Object.entries(robot.specifications).length ? Object.entries(robot.specifications).map(([label, value]) => (
-              <div key={label} className="grid gap-2 border-b border-white/10 bg-[#0b1727] px-6 py-4 last:border-0 sm:grid-cols-[220px_1fr]">
+              <div key={label} className="grid gap-2 border-b border-white/10 bg-[#0b1727] px-4 py-4 sm:px-6 last:border-0 sm:grid-cols-[220px_1fr]">
                 <span className="text-sm text-slate-500">{label}</span><span className="text-sm text-slate-200">{value}</span>
               </div>
             )) : <div className="bg-[#0b1727] px-6 py-5 text-sm text-slate-500">Technical specifications are not published yet.</div>}
@@ -53,7 +53,7 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
         {robot.engineering ? (
           <section className="mt-16 grid gap-5 md:grid-cols-2">
             {Object.entries(robot.engineering).map(([key, value]) => value ? (
-              <div key={key} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+              <div key={key} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
                 <h2 className="text-lg font-bold capitalize">{key.replace(/[A-Z]/g, (letter) => ` ${letter}`)}</h2>
                 <p className="mt-3 text-sm leading-7 text-slate-400">{value}</p>
               </div>

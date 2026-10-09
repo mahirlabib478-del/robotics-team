@@ -21,7 +21,7 @@ export default async function ResearchPage() {
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading
           eyebrow="Knowledge base"
           title="Research & Projects"
@@ -29,7 +29,7 @@ export default async function ResearchPage() {
         />
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {categories.map(([title, description]) => (
-            <article key={title} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+            <article key={title} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
               <h2 className="font-bold">{title}</h2>
               <p className="mt-3 text-sm leading-6 text-slate-500">{description}</p>
             </article>

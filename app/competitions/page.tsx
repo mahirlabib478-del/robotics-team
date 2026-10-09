@@ -10,13 +10,13 @@ export default async function CompetitionsPage() {
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading eyebrow="Structured results database" title="Competitions" description="Competition records connect the official event, organizer, date, location, robot, result, team members and supporting evidence." />
         <div className="mt-10">
           {competitions.length ? (
             <div className="grid gap-5 md:grid-cols-2">
               {competitions.map((record) => (
-                <article key={record.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+                <article key={record.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
                   <p className="text-xs uppercase tracking-[0.18em] text-[#19d3ff]">{record.level} · {record.year}</p>
                   <h2 className="mt-3 text-2xl font-bold">{record.competition}</h2>
                   <p className="mt-2 text-sm text-slate-400">{record.location} · {record.robot} · {record.result}</p>
