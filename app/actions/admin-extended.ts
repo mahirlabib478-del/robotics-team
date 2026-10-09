@@ -7,13 +7,49 @@ function validSlug(value:string){return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
 function go(p:string,e?:string){redirect(e?p+"?error="+e:p+"?saved=1")}
 function safeHttps(value:string){try{return new URL(value).protocol==="https:"}catch{return false}}
 function safeYouTube(value:string){try{const u=new URL(value);if(u.protocol!=="https:")return false;const host=u.hostname.toLowerCase();let id="";if(host==="youtu.be"||host==="www.youtu.be")id=u.pathname.split("/").filter(Boolean)[0]??"";else if(host==="youtube.com"||host==="www.youtube.com"){if(u.pathname==="/watch")id=u.searchParams.get("v")??"";else if(/^\/(embed|shorts|live)\//.test(u.pathname))id=u.pathname.split("/").filter(Boolean)[1]??""}else return false;return /^[A-Za-z0-9_-]{11}$/.test(id)}catch{return false}}
-export async function createResearchPost(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","technical_lead","media"],profile.role);const title=v(f,"title",220),slug=v(f,"slug",120).toLowerCase(),excerpt=v(f,"excerpt",500),body=v(f,"body",12000),category=v(f,"category",120);if(!title||!slug||!validSlug(slug)||!excerpt||!body||!category)go("/admin/research","missing");const {error}=await supabase.from("research_posts").insert({title,slug,excerpt,body,category,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/research","save")}go("/admin/research")}
-export async function createGalleryItem(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","media"],profile.role);const title=v(f,"title",220),category=v(f,"category",120),source_type=v(f,"source_type",20),source_url=v(f,"source_url",1200),alt_text=v(f,"alt_text",300);if(!title||!category||!source_url||!alt_text||!["image","youtube"].includes(source_type))go("/admin/gallery","missing");
-  if(source_type==="youtube" ? !safeYouTube(source_url) : !safeHttps(source_url)) go("/admin/gallery","invalid-url");const {error}=await supabase.from("gallery_items").insert({title,category,source_type,source_url,alt_text,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/gallery","save")}go("/admin/gallery")}
-export async function createSponsor(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead"],profile.role);const name=v(f,"name",180),logoUrl=v(f,"logo_url",1200),websiteUrl=v(f,"website_url",1200);
-  if(!name)go("/admin/sponsors","missing");
-  if(logoUrl && !safeHttps(logoUrl)) go("/admin/sponsors","invalid-url");
-  if(websiteUrl && !safeHttps(websiteUrl)) go("/admin/sponsors","invalid-url");const {error}=await supabase.from("sponsors").insert({name,partnership_type:v(f,"partnership_type",120)||null,logo_url:logoUrl||null,website_url:websiteUrl||null,description:v(f,"description",1200)||null,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/sponsors","save")}go("/admin/sponsors")}
+export async function createResearchPost(f: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
+  const title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120);
+  if (!title || !slug || !validSlug(slug) || !excerpt || !body || !category) go("/admin/research", "missing");
+  const { data: created, error } = await supabase.from("research_posts").insert({ title, slug, excerpt, body, category, publish_status: "draft", visibility: "public" }).select("id").single();
+  if (error || !created) { console.error("Research post insert failed:", error); go("/admin/research", "save"); }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_research_post", entity_type: "research_posts", entity_id: created.id, metadata: { slug } });
+  if (auditError) console.error("Research creation audit write failed:", auditError);
+  go("/admin/research");
+}
+
+export async function createGalleryItem(f: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(["super_admin", "team_lead", "media"], profile.role);
+  const title = v(f, "title", 220), category = v(f, "category", 120), source_type = v(f, "source_type", 20), source_url = v(f, "source_url", 1200), alt_text = v(f, "alt_text", 300);
+  if (!title || !category || !source_url || !alt_text || !["image", "youtube"].includes(source_type)) go("/admin/gallery", "missing");
+  if (source_type === "youtube" ? !safeYouTube(source_url) : !safeHttps(source_url)) go("/admin/gallery", "invalid-url");
+  const { data: created, error } = await supabase.from("gallery_items").insert({ title, category, source_type, source_url, alt_text, publish_status: "draft", visibility: "public" }).select("id").single();
+  if (error || !created) { console.error("Gallery item insert failed:", error); go("/admin/gallery", "save"); }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_gallery_item", entity_type: "gallery_items", entity_id: created.id, metadata: { source_type } });
+  if (auditError) console.error("Gallery creation audit write failed:", auditError);
+  go("/admin/gallery");
+}
+
+export async function createSponsor(f: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(["super_admin", "team_lead"], profile.role);
+  const name = v(f, "name", 180), logoUrl = v(f, "logo_url", 1200), websiteUrl = v(f, "website_url", 1200);
+  if (!name) go("/admin/sponsors", "missing");
+  if (logoUrl && !safeHttps(logoUrl)) go("/admin/sponsors", "invalid-url");
+  if (websiteUrl && !safeHttps(websiteUrl)) go("/admin/sponsors", "invalid-url");
+  const { data: created, error } = await supabase.from("sponsors").insert({
+    name, partnership_type: v(f, "partnership_type", 120) || null, logo_url: logoUrl || null,
+    website_url: websiteUrl || null, description: v(f, "description", 1200) || null,
+    publish_status: "draft", visibility: "public",
+  }).select("id").single();
+  if (error || !created) { console.error("Sponsor insert failed:", error); go("/admin/sponsors", "save"); }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_sponsor", entity_type: "sponsors", entity_id: created.id, metadata: { name } });
+  if (auditError) console.error("Sponsor creation audit write failed:", auditError);
+  go("/admin/sponsors");
+}
+
 export async function updateContactMessage(f:FormData){
   const {supabase,profile}=await requireAdmin();
   requireAnyRole(["super_admin","team_lead","hr_operations","media"],profile.role);

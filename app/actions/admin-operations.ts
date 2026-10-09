@@ -27,42 +27,20 @@ function validHttpsUrl(url: string) {
 export async function createTeamMember(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
-
-  const name = value(formData, "name", 160);
-  const slug = value(formData, "slug", 120).toLowerCase();
-  const role = value(formData, "role", 160);
-  const division = value(formData, "division", 160);
-  const tenure = value(formData, "tenure", 120);
-
+  const name = value(formData, "name", 160), slug = value(formData, "slug", 120).toLowerCase();
+  const role = value(formData, "role", 160), division = value(formData, "division", 160), tenure = value(formData, "tenure", 120);
   const photoUrl = value(formData, "photo_url", 1000);
   if (!name || !slug || !validSlug(slug) || !role || !division || !tenure) redirect("/admin/team?error=missing");
   if (photoUrl && !validHttpsUrl(photoUrl)) redirect("/admin/team?error=invalid-url");
-
-  const { error } = await supabase.from("team_members").insert({
-    name, slug, role, division, tenure,
-    department: value(formData, "department", 160) || null,
-    semester: value(formData, "semester", 80) || null,
-    skills: listValue(formData, "skills"),
-    projects: listValue(formData, "projects"),
-    photo_url: photoUrl || null,
-    public_links: [],
-    alumni: formData.get("alumni") === "on",
-    publish_status: "draft",
-    visibility: "public",
-  });
-
-  if (error) {
-    console.error("Team member insert failed:", error);
-    redirect("/admin/team?error=save");
-  }
-
-  await supabase.from("audit_logs").insert({
-    actor_id: profile.id,
-    action: "create_team_member",
-    entity_type: "team_member",
-    metadata: { slug },
-  });
-
+  const { data: created, error } = await supabase.from("team_members").insert({
+    name, slug, role, division, tenure, department: value(formData, "department", 160) || null,
+    semester: value(formData, "semester", 80) || null, skills: listValue(formData, "skills"),
+    projects: listValue(formData, "projects"), photo_url: photoUrl || null, public_links: [],
+    alumni: formData.get("alumni") === "on", publish_status: "draft", visibility: "public",
+  }).select("id").single();
+  if (error || !created) { console.error("Team member insert failed:", error); redirect("/admin/team?error=save"); }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_team_member", entity_type: "team_member", entity_id: created.id, metadata: { slug } });
+  if (auditError) console.error("Team member creation audit write failed:", auditError);
   redirect("/admin/team?saved=1");
 }
 
