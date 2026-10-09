@@ -249,6 +249,7 @@ assert.match(robotsSource, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance
 
 
 const auditIntegrityMigration = await read("supabase/migrations/20261009_audit_log_integrity.sql");
+const dataIntegrityMigration = await read("supabase/migrations/20261008_data_integrity_hardening.sql");
 assert.ok(auditIntegrityMigration.includes("actor_id = (select auth.uid())"), "Audit-log inserts must be attributed to the authenticated actor");
 assert.ok(auditIntegrityMigration.includes("create or replace function public.prevent_audit_log_mutation()"), "Audit-log mutation guard function must exist");
 assert.ok(auditIntegrityMigration.includes("before update or delete on public.audit_logs"), "Audit logs must reject both updates and deletes");
@@ -257,6 +258,24 @@ assert.ok(auditIntegrityMigration.includes("revoke all on function public.preven
 assert.ok(schema.includes("actor_id = (select auth.uid())"), "Fresh-install audit inserts must bind actor_id to auth.uid()");
 assert.ok(schema.includes("create or replace function public.prevent_audit_log_mutation()"), "Fresh-install schema must include the append-only audit guard");
 assert.ok(schema.includes("before update or delete on public.audit_logs"), "Fresh-install schema must guard audit-log updates and deletes");
+for (const [label, source] of [
+  ["data-integrity migration", dataIntegrityMigration],
+  ["fresh-install schema", schema],
+]) {
+  assert.match(source, /create or replace function public\\.set_updated_at\\(\\)[\\s\\S]*?set search_path = ''/, `${label} updated-at trigger must use an empty search_path`);
+  assert.match(source, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, `${label} updated-at trigger must not be directly executable by client roles`);
+}
+for (const constraint of [
+  "robots_weight_nonnegative", "robots_year_reasonable", "robots_slug_format",
+  "competitions_year_reasonable", "competitions_slug_format", "team_members_slug_format",
+  "team_members_photo_https", "research_posts_slug_format", "gallery_source_https",
+  "gallery_thumbnail_https", "gallery_youtube_host", "sponsors_logo_https",
+  "sponsors_website_https", "contact_status_valid", "robot_media_source_https",
+  "competition_evidence_https",
+]) {
+  assert.ok(dataIntegrityMigration.includes(constraint), `Upgrade migration must enforce ${constraint}`);
+  assert.ok(schema.includes(constraint), `Fresh-install schema must enforce ${constraint}`);
+}
 for (const [label, source] of [
   ["upgrade migration", auditIntegrityMigration],
   ["fresh-install schema", schema],
