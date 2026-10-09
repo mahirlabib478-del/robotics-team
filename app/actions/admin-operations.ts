@@ -151,27 +151,21 @@ export async function updateRecruitmentApplication(formData: FormData) {
 export async function updateTeamMember(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
-  const id = value(formData, "id", 80);
-  const name = value(formData, "name", 160);
-  const slug = value(formData, "slug", 120).toLowerCase();
-  const role = value(formData, "role", 160);
-  const division = value(formData, "division", 160);
-  const tenure = value(formData, "tenure", 120);
-  const photoUrl = value(formData, "photo_url", 1000);
+  const id = value(formData, "id", 80), name = value(formData, "name", 160), slug = value(formData, "slug", 120).toLowerCase();
+  const role = value(formData, "role", 160), division = value(formData, "division", 160), tenure = value(formData, "tenure", 120), photoUrl = value(formData, "photo_url", 1000);
   if (!/^[0-9a-f-]{36}$/i.test(id) || !name || !slug || !validSlug(slug) || !role || !division || !tenure) redirect("/admin/team?error=missing");
   if (photoUrl && !validHttpsUrl(photoUrl)) redirect("/admin/team?error=invalid-url");
-  const { error } = await supabase.from("team_members").update({
-    name, slug, role, division, tenure,
-    department: value(formData, "department", 160) || null,
-    semester: value(formData, "semester", 80) || null,
-    skills: listValue(formData, "skills"), projects: listValue(formData, "projects"),
-    photo_url: photoUrl || null,
-    alumni: formData.get("alumni") === "on", updated_at: new Date().toISOString(),
-  }).eq("id", id);
-  if (error) redirect("/admin/team?error=save");
-  await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_team_member", entity_type: "team_member", entity_id: id });
+  const { data: current, error: readError } = await supabase.from("team_members").select("publish_status").eq("id", id).maybeSingle();
+  if (readError || !current) redirect("/admin/team?error=not-found");
+  if (current.publish_status === "archived") redirect("/admin/team?error=archived");
+  if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/team?error=review-required");
+  const { error } = await supabase.from("team_members").update({ name, slug, role, division, tenure, department: value(formData, "department", 160) || null, semester: value(formData, "semester", 80) || null, skills: listValue(formData, "skills"), projects: listValue(formData, "projects"), photo_url: photoUrl || null, alumni: formData.get("alumni") === "on", publish_status: "draft", updated_at: new Date().toISOString() }).eq("id", id);
+  if (error) { console.error("Team member update failed:", error); redirect("/admin/team?error=save"); }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_team_member", entity_type: "team_member", entity_id: id, metadata: { from: current.publish_status, to: "draft" } });
+  if (auditError) console.error("Team member audit write failed:", auditError);
   redirect("/admin/team?saved=1");
 }
+
 
 
 async function transitionTeamMember(formData: FormData, target: "review" | "published") {
