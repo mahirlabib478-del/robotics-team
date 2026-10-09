@@ -4,6 +4,24 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicGallery } from "@/lib/public-data";
 
+function youtubeEmbedUrl(source: string) {
+  try {
+    const url = new URL(source);
+    if (url.protocol !== "https:") return null;
+    const host = url.hostname.toLowerCase();
+    let videoId = "";
+    if (host === "youtu.be" || host === "www.youtu.be") {
+      videoId = url.pathname.split("/").filter(Boolean)[0] ?? "";
+    } else if (host === "youtube.com" || host === "www.youtube.com") {
+      if (url.pathname === "/watch") videoId = url.searchParams.get("v") ?? "";
+      else if (/^\/(embed|shorts|live)\//.test(url.pathname)) videoId = url.pathname.split("/").filter(Boolean)[1] ?? "";
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+}
+
 const categories = [
   ["Robot Development", "Build stages, fabrication and assembly."],
   ["Workshop", "Hands-on engineering and team learning."],
@@ -42,14 +60,25 @@ export default async function GalleryPage() {
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => {
                 if (!item.source_url) return null;
+                const embedUrl = item.source_type === "youtube" ? youtubeEmbedUrl(item.source_url) : null;
                 return (
                   <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">
                     {item.source_type === "image" ? (
                       <img src={item.source_url} alt={item.alt_text} className="aspect-video w-full object-cover" />
+                    ) : embedUrl ? (
+                      <iframe
+                        src={embedUrl}
+                        title={item.title}
+                        loading="lazy"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="aspect-video w-full border-b border-white/10"
+                      />
                     ) : (
-                      <a href={item.source_url} target="_blank" rel="noreferrer" className="flex aspect-video items-center justify-center border-b border-white/10 bg-[#07111f] px-6 text-center text-sm font-semibold text-[#8deaff] hover:bg-[#102033]">
-                        Watch on YouTube ↗
-                      </a>
+                      <div className="flex aspect-video items-center justify-center border-b border-white/10 bg-[#07111f] px-6 text-center text-sm text-slate-500">
+                        Video unavailable: the saved YouTube URL is invalid.
+                      </div>
                     )}
                     <div className="p-5">
                       <p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{item.category}</p>
