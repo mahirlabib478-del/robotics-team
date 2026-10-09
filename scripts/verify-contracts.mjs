@@ -275,15 +275,15 @@ for (const [label, source] of [
   ["data-integrity migration", dataIntegrityMigration],
   ["fresh-install schema", schema],
 ]) {
-  assert.match(source, /create or replace function public\\.set_updated_at\\(\\)[\\s\\S]*?set search_path = ''/, `${label} updated-at trigger must use an empty search_path`);
-  assert.match(source, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, `${label} updated-at trigger must not be directly executable by client roles`);
+  assert.match(source, /create or replace function public\.set_updated_at\(\)[\s\S]*?set search_path = ''/, `${label} updated-at trigger must use an empty search_path`);
+  assert.match(source, /revoke all on function public\.set_updated_at\(\) from public, anon, authenticated/, `${label} updated-at trigger must not be directly executable by client roles`);
 }
 for (const [label, source] of [
   ["data-integrity migration", dataIntegrityMigration],
   ["fresh-install schema", schema],
 ]) {
-  assert.match(source, /create policy internal_audit_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict audit-log reads to team leadership`);
-  assert.match(source, /create policy admin_profiles_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead','hr_operations'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict staff-profile reads to authorized operational roles`);
+  assert.match(source, /create policy internal_audit_read[\s\S]*?for select to authenticated[\s\S]*?private\.has_any_role\(array\['super_admin','team_lead'\]::public\.user_role\[\]\)/, `${label} must restrict audit-log reads to team leadership`);
+  assert.match(source, /create policy admin_profiles_read[\s\S]*?for select to authenticated[\s\S]*?private\.has_any_role\(array\['super_admin','team_lead','hr_operations'\]::public\.user_role\[\]\)/, `${label} must restrict staff-profile reads to authorized operational roles`);
 }
 
 for (const constraint of [
