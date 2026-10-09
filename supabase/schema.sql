@@ -161,7 +161,7 @@ create policy hr_applications_write on public.recruitment_applications for all t
 create policy staff_contact_read on public.contact_messages for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[])));
 create policy staff_contact_update on public.contact_messages for update to authenticated using ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[]))) with check ((select private.has_any_role(array['super_admin','team_lead','hr_operations','media']::public.user_role[])));
 create policy internal_audit_read on public.audit_logs for select to authenticated using ((select private.has_any_role(array['super_admin','team_lead']::public.user_role[])));
-create policy admin_audit_insert on public.audit_logs for insert to authenticated with check ((select private.has_any_role(array['super_admin','team_lead','technical_lead','media','hr_operations']::public.user_role[])));
+-- The final audit insert policy is defined below with actor_id bound to auth.uid().
 
 -- Public recruitment/contact inserts are intentionally handled by server-side actions with validation and rate limiting.
 
