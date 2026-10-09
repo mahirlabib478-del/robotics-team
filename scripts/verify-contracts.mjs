@@ -255,4 +255,34 @@ assert.match(sitemapSource, /url\.protocol === "https:" \|\| url\.hostname === "
 assert.match(siteHeader, /aria-label="Primary navigation"/, "Primary navigation landmark must remain accessible");
 assert.match(siteHeader, /aria-label="Mobile navigation"/, "Mobile navigation landmark must remain accessible");
 
+
+
+// Public SEO metadata contracts: each indexable route must have a route-specific
+// title/description, and detail metadata must come from the same public-safe accessors.
+const metadataPages = await Promise.all([
+  read("app/about/page.tsx"),
+  read("app/robots/page.tsx"),
+  read("app/competitions/page.tsx"),
+  read("app/achievements/page.tsx"),
+  read("app/team/page.tsx"),
+  read("app/research/page.tsx"),
+  read("app/gallery/page.tsx"),
+  read("app/sponsors/page.tsx"),
+  read("app/join-us/page.tsx"),
+  read("app/contact/page.tsx"),
+]);
+for (const [index, page] of metadataPages.entries()) {
+  assert.match(page, /export const metadata: Metadata = \{[\s\S]*?title: "[^"]+"[\s\S]*?description: "[^"]+"/, `Public route metadata must define a title and description (page index ${index})`);
+}
+const [robotDetailMetadata, competitionDetailMetadata, researchDetailMetadata, rootLayout] = await Promise.all([
+  read("app/robots/[slug]/page.tsx"),
+  read("app/competitions/[slug]/page.tsx"),
+  read("app/research/[slug]/page.tsx"),
+  read("app/layout.tsx"),
+]);
+assert.match(robotDetailMetadata, /generateMetadata[\s\S]*getPublicRobot\(slug\)[\s\S]*title: robot\.name/, "Robot detail metadata must use its published public record");
+assert.match(competitionDetailMetadata, /generateMetadata[\s\S]*getPublicCompetition\(slug\)[\s\S]*title: record\.competition/, "Competition detail metadata must use its published public record");
+assert.match(researchDetailMetadata, /generateMetadata[\s\S]*getPublicResearchPost\(slug\)[\s\S]*title: post\.title/, "Research detail metadata must use its published public record");
+assert.match(rootLayout, /title: \{ default: "[^"]+", template: "%s \| Team Stellar" \}/, "Root metadata must preserve a consistent title template");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
