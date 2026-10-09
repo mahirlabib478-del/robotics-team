@@ -124,6 +124,15 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
   assert.ok(publishGuardMigration.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow();`), `Database publishing guard must cover ${table}`);
 }
 
+
+const provenanceMigration = await read("supabase/migrations/20261009_content_provenance.sql");
+for (const table of ["team_members", "research_posts", "gallery_items", "sponsors"]) {
+  assert.ok(provenanceMigration.includes(`alter table public.${table}`), `Content provenance migration must update ${table}`);
+  assert.ok(schema.includes(`created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id)`) || schema.includes(`created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),`), `Fresh schema must define provenance columns for ${table}`);
+}
+assert.match(adminExtended, /created_by: profile\.id, updated_by: profile\.id/, "Extended content creation must record creator and updater");
+assert.match(adminOperations, /created_by: profile\.id, updated_by: profile\.id/, "Team member creation must record creator and updater");
+
 assert.match(adminAuth, /export async function requireAdminSession\([\s\S]*?auth\.getUser\(\)/, "Admin routes and actions must validate the current auth session");
 assert.match(adminAuth, /if \(!user\.email_confirmed_at\)[\s\S]*?auth\.signOut\(\)/, "Unverified admin accounts must be signed out");
 assert.match(adminAuth, /if \(!profile \|\| !privilegedRoles\.includes\(profile\.role as UserRole\)\)/, "Admin access must require an allowlisted profile role");

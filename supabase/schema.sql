@@ -48,20 +48,23 @@ create table public.team_members (
   id uuid primary key default gen_random_uuid(), slug text unique not null, name text not null, role text not null, division text not null,
   department text, semester text, skills text[] not null default '{}', projects text[] not null default '{}', tenure text not null,
   alumni boolean not null default false, photo_url text, public_links jsonb not null default '[]'::jsonb,
+  created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   publish_status public.publish_status not null default 'draft', visibility public.visibility not null default 'public',
+  created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
 create table public.research_posts (
   id uuid primary key default gen_random_uuid(), slug text unique not null, title text not null, excerpt text not null, body text not null,
-  category text not null, author_name text, publish_status public.publish_status not null default 'draft',
+  category text not null, author_name text, created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id), publish_status public.publish_status not null default 'draft',
   visibility public.visibility not null default 'public', created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
 create table public.gallery_items (
   id uuid primary key default gen_random_uuid(), title text not null, category text not null,
   source_type text not null check (source_type in ('image','youtube')), source_url text not null, thumbnail_url text, alt_text text not null,
-  caption text, publish_status public.publish_status not null default 'draft', visibility public.visibility not null default 'public',
+  caption text, created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
+  publish_status public.publish_status not null default 'draft', visibility public.visibility not null default 'public',
   created_at timestamptz not null default now()
 );
 
@@ -413,3 +416,22 @@ before update or delete on public.audit_logs
 for each row execute function public.prevent_audit_log_mutation();
 
 revoke all on function public.prevent_audit_log_mutation() from public, anon, authenticated;
+
+
+-- Keep fresh installs aligned with the content provenance migration.
+-- Add consistent creator/updater provenance to content tables that lacked it.
+alter table public.team_members
+  add column if not exists created_by uuid references public.profiles(id),
+  add column if not exists updated_by uuid references public.profiles(id);
+
+alter table public.research_posts
+  add column if not exists created_by uuid references public.profiles(id),
+  add column if not exists updated_by uuid references public.profiles(id);
+
+alter table public.gallery_items
+  add column if not exists created_by uuid references public.profiles(id),
+  add column if not exists updated_by uuid references public.profiles(id);
+
+alter table public.sponsors
+  add column if not exists created_by uuid references public.profiles(id),
+  add column if not exists updated_by uuid references public.profiles(id);

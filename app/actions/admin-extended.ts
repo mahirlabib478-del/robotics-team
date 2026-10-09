@@ -12,7 +12,7 @@ export async function createResearchPost(f: FormData) {
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
   const title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120);
   if (!title || !slug || !validSlug(slug) || !excerpt || !body || !category) go("/admin/research", "missing");
-  const { data: created, error } = await supabase.from("research_posts").insert({ title, slug, excerpt, body, category, publish_status: "draft", visibility: "public" }).select("id").single();
+  const { data: created, error } = await supabase.from("research_posts").insert({ title, slug, excerpt, body, category, publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id }).select("id").single();
   if (error || !created) { console.error("Research post insert failed:", error); go("/admin/research", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_research_post", entity_type: "research_posts", entity_id: created.id, metadata: { slug } });
   if (auditError) console.error("Research creation audit write failed:", auditError);
@@ -25,7 +25,7 @@ export async function createGalleryItem(f: FormData) {
   const title = v(f, "title", 220), category = v(f, "category", 120), source_type = v(f, "source_type", 20), source_url = v(f, "source_url", 1200), alt_text = v(f, "alt_text", 300);
   if (!title || !category || !source_url || !alt_text || !["image", "youtube"].includes(source_type)) go("/admin/gallery", "missing");
   if (source_type === "youtube" ? !safeYouTube(source_url) : !safeHttps(source_url)) go("/admin/gallery", "invalid-url");
-  const { data: created, error } = await supabase.from("gallery_items").insert({ title, category, source_type, source_url, alt_text, publish_status: "draft", visibility: "public" }).select("id").single();
+  const { data: created, error } = await supabase.from("gallery_items").insert({ title, category, source_type, source_url, alt_text, publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id }).select("id").single();
   if (error || !created) { console.error("Gallery item insert failed:", error); go("/admin/gallery", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_gallery_item", entity_type: "gallery_items", entity_id: created.id, metadata: { source_type } });
   if (auditError) console.error("Gallery creation audit write failed:", auditError);
@@ -42,7 +42,7 @@ export async function createSponsor(f: FormData) {
   const { data: created, error } = await supabase.from("sponsors").insert({
     name, partnership_type: v(f, "partnership_type", 120) || null, logo_url: logoUrl || null,
     website_url: websiteUrl || null, description: v(f, "description", 1200) || null,
-    publish_status: "draft", visibility: "public",
+    publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id,
   }).select("id").single();
   if (error || !created) { console.error("Sponsor insert failed:", error); go("/admin/sponsors", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_sponsor", entity_type: "sponsors", entity_id: created.id, metadata: { name } });
@@ -94,7 +94,7 @@ export async function transitionContent(f: FormData) {
     (target === "archived" && current !== "archived" && ["super_admin", "team_lead"].includes(profile.role));
   if (!allowed) go(path, "invalid-transition");
 
-  const update: Record<string, unknown> = { publish_status: target };
+  const update: Record<string, unknown> = { publish_status: target, updated_by: profile.id };
   if (table !== "gallery_items") update.updated_at = new Date().toISOString();
   const { error } = await supabase.from(table).update(update).eq("id", id);
   if (error) { console.error(error); go(path, "transition"); }
@@ -120,7 +120,7 @@ export async function updateResearchPost(f: FormData) {
   if (readError || !current) { go("/admin/research", "not-found"); return; }
   if (current.publish_status === "archived") go("/admin/research", "archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) go("/admin/research", "review-required");
-  const { error } = await supabase.from("research_posts").update({ title, slug, excerpt, body, category, publish_status: "draft", updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase.from("research_posts").update({ title, slug, excerpt, body, category, publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) { console.error(error); go("/admin/research", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_research_post", entity_type: "research_posts", entity_id: id, metadata: { slug, from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Research audit write failed:", auditError);
@@ -137,7 +137,7 @@ export async function updateGalleryItem(f: FormData) {
   if (readError || !current) { go("/admin/gallery", "not-found"); return; }
   if (current.publish_status === "archived") go("/admin/gallery", "archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) go("/admin/gallery", "review-required");
-  const { error } = await supabase.from("gallery_items").update({ title, category, source_type, source_url, alt_text, caption: v(f, "caption", 1000) || null, publish_status: "draft" }).eq("id", id);
+  const { error } = await supabase.from("gallery_items").update({ title, category, source_type, source_url, alt_text, caption: v(f, "caption", 1000) || null, publish_status: "draft", updated_by: profile.id }).eq("id", id);
   if (error) { console.error(error); go("/admin/gallery", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_gallery_item", entity_type: "gallery_items", entity_id: id, metadata: { source_type, from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Gallery audit write failed:", auditError);
@@ -153,7 +153,7 @@ export async function updateSponsor(f: FormData) {
   const { data: current, error: readError } = await supabase.from("sponsors").select("publish_status").eq("id", id).maybeSingle();
   if (readError || !current) { go("/admin/sponsors", "not-found"); return; }
   if (current.publish_status === "archived") go("/admin/sponsors", "archived");
-  const { error } = await supabase.from("sponsors").update({ name, logo_url: logo_url || null, website_url: website_url || null, partnership_type: v(f, "partnership_type", 120) || null, description: v(f, "description", 1200) || null, publish_status: "draft", updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase.from("sponsors").update({ name, logo_url: logo_url || null, website_url: website_url || null, partnership_type: v(f, "partnership_type", 120) || null, description: v(f, "description", 1200) || null, publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) { console.error(error); go("/admin/sponsors", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_sponsor", entity_type: "sponsors", entity_id: id, metadata: { name, from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Sponsor audit write failed:", auditError);

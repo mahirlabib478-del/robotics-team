@@ -37,7 +37,7 @@ export async function createTeamMember(formData: FormData) {
     name, slug, role, division, tenure, department: value(formData, "department", 160) || null,
     semester: value(formData, "semester", 80) || null, skills: listValue(formData, "skills"),
     projects: listValue(formData, "projects"), photo_url: photoUrl || null, public_links: [],
-    alumni: formData.get("alumni") === "on", publish_status: "draft", visibility: "public",
+    alumni: formData.get("alumni") === "on", publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id,
   }).select("id").single();
   if (error || !created) { console.error("Team member insert failed:", error); redirect("/admin/team?error=save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_team_member", entity_type: "team_member", entity_id: created.id, metadata: { slug } });
@@ -63,6 +63,7 @@ export async function archiveTeamMember(formData: FormData) {
 
   const { error } = await supabase.from("team_members").update({
     publish_status: "archived",
+    updated_by: profile.id,
     updated_at: new Date().toISOString(),
   }).eq("id", id);
 
@@ -163,7 +164,7 @@ export async function updateTeamMember(formData: FormData) {
   if (readError || !current) redirect("/admin/team?error=not-found");
   if (current.publish_status === "archived") redirect("/admin/team?error=archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/team?error=review-required");
-  const { error } = await supabase.from("team_members").update({ name, slug, role, division, tenure, department: value(formData, "department", 160) || null, semester: value(formData, "semester", 80) || null, skills: listValue(formData, "skills"), projects: listValue(formData, "projects"), photo_url: photoUrl || null, alumni: formData.get("alumni") === "on", publish_status: "draft", updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase.from("team_members").update({ name, slug, role, division, tenure, department: value(formData, "department", 160) || null, semester: value(formData, "semester", 80) || null, skills: listValue(formData, "skills"), projects: listValue(formData, "projects"), photo_url: photoUrl || null, alumni: formData.get("alumni") === "on", publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) { console.error("Team member update failed:", error); redirect("/admin/team?error=save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_team_member", entity_type: "team_member", entity_id: id, metadata: { from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Team member audit write failed:", auditError);
@@ -185,7 +186,7 @@ async function transitionTeamMember(formData: FormData, target: "review" | "publ
   if (target === "review" && current.publish_status !== "draft") redirect("/admin/team?error=transition");
   if (target === "published" && current.publish_status !== "review") redirect("/admin/team?error=transition");
 
-  const { error } = await supabase.from("team_members").update({ publish_status: target, updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase.from("team_members").update({ publish_status: target, updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) redirect("/admin/team?error=save");
 
   await supabase.from("audit_logs").insert({
