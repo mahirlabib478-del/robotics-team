@@ -2,13 +2,15 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient] = await Promise.all([
+const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage] = await Promise.all([
   read("app/actions/admin-operations.ts"),
   read("app/admin/recruitment/page.tsx"),
   read("supabase/schema.sql"),
   read("supabase/migrations/20261009_recruitment_status_alignment.sql"),
   read("lib/public-data.ts"),
   read("lib/supabase/admin.ts"),
+  read("app/actions/public-submissions.ts"),
+  read("app/join-us/page.tsx"),
 ]);
 
 function quotedValues(source, expression, label) {
@@ -54,4 +56,10 @@ assert.ok(
 );
 assert.match(publicData, /engineering:\s*undefined/, "Public robot projection must omit engineering data");
 
-console.log("Contract checks passed: recruitment statuses, service-role boundary, and public robot projection.");
+assert.match(publicSubmissions, /await enforceRateLimit\("recruitment", 3\)/, "Recruitment submissions must be rate limited");
+assert.match(publicSubmissions, /await enforceRateLimit\("contact", 5\)/, "Contact submissions must be rate limited");
+assert.match(publicSubmissions, /createHmac\("sha256", secret\)/, "Rate-limit fingerprints must be keyed hashes");
+assert.match(joinPage, /statusAvailable && settings\?\.applications_open === true && !deadlinePassed/, "Recruitment form must fail closed when status is unavailable or expired");
+assert.match(publicSubmissions, /settings\.deadline && new Date\(settings\.deadline\)\.getTime\(\) <= Date\.now\(\)/, "Server action must enforce the recruitment deadline");
+
+console.log("Contract checks passed: recruitment statuses/deadlines, rate limits, service-role boundary, and public robot projection.");
