@@ -23,14 +23,15 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
             <h2 className="text-xl font-bold">New robot draft</h2>
             {[
               ["name", "Official name", true], ["slug", "Slug", true], ["category", "Category", true],
-              ["version", "Version", true], ["status", "Status", true], ["development_year", "Development year", true],
+              ["version", "Version", true], ["development_year", "Development year", true],
               ["weight_kg", "Weight (kg)", false], ["dimensions", "Dimensions", false],
             ].map(([name, label, required]) => (
               <label key={name as string} className="grid gap-2 text-sm text-slate-300">
                 {label as string}
-                <input name={name as string} required={required as boolean} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" />
+                <input name={name as string} type={name === "weight_kg" || name === "development_year" ? "number" : "text"} min={name === "weight_kg" ? 0 : name === "development_year" ? 1900 : undefined} max={name === "development_year" ? 2100 : undefined} step={name === "weight_kg" ? "0.01" : name === "development_year" ? "1" : undefined} required={required as boolean} className="min-w-0 rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" />
               </label>
             ))}
+            <label className="grid gap-2 text-sm text-slate-300">Status<select name="status" required defaultValue="In Development" className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3"><option>Competition Ready</option><option>In Development</option><option>Retired</option><option>Prototype</option></select></label>
             <label className="grid gap-2 text-sm text-slate-300">Summary<textarea name="summary" required rows={5} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" /></label>
             <button className="rounded-full bg-[#1479ff] px-5 py-3 font-semibold">Create draft</button>
           </form>
@@ -51,7 +52,7 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                     <input name="slug" defaultValue={robot.slug} placeholder="Slug" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="category" defaultValue={robot.category} placeholder="Category" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="version" defaultValue={robot.version} placeholder="Version" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
-                    <input name="status" defaultValue={robot.status} placeholder="Status" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <select name="status" defaultValue={robot.status} required className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm"><option>Competition Ready</option><option>In Development</option><option>Retired</option><option>Prototype</option></select>
                     <input name="development_year" defaultValue={robot.development_year} placeholder="Development year" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="weight_kg" type="number" min="0" step="0.01" defaultValue={robot.weight_kg ?? ""} placeholder="Weight (kg)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="dimensions" defaultValue={robot.dimensions ?? ""} placeholder="Dimensions" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
