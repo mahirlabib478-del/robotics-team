@@ -4,6 +4,8 @@ import Link from "next/link";
 import { publishCompetition, submitCompetitionForReview } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
 
+// Achievement records are derived from competition results to avoid duplicate data.
+
 export default async function AdminAchievementsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
   requireRole("team_lead", profile.role);
