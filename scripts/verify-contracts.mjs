@@ -127,7 +127,10 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
 
 const provenanceMigration = await read("supabase/migrations/20261009_content_provenance.sql");
 for (const table of ["team_members", "research_posts", "gallery_items", "sponsors"]) {
-  assert.ok(provenanceMigration.includes(`alter table public.${table}`), `Content provenance migration must update ${table}`);
+  const migrationDefinition = provenanceMigration.match(new RegExp("alter table public\\." + table + "([\\s\\S]*?);"));
+  assert.ok(migrationDefinition, `Content provenance migration must update ${table}`);
+  assert.match(migrationDefinition[1], /add column if not exists created_by uuid references public\\.profiles\\(id\\)/, `Upgrade migration must add creator provenance for ${table}`);
+  assert.match(migrationDefinition[1], /add column if not exists updated_by uuid references public\\.profiles\\(id\\)/, `Upgrade migration must add updater provenance for ${table}`);
   const definition = schema.match(new RegExp("create table public\\." + table + " \\(([\\s\\S]*?)\\n\\);"));
   assert.ok(definition, `Fresh schema must define ${table}`);
   assert.match(definition[1], /created_by uuid references public\.profiles\(id\)/, `Fresh schema must define creator provenance for ${table}`);
