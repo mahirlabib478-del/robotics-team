@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { CompetitionArchive } from "@/components/competition-archive";
 import { getPublicCompetitions } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Achievements",
+  description: "Explore evidence-backed awards and achievements from Team Stellar’s public competition record.",
+};
 
 export default async function AchievementsPage() {
   const competitions = await getPublicCompetitions();
