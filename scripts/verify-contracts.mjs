@@ -124,7 +124,7 @@ const [competitionArchive, competitionPage] = await Promise.all([
   read("app/competitions/page.tsx"),
 ]);
 assert.match(competitionPage, /<CompetitionArchive records=\{competitions\} \/>/, "Competition page must render the interactive archive from public records");
-assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, \.\.\.record\.teamMembers/, "Competition search must cover event, organizer, location, robot, segment, and team members");
+assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, record\.result, String\(record\.year\), record\.date, record\.report, \.\.\.record\.teamMembers/, "Competition search must cover event details, outcomes, dates, reports, and team members");
 assert.match(competitionArchive, /record\.level === level/, "Competition archive must filter by national/international level");
 assert.match(competitionArchive, /String\(record\.year\) === year/, "Competition archive must filter by event year");
 assert.match(competitionArchive, /record\.result === result/, "Competition archive must filter by result");
