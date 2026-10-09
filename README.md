@@ -10,6 +10,12 @@ Professional public website and future engineering platform for the BRAC Univers
 - Supabase/PostgreSQL-ready architecture
 - Vercel-ready deployment
 
+## Project documentation
+
+- [Roadmap and phase release gates](ROADMAP.md)
+- [Development and release workflow](docs/DEVELOPMENT.md)
+- [Security and privacy boundaries](docs/SECURITY.md)
+
 ## Product phases
 
 1. Public portfolio: Home, About, Robots, Competitions, Achievements, Team, Research, Gallery, Sponsors, Join Us, Contact.
