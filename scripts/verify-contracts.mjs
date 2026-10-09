@@ -263,6 +263,7 @@ assert.match(robotsSource, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance
 
 const auditIntegrityMigration = await read("supabase/migrations/20261009_audit_log_integrity.sql");
 const dataIntegrityMigration = await read("supabase/migrations/20261008_data_integrity_hardening.sql");
+const updatedAtHardeningMigration = await read("supabase/migrations/20261010_harden_updated_at_search_path.sql");
 assert.ok(auditIntegrityMigration.includes("actor_id = (select auth.uid())"), "Audit-log inserts must be attributed to the authenticated actor");
 assert.ok(auditIntegrityMigration.includes("create or replace function public.prevent_audit_log_mutation()"), "Audit-log mutation guard function must exist");
 assert.ok(auditIntegrityMigration.includes("before update or delete on public.audit_logs"), "Audit logs must reject both updates and deletes");
@@ -272,7 +273,7 @@ assert.ok(schema.includes("actor_id = (select auth.uid())"), "Fresh-install audi
 assert.ok(schema.includes("create or replace function public.prevent_audit_log_mutation()"), "Fresh-install schema must include the append-only audit guard");
 assert.ok(schema.includes("before update or delete on public.audit_logs"), "Fresh-install schema must guard audit-log updates and deletes");
 for (const [label, source] of [
-  ["data-integrity migration", dataIntegrityMigration],
+  ["forward hardening migration", updatedAtHardeningMigration],
   ["fresh-install schema", schema],
 ]) {
   assert.match(source, /create or replace function public\.set_updated_at\(\)[\s\S]*?set search_path = ''/, `${label} updated-at trigger must use an empty search_path`);
