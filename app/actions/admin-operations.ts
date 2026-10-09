@@ -47,7 +47,8 @@ export async function createTeamMember(formData: FormData) {
 
 export async function archiveTeamMember(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
-  requireAnyRole(["super_admin", "team_lead", "hr_operations"], profile.role);
+  // Keep the server action aligned with the database publishing guard.
+  requireAnyRole(["super_admin", "team_lead"], profile.role);
 
   const id = value(formData, "id", 80);
   if (!/^[0-9a-f-]{36}$/i.test(id)) redirect("/admin/team?error=invalid-id");
