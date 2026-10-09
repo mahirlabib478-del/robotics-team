@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
+import { parseDhakaDateTimeLocal } from "@/lib/dhaka-time";
 
 function value(formData: FormData, name: string, max = 5000) {
   const raw = formData.get(name);
@@ -76,9 +77,9 @@ export async function updateRecruitmentSettings(formData: FormData) {
   const stage = value(formData, "stage", 120);
   const description = value(formData, "description", 2000);
   const deadlineInput = value(formData, "deadline", 40);
-  const parsedDeadline = deadlineInput ? new Date(deadlineInput) : null;
-  if (parsedDeadline && Number.isNaN(parsedDeadline.getTime())) redirect("/admin/recruitment?error=invalid-deadline");
-  const deadline = parsedDeadline ? parsedDeadline.toISOString() : null;
+  const parsedDeadline = deadlineInput ? parseDhakaDateTimeLocal(deadlineInput) : null;
+  if (deadlineInput && !parsedDeadline) redirect("/admin/recruitment?error=invalid-deadline");
+  const deadline = parsedDeadline?.toISOString() ?? null;
 
   const { error } = await supabase.from("recruitment_settings").upsert({
     id: true, applications_open: open, stage: stage || (open ? "Applications Open" : "Applications Closed"),

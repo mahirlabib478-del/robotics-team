@@ -79,7 +79,7 @@ export async function submitRecruitmentApplication(formData: FormData) {
   const supabase = adminClientOrRedirect("/join-us?error=config");
   const { data: settings, error: settingsError } = await supabase
     .from("recruitment_settings")
-    .select("applications_open")
+    .select("applications_open,deadline")
     .eq("id", true)
     .maybeSingle();
 
@@ -87,7 +87,7 @@ export async function submitRecruitmentApplication(formData: FormData) {
     console.error("Recruitment settings lookup failed:", settingsError);
     redirect("/join-us?error=submit");
   }
-  if (!settings?.applications_open) redirect("/join-us?error=closed");
+  if (!settings?.applications_open || (settings.deadline && new Date(settings.deadline).getTime() <= Date.now())) redirect("/join-us?error=closed");
 
   if (!(await enforceRateLimit("recruitment", 3))) redirect("/join-us?error=rate");
 

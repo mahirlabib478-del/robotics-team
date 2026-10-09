@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { updateRecruitmentApplication, updateRecruitmentSettings } from "@/app/actions/admin-operations";
+import { formatDhakaDateTimeLocal } from "@/lib/dhaka-time";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
 const statuses = ["Submitted", "Screening", "Shortlisted", "Interview", "Selected", "Rejected", "Withdrawn"];
@@ -28,7 +29,7 @@ export default async function AdminRecruitmentPage({ searchParams }: { searchPar
           <h2 className="text-xl font-bold">Recruitment status</h2>
           <label className="flex items-center gap-3 text-sm text-slate-300"><input type="checkbox" name="applications_open" defaultChecked={settings?.applications_open ?? false} /> Applications open</label>
           <label className="grid gap-2 text-sm text-slate-300">Stage<input name="stage" defaultValue={settings?.stage ?? "Applications Closed"} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3" /></label>
-          <label className="grid gap-2 text-sm text-slate-300">Deadline<input type="datetime-local" name="deadline" defaultValue={settings?.deadline ? new Date(settings.deadline).toISOString().slice(0,16) : ""} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3" /></label>
+          <label className="grid gap-2 text-sm text-slate-300">Deadline (Bangladesh time, UTC+06:00)<input type="datetime-local" name="deadline" defaultValue={settings?.deadline ? formatDhakaDateTimeLocal(settings.deadline) : ""} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3" /></label>
           <label className="grid gap-2 text-sm text-slate-300">Public description<textarea name="description" defaultValue={settings?.description ?? ""} rows={4} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3" /></label>
           <button className="w-fit rounded-full bg-[#1479ff] px-5 py-3 font-semibold">Save recruitment status</button>
         </form>
