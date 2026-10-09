@@ -123,7 +123,7 @@ const siteHeader = await read("components/site-header.tsx");
 assert.match(siteHeader, /aria-label="Primary navigation"/, "Desktop navigation must have an accessible name");
 assert.match(siteHeader, /aria-label="Mobile navigation"/, "Mobile navigation must have an accessible name");
 assert.match(siteHeader, /aria-label="Open site navigation menu"/, "Mobile menu trigger must have a descriptive accessible name");
-assert.match(siteHeader, /max-h-\\[min\\(75vh,36rem\\)\\] overflow-y-auto/, "Mobile navigation must remain scrollable on short screens");
+assert.match(siteHeader, /max-h-\[min\(75vh,36rem\)\] overflow-y-auto/, "Mobile navigation must remain scrollable on short screens");
 assert.match(siteHeader, /focus-visible:outline-2/, "Navigation controls must have visible keyboard focus styling");
 assert.match(siteHeader, /xl:hidden/, "Compact navigation must remain available below the desktop breakpoint");
 

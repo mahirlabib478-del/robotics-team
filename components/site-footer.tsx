@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const footerLinkClass = "rounded-sm transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]";
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-white/10 bg-[#050c15]">
@@ -11,13 +13,13 @@ export function SiteFooter() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Explore</p>
           <div className="mt-4 grid gap-2 text-sm text-slate-400">
-            <Link href="/robots">Robots</Link><Link href="/competitions">Competitions</Link><Link href="/team">Team</Link><Link href="/research">Research</Link>
+            <Link className={footerLinkClass} href="/about">About Us</Link><Link className={footerLinkClass} href="/robots">Robots</Link><Link className={footerLinkClass} href="/competitions">Competitions</Link><Link className={footerLinkClass} href="/achievements">Achievements</Link><Link className={footerLinkClass} href="/team">Team</Link><Link className={footerLinkClass} href="/research">Research</Link><Link className={footerLinkClass} href="/gallery">Gallery</Link>
           </div>
         </div>
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Connect</p>
           <div className="mt-4 grid gap-2 text-sm text-slate-400">
-            <Link href="/sponsors">Sponsors</Link><Link href="/join-us">Join Us</Link><Link href="/contact">Contact</Link>
+            <Link className={footerLinkClass} href="/sponsors">Sponsors</Link><Link className={footerLinkClass} href="/join-us">Join Us</Link><Link className={footerLinkClass} href="/contact">Contact</Link>
           </div>
         </div>
       </div>
