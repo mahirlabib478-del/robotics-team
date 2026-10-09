@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicSponsors } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Sponsors and Partners",
+  description: "Learn how organizations can support Team Stellar and its robotics engineering and competition work.",
+};
 
 const packages = ["Title Partner", "Platinum Partner", "Gold Partner", "Technology Partner", "Travel Partner", "Manufacturing Partner", "Media Partner"];
 
