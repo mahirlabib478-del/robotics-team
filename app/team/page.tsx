@@ -40,7 +40,7 @@ export default async function TeamPage() {
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {teamMembers.map((member) => (
                   <article key={member.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
-                    {member.photo ? <img src={member.photo} alt={`${member.name} profile`} className="h-16 w-16 rounded-2xl object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-[#07111f] text-xl font-black text-[#19d3ff]">{member.name.charAt(0).toUpperCase()}</div>}
+                    {member.photo ? <img src={member.photo} alt={`${member.name} profile`} loading="lazy" decoding="async" className="h-16 w-16 rounded-2xl object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-[#07111f] text-xl font-black text-[#19d3ff]">{member.name.charAt(0).toUpperCase()}</div>}
                     <h3 className="mt-4 text-xl font-bold">{member.name}</h3>
                     <p className="mt-1 text-sm text-[#8deaff]">{member.role}</p>
                     <p className="mt-1 text-xs text-slate-500">{member.division}{member.department ? ` · ${member.department}` : ""}</p>

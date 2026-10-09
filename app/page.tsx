@@ -29,7 +29,7 @@ export default async function Home() {
         <div className="relative mx-auto grid min-h-[70vh] max-w-7xl items-center gap-8 px-4 py-16 sm:gap-12 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_.9fr]">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#19d3ff]">BRAC University Robotics Team</p>
-            <h1 className="mt-5 max-w-5xl text-4xl sm:text-4xl font-black tracking-tight sm:text-6xl lg:text-8xl">
+            <h1 className="mt-5 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl lg:text-8xl">
               Engineering Robots.
               <br />
               <span className="text-[#19d3ff]">Competing Beyond Borders.</span>

@@ -19,7 +19,7 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">{robot.category}</p>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tight sm:text-6xl">{robot.name}</h1>
+            <h1 className="text-4xl font-black tracking-tight sm:text-6xl">{robot.name}</h1>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-400">{robot.summary}</p>
           </div>
           <span className="rounded-full border border-[#19d3ff]/30 bg-[#19d3ff]/5 px-4 py-2 text-sm text-[#8deaff]">{robot.status}</span>
