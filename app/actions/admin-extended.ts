@@ -4,7 +4,7 @@ import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 import type { UserRole } from "@/lib/types";
 function v(f:FormData,n:string,m=5000){const x=f.get(n);return typeof x==="string"?x.trim().slice(0,m):""}
 function validSlug(value:string){return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)}
-function go(p:string,e?:string){redirect(e?p+"?error="+e:p+"?saved=1")}
+function go(p:string,e?:string): never {redirect(e?p+"?error="+e:p+"?saved=1")}
 function safeHttps(value:string){try{return new URL(value).protocol==="https:"}catch{return false}}
 function safeYouTube(value:string){try{const u=new URL(value);if(u.protocol!=="https:")return false;const host=u.hostname.toLowerCase();let id="";if(host==="youtu.be"||host==="www.youtu.be")id=u.pathname.split("/").filter(Boolean)[0]??"";else if(host==="youtube.com"||host==="www.youtube.com"){if(u.pathname==="/watch")id=u.searchParams.get("v")??"";else if(/^\/(embed|shorts|live)\//.test(u.pathname))id=u.pathname.split("/").filter(Boolean)[1]??""}else return false;return /^[A-Za-z0-9_-]{11}$/.test(id)}catch{return false}}
 export async function createResearchPost(f: FormData) {
