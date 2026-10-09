@@ -108,6 +108,8 @@ assert.match(adminExtended, /target === "published" && current === "review" && \
 assert.match(adminExtended, /target === "archived" && current !== "archived" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Research, gallery, and sponsor archiving must require leadership approval");
 assert.match(adminOperations, /if \(target === "published"\) requireAnyRole\(\["super_admin", "team_lead"\]/, "Team member publishing must require leadership approval");
 assert.match(adminOperations, /export async function archiveTeamMember\(formData: FormData\)[\s\S]*?requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Team member archiving must match the database leadership-only policy");
+const teamPage = await read("app/admin/team/page.tsx");
+assert.match(teamPage, /member\.publish_status !== "archived" && \(profile\.role === "team_lead" \|\| profile\.role === "super_admin"\) \? <button formAction=\{archiveTeamMember\}/, "Team archive button must only be shown to roles permitted by the server action and database guard");
 assert.match(adminOperations, /if \(target === "review" && current\.publish_status !== "draft"\)/, "Team member review transition must only accept drafts");
 assert.match(adminOperations, /if \(target === "published" && current\.publish_status !== "review"\)/, "Team member publishing must only accept reviewed records");
 assert.match(publicData, /url\.protocol === "https:"/, "Public profile links and media must reject non-HTTPS URLs");
