@@ -128,7 +128,12 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
 const provenanceMigration = await read("supabase/migrations/20261009_content_provenance.sql");
 for (const table of ["team_members", "research_posts", "gallery_items", "sponsors"]) {
   assert.ok(provenanceMigration.includes(`alter table public.${table}`), `Content provenance migration must update ${table}`);
-  assert.ok(schema.includes(`created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id)`) || schema.includes(`created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),`), `Fresh schema must define provenance columns for ${table}`);
+  const definition = schema.match(new RegExp(`create table public\\\\.${table} \\\\(([\\\\s\\\\S]*?)\\\\n\\\\);`));
+  assert.ok(definition, `Fresh schema must define ${table}`);
+  assert.match(definition[1], /created_by uuid references public\\.profiles\\(id\\)/, `Fresh schema must define creator provenance for ${table}`);
+  assert.match(definition[1], /updated_by uuid references public\\.profiles\\(id\\)/, `Fresh schema must define updater provenance for ${table}`);
+  const columns = [...definition[1].matchAll(/^\\s*([a-z_]+)\\s+/gm)].map((match) => match[1]);
+  assert.equal(new Set(columns).size, columns.length, `Fresh schema must not duplicate columns in ${table}`);
 }
 assert.match(adminExtended, /created_by: profile\.id, updated_by: profile\.id/, "Extended content creation must record creator and updater");
 assert.match(adminOperations, /created_by: profile\.id, updated_by: profile\.id/, "Team member creation must record creator and updater");
