@@ -69,6 +69,7 @@ create table public.gallery_items (
 
 create table public.sponsors (
   id uuid primary key default gen_random_uuid(), name text not null, logo_url text, website_url text, partnership_type text, description text,
+  created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   publish_status public.publish_status not null default 'draft', visibility public.visibility not null default 'public',
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
