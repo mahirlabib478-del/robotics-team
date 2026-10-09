@@ -27,14 +27,17 @@ export async function createRobot(formData: FormData) {
   const status = value(formData, "status", 80);
   const year = Number(value(formData, "development_year", 10));
   const summary = value(formData, "summary", 2000);
+  const weightInput = value(formData, "weight_kg", 20);
+  const weight = weightInput === "" ? null : Number(weightInput);
 
+  if (weight !== null && (!Number.isFinite(weight) || weight < 0)) redirect("/admin/robots?error=invalid-weight");
   if (!name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) {
     redirect("/admin/robots?error=missing");
   }
 
   const { error } = await supabase.from("robots").insert({
     name, slug, category, version, status, development_year: year, summary,
-    weight_kg: Number(value(formData, "weight_kg", 20)) || null,
+    weight_kg: weight,
     dimensions: value(formData, "dimensions", 160) || null,
     specifications: {}, engineering: {},
     sensitive_fields_hidden: ["weapon geometry", "custom control code", "sensitive CAD", "firmware", "competition strategy"],
@@ -176,10 +179,13 @@ export async function updateRobot(formData: FormData) {
   const status = value(formData, "status", 80);
   const year = Number(value(formData, "development_year", 10));
   const summary = value(formData, "summary", 2000);
+  const weightInput = value(formData, "weight_kg", 20);
+  const weight = weightInput === "" ? null : Number(weightInput);
+  if (weight !== null && (!Number.isFinite(weight) || weight < 0)) redirect("/admin/robots?error=invalid-weight");
   if (!id || !name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) redirect("/admin/robots?error=missing");
   const { error } = await supabase.from("robots").update({
     name, slug, category, version, status, development_year: year, summary,
-    weight_kg: Number(value(formData, "weight_kg", 20)) || null,
+    weight_kg: weight,
     dimensions: value(formData, "dimensions", 160) || null,
     updated_by: profile.id, updated_at: new Date().toISOString(),
   }).eq("id", id);

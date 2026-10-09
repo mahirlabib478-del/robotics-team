@@ -107,7 +107,17 @@ export async function updateRecruitmentSettings(formData: FormData) {
     deadline, description, updated_at: new Date().toISOString(),
   });
 
-  if (error) redirect("/admin/recruitment?error=save");
+  if (error) {
+    console.error("Recruitment settings save failed:", error);
+    redirect("/admin/recruitment?error=save");
+  }
+  const { error: auditError } = await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action: "update_recruitment_settings",
+    entity_type: "recruitment_settings",
+    metadata: { applications_open: open, stage: stage || (open ? "Applications Open" : "Applications Closed"), deadline },
+  });
+  if (auditError) console.error("Recruitment settings audit write failed:", auditError);
   redirect("/admin/recruitment?saved=1");
 }
 
