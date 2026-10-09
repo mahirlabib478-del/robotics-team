@@ -45,13 +45,28 @@ export default async function Home() {
             </div>
             <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
           </div>
-          <div className="aspect-[4/5] rounded-3xl border border-white/10 bg-[#0b1727] p-5 shadow-2xl">
-            <div className="flex h-full items-end rounded-2xl border border-white/5 bg-[radial-gradient(circle_at_50%_35%,rgba(25,211,255,.16),transparent_35%)] p-6">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Hero Media Placeholder</p>
-                <p className="mt-2 text-2xl font-bold">Replace with verified robot action footage.</p>
-                <p className="mt-3 text-sm leading-6 text-slate-400">The production hero is intentionally media-ready without inventing a robot photo or competition result.</p>
+          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 bg-[#07111f] shadow-2xl shadow-blue-950/40">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(20,121,255,.28),transparent_42%),linear-gradient(145deg,rgba(25,211,255,.07),transparent_45%)]" />
+            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(125,211,252,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,.18)_1px,transparent_1px)] [background-size:34px_34px]" />
+            <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-[#19d3ff]/20 bg-[#07111f]/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#8deaff]"><span className="h-2 w-2 rounded-full bg-[#19d3ff] shadow-[0_0_12px_#19d3ff]" /> Engineering systems</div>
+            <div className="absolute inset-x-0 top-[17%] flex justify-center">
+              <div className="relative flex h-44 w-44 items-center justify-center rounded-[2.5rem] border border-[#19d3ff]/50 bg-gradient-to-br from-[#163b5c] via-[#0b2035] to-[#07111f] shadow-[0_0_55px_rgba(25,211,255,.18)] sm:h-52 sm:w-52">
+                <div className="absolute inset-3 rounded-[1.9rem] border border-white/10" />
+                <div className="flex h-20 w-28 items-center justify-center gap-3 rounded-2xl border border-[#19d3ff]/40 bg-[#06101d] shadow-inner">
+                  <span className="h-5 w-5 rounded-full bg-[#19d3ff] shadow-[0_0_18px_#19d3ff]" /><span className="h-5 w-5 rounded-full bg-[#19d3ff] shadow-[0_0_18px_#19d3ff]" />
+                </div>
+                <div className="absolute -left-5 top-1/2 h-12 w-5 -translate-y-1/2 rounded-l-lg border border-[#19d3ff]/40 bg-[#102d48]" />
+                <div className="absolute -right-5 top-1/2 h-12 w-5 -translate-y-1/2 rounded-r-lg border border-[#19d3ff]/40 bg-[#102d48]" />
+                <div className="absolute -bottom-7 h-8 w-24 rounded-b-xl border-x border-b border-[#19d3ff]/30 bg-[#102d48]" />
               </div>
+            </div>
+            <div className="absolute inset-x-8 top-[62%] grid grid-cols-3 gap-2">
+              {["SENSORS", "CONTROL", "AUTONOMY"].map((label, index) => <div key={label} className="rounded-xl border border-white/10 bg-[#0b1727]/90 p-3 text-center"><div className="mx-auto mb-2 h-1 w-7 rounded-full bg-[#19d3ff]" /><p className="text-[9px] font-bold tracking-[0.12em] text-slate-400">{label}</p><p className="mt-1 font-mono text-xs text-[#8deaff]">0{index + 1}</p></div>)}
+            </div>
+            <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/10 bg-[#07111f]/90 p-5 backdrop-blur">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#19d3ff]">Team Stellar · Robotics</p>
+              <p className="mt-2 text-xl font-bold">Design. Build. Test. Compete.</p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">Concept illustration — actual team robot imagery can replace this artwork when approved media is available.</p>
             </div>
           </div>
         </div>
