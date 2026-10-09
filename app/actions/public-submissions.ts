@@ -31,9 +31,12 @@ async function getRequesterFingerprint(formType: "recruitment" | "contact") {
   }
 
   const requestHeaders = await headers();
-  const forwarded = requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim();
+  // Prefer the proxy-provided single-address header. If only X-Forwarded-For is
+  // available, use its rightmost address: trusted proxies append client addresses,
+  // while the leftmost value may be supplied by the requester.
   const realIp = requestHeaders.get("x-real-ip")?.trim();
-  const ip = forwarded || realIp || "unknown";
+  const forwarded = requestHeaders.get("x-forwarded-for")?.split(",").map((part) => part.trim()).filter(Boolean);
+  const ip = realIp || forwarded?.at(-1) || "unknown";
 
   const normalizedIp = ip === "unknown" ? "unknown" : ip;
   return createHmac("sha256", secret).update(formType).update(":").update(normalizedIp).digest("hex");
