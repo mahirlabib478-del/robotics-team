@@ -33,6 +33,13 @@ begin
       using errcode = '42501';
   end if;
 
+  if old.publish_status = 'archived'
+     and (to_jsonb(new) - 'updated_at' - 'updated_by')
+         is distinct from (to_jsonb(old) - 'updated_at' - 'updated_by') then
+    raise exception 'Archived content is immutable'
+      using errcode = '42501';
+  end if;
+
   if new.publish_status = 'published'
      and (old.publish_status <> 'review' or not is_leader) then
     raise exception 'Only team leadership may publish reviewed content'
