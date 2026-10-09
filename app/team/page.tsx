@@ -13,7 +13,7 @@ export default async function TeamPage() {
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-6 py-20">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading eyebrow="People & continuity" title="The Team" description="Leadership, technical divisions, active members and alumni are designed as a long-lived record of the team—not a temporary roster." />
         <section className="mt-12">
           <h2 className="text-2xl font-bold">Leadership</h2>
@@ -24,7 +24,7 @@ export default async function TeamPage() {
         <section className="mt-14">
           <h2 className="text-2xl font-bold">Technical Divisions</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {divisions.map((division) => <div key={division} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6"><h3 className="font-bold">{division}</h3><p className="mt-2 text-sm text-slate-500">Verified members and projects will be linked here.</p></div>)}
+            {divisions.map((division) => <div key={division} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6"><h3 className="font-bold">{division}</h3><p className="mt-2 text-sm text-slate-500">Verified members and projects will be linked here.</p></div>)}
           </div>
         </section>
         <section className="mt-14">
@@ -39,7 +39,7 @@ export default async function TeamPage() {
               </div>
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {teamMembers.map((member) => (
-                  <article key={member.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6">
+                  <article key={member.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
                     {member.photo ? <img src={member.photo} alt={`${member.name} profile`} className="h-16 w-16 rounded-2xl object-cover" /> : <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-[#07111f] text-xl font-black text-[#19d3ff]">{member.name.charAt(0).toUpperCase()}</div>}
                     <h3 className="mt-4 text-xl font-bold">{member.name}</h3>
                     <p className="mt-1 text-sm text-[#8deaff]">{member.role}</p>

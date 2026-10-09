@@ -22,9 +22,9 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
   return (
     <main className="min-h-screen">
       <SiteHeader />
-      <section className="mx-auto max-w-5xl px-6 py-20">
+      <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-[#19d3ff]">Recruitment</p>
-        <h1 className="mt-4 text-5xl font-black tracking-tight">Join Team Stellar</h1>
+        <h1 className="mt-4 text-4xl sm:text-5xl font-black tracking-tight">Join Team Stellar</h1>
         <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-400">Apply through a structured engineering-team intake covering your division, skills, projects, portfolio and weekly availability.</p>
 
         {params.submitted ? <div className="mt-8 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5 text-sm text-emerald-200">Application received. The operations team can now review it through the private recruitment workflow.</div> : null}
