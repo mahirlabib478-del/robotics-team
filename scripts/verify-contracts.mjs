@@ -289,7 +289,7 @@ assert.match(rootLayout, /title: \{ default: "[^"]+", template: "%s \| Team Stel
 
 // Phase 2 database-enforced workflow and privilege contracts. The migration and
 // fresh-install schema must protect the same public content tables.
-const [publishGuardMigration, rateLimitMigration, freshSchema, adminContentActions, adminExtendedActions, adminOperationsActions] = await Promise.all([
+const [publishWorkflowMigration, rateLimitMigration, freshSchema, adminContentActions, adminExtendedActions, adminOperationsActions] = await Promise.all([
   read("supabase/migrations/20261009_database_publish_workflow_guard.sql"),
   read("supabase/migrations/20261008_public_form_security.sql"),
   read("supabase/schema.sql"),
@@ -299,10 +299,10 @@ const [publishGuardMigration, rateLimitMigration, freshSchema, adminContentActio
 ]);
 const guardedContentTables = ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"];
 for (const table of guardedContentTables) {
-  assert.match(publishGuardMigration, new RegExp(`create trigger ${table}_publish_workflow_guard before insert or update or delete on public\\.${table}`), `Upgrade migration must guard ${table} publish workflow`);
+  assert.match(publishWorkflowMigration, new RegExp(`create trigger ${table}_publish_workflow_guard before insert or update or delete on public\\.${table}`), `Upgrade migration must guard ${table} publish workflow`);
   assert.match(freshSchema, new RegExp(`create trigger ${table}_publish_workflow_guard before insert or update or delete on public\\.${table}`), `Fresh-install schema must guard ${table} publish workflow`);
 }
-for (const source of [publishGuardMigration, freshSchema]) {
+for (const source of [publishWorkflowMigration, freshSchema]) {
   assert.match(source, /new\.publish_status = 'published'[\s\S]*old\.publish_status <> 'review' or not is_leader/, "Database must restrict publication to leadership and reviewed records");
   assert.match(source, /old\.publish_status = 'published'[\s\S]*new\.publish_status <> 'published'[\s\S]*not is_leader/, "Unpublishing must be leadership-controlled");
   assert.match(source, /old\.publish_status = 'archived'[\s\S]*Archived content is immutable/, "Archived content must be immutable");
