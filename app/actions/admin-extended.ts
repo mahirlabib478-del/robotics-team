@@ -14,7 +14,19 @@ export async function createSponsor(f:FormData){const {supabase,profile}=await r
   if(!name)go("/admin/sponsors","missing");
   if(logoUrl && !safeHttps(logoUrl)) go("/admin/sponsors","invalid-url");
   if(websiteUrl && !safeHttps(websiteUrl)) go("/admin/sponsors","invalid-url");const {error}=await supabase.from("sponsors").insert({name,partnership_type:v(f,"partnership_type",120)||null,logo_url:logoUrl||null,website_url:websiteUrl||null,description:v(f,"description",1200)||null,publish_status:"draft",visibility:"public"});if(error){console.error(error);go("/admin/sponsors","save")}go("/admin/sponsors")}
-export async function updateContactMessage(f:FormData){const {supabase,profile}=await requireAdmin();requireAnyRole(["super_admin","team_lead","hr_operations","media"],profile.role);const id=v(f,"id",80),status=v(f,"status",40);if(!/^[0-9a-f-]{36}$/i.test(id)||!["New","In Progress","Resolved"].includes(status))go("/admin/messages","invalid");const {error}=await supabase.from("contact_messages").update({status,handled_by:status==="Resolved"?profile.id:null,handled_at:status==="Resolved"?new Date().toISOString():null}).eq("id",id);if(error)go("/admin/messages","save");go("/admin/messages")}
+export async function updateContactMessage(f:FormData){
+  const {supabase,profile}=await requireAdmin();
+  requireAnyRole(["super_admin","team_lead","hr_operations","media"],profile.role);
+  const id=v(f,"id",80),status=v(f,"status",40);
+  if(!/^[0-9a-f-]{36}$/i.test(id)||!["New","In Progress","Resolved"].includes(status))go("/admin/messages","invalid");
+  const {data:current,error:readError}=await supabase.from("contact_messages").select("status").eq("id",id).maybeSingle();
+  if(readError||!current)go("/admin/messages","not-found");
+  const {error}=await supabase.from("contact_messages").update({status,handled_by:status==="Resolved"?profile.id:null,handled_at:status==="Resolved"?new Date().toISOString():null}).eq("id",id);
+  if(error)go("/admin/messages","save");
+  const {error:auditError}=await supabase.from("audit_logs").insert({actor_id:profile.id,action:"update_contact_message",entity_type:"contact_message",entity_id:id,metadata:{from:current.status,to:status}});
+  if(auditError)console.error("Contact-message audit write failed:",auditError);
+  go("/admin/messages")
+}
 
 
 export async function transitionContent(f: FormData) {
