@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicGallery } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Gallery",
+  description: "View approved public photos and videos documenting Team Stellar’s robotics work and activities.",
+};
 
 function youtubeEmbedUrl(source: string) {
   try {
