@@ -20,7 +20,7 @@ export async function updateContactMessage(f:FormData){
   const id=v(f,"id",80),status=v(f,"status",40);
   if(!/^[0-9a-f-]{36}$/i.test(id)||!["New","In Progress","Resolved"].includes(status))go("/admin/messages","invalid");
   const {data:current,error:readError}=await supabase.from("contact_messages").select("status").eq("id",id).maybeSingle();
-  if(readError||!current)go("/admin/messages","not-found");
+  if(readError||!current){go("/admin/messages","not-found");return;}
   const {error}=await supabase.from("contact_messages").update({status,handled_by:status==="Resolved"?profile.id:null,handled_at:status==="Resolved"?new Date().toISOString():null}).eq("id",id);
   if(error)go("/admin/messages","save");
   const {error:auditError}=await supabase.from("audit_logs").insert({actor_id:profile.id,action:"update_contact_message",entity_type:"contact_message",entity_id:id,metadata:{from:current.status,to:status}});
