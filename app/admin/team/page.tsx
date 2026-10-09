@@ -11,16 +11,16 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
   const params = await searchParams;
 
   return (
-    <main className="min-h-screen bg-[#07111f] px-6 py-12 text-[#f5f8fc]">
+    <main className="min-h-screen bg-[#07111f] px-4 py-10 text-[#f5f8fc] sm:px-6 sm:py-12">
       <div className="mx-auto max-w-7xl">
         <Link href="/admin" className="text-sm text-[#19d3ff]">← Admin</Link>
-        <h1 className="mt-6 text-4xl font-black">Team management</h1>
+        <h1 className="mt-6 text-3xl font-black sm:text-4xl">Team management</h1>
         <p className="mt-3 max-w-2xl text-slate-400">Create verified member records and archive former members without deleting team history.</p>
-        {params.error ? <p className="mt-5 rounded-xl border border-orange-300/20 p-4 text-sm text-orange-200">Could not save this record.</p> : null}
-        {params.saved ? <p className="mt-5 rounded-xl border border-emerald-300/20 p-4 text-sm text-emerald-200">Saved.</p> : null}
+        {params.error ? <p role="alert" className="mt-5 rounded-xl border border-orange-300/20 p-4 text-sm text-orange-200">{params.error === "archived" ? "Archived team records cannot be edited." : params.error === "review-required" ? "Only team leads can edit a published member profile. It must go through review again." : params.error === "transition" ? "This workflow transition is not allowed from the current status." : "Could not save this record. Check the required fields, slug and permissions."}</p> : null}
+        {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-300/20 p-4 text-sm text-emerald-200">Team record saved. If edited from review or published, it is now a draft and must be reviewed again.</p> : null}
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          <form action={createTeamMember} className="grid gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-7">
+          <form action={createTeamMember} className="grid min-w-0 gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-4 sm:p-7">
             <h2 className="text-xl font-bold">New member draft</h2>
             {[
               ["name","Name",true],["slug","Slug",true],["role","Role",true],["division","Division",true],
@@ -37,7 +37,7 @@ export default async function AdminTeamPage({ searchParams }: { searchParams: Pr
 
           <div className="grid content-start gap-3">
             {(members ?? []).map((member) => (
-              <article key={member.id} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5">
+              <article key={member.id} className="min-w-0 rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-5">
                 <div className="flex justify-between gap-4">
                   <div><h2 className="font-bold">{member.name}</h2><p className="mt-1 text-xs text-slate-500">{member.role} · {member.division} · {member.tenure}</p></div>
                   <span className="text-xs uppercase text-slate-500">{member.publish_status}</span>

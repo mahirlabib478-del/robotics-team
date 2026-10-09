@@ -11,15 +11,15 @@ export default async function AdminCompetitionsPage({ searchParams }: { searchPa
   const params = await searchParams;
 
   return (
-    <main className="min-h-screen bg-[#07111f] px-6 py-12 text-[#f5f8fc]">
+    <main className="min-h-screen bg-[#07111f] px-4 py-10 text-[#f5f8fc] sm:px-6 sm:py-12">
       <div className="mx-auto max-w-7xl">
         <Link href="/admin" className="text-sm text-[#19d3ff]">← Admin</Link>
-        <h1 className="mt-6 text-4xl font-black">Competition records</h1>
-        {params.error ? <p className="mt-5 rounded-xl border border-[#ff7a00]/30 p-4 text-sm text-[#ffbd85]">Could not save this record.</p> : null}
-        {params.saved ? <p className="mt-5 rounded-xl border border-emerald-400/20 p-4 text-sm text-emerald-300">Draft competition created.</p> : null}
+        <h1 className="mt-6 text-3xl font-black sm:text-4xl">Competition records</h1>
+        {params.error ? <p role="alert" className="mt-5 rounded-xl border border-[#ff7a00]/30 p-4 text-sm text-[#ffbd85]">{params.error === "archived" ? "Archived records cannot be edited." : params.error === "review-required" ? "Only team leads can edit a published record. The record must be reviewed again after editing." : params.error === "invalid-transition" ? "This workflow transition is not allowed from the current status." : "Could not save this record. Check required fields, duplicate slugs and permissions."}</p> : null}
+        {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/20 p-4 text-sm text-emerald-300">Competition record saved. If edited from review or published, it is now a draft and must be reviewed again.</p> : null}
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          <form action={createCompetition} className="grid gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-7">
+          <form action={createCompetition} className="grid min-w-0 gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-4 sm:p-7">
             <h2 className="text-xl font-bold">New competition draft</h2>
             {[
               ["official_name", "Official competition name", true], ["slug", "Slug", true], ["organizer", "Organizer", true],
@@ -39,7 +39,7 @@ export default async function AdminCompetitionsPage({ searchParams }: { searchPa
 
           <div className="grid content-start gap-3">
             {(items ?? []).map((item) => (
-              <article key={item.id} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5">
+              <article key={item.id} className="min-w-0 rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-5">
                 <div className="flex justify-between gap-4"><div><h2 className="font-bold">{item.official_name}</h2><p className="mt-1 text-xs text-slate-500">{item.year} · {item.city ?? "—"}, {item.country ?? "—"} · {item.level}</p></div><span className="text-xs uppercase text-slate-600">{item.publish_status}</span></div>
                 <p className="mt-3 text-sm text-slate-400">{item.robot_name} · {item.result}</p>
                 <details className="mt-4">
