@@ -257,6 +257,15 @@ assert.ok(auditIntegrityMigration.includes("revoke all on function public.preven
 assert.ok(schema.includes("actor_id = (select auth.uid())"), "Fresh-install audit inserts must bind actor_id to auth.uid()");
 assert.ok(schema.includes("create or replace function public.prevent_audit_log_mutation()"), "Fresh-install schema must include the append-only audit guard");
 assert.ok(schema.includes("before update or delete on public.audit_logs"), "Fresh-install schema must guard audit-log updates and deletes");
+for (const [label, source] of [
+  ["upgrade migration", auditIntegrityMigration],
+  ["fresh-install schema", schema],
+]) {
+  assert.match(source, /create policy admin_audit_insert[\s\S]*?on public\.audit_logs[\s\S]*?for insert[\s\S]*?to authenticated[\s\S]*?with check \([\s\S]*?private\.has_any_role\(array\['super_admin','team_lead','technical_lead','media','hr_operations'\]::public\.user_role\[\]\)[\s\S]*?actor_id = \(select auth\.uid\(\)\)/, `${label} must restrict audit inserts to approved roles and bind actor_id to auth.uid()`);
+  assert.match(source, /create or replace function public\.prevent_audit_log_mutation\(\)[\s\S]*?language plpgsql[\s\S]*?set search_path = ''/, `${label} audit guard must use an empty search_path`);
+  assert.match(source, /revoke all on function public\.prevent_audit_log_mutation\(\) from public, anon, authenticated/, `${label} audit guard must not be directly executable by client roles`);
+  assert.equal((source.match(/before update or delete on public\.audit_logs/g) || []).length, 1, `${label} must install exactly one append-only audit trigger`);
+}
 
 
 // SEO and public-indexing contracts: crawler rules are not access control, and
@@ -330,7 +339,12 @@ for (const source of [publishWorkflowMigration, freshSchema]) {
 assert.match(rateLimitMigration, /alter table public\.public_submission_rate_limits enable row level security/, "Submission rate-limit storage must have RLS enabled");
 assert.match(rateLimitMigration, /revoke all on table public\.public_submission_rate_limits from public, anon, authenticated/, "Submission rate-limit storage must not be accessible to client roles");
 assert.match(rateLimitMigration, /grant execute on function public\.check_public_submission_rate_limit\(text, integer, integer\) to service_role/, "Only the trusted service role should call the rate-limit function");
+assert.match(rateLimitMigration, /create table if not exists public\.public_submission_rate_limits[\s\S]*?request_count integer not null default 0 check \(request_count >= 0\)/, "Rate-limit migration must constrain request counts to non-negative values");
+assert.match(rateLimitMigration, /create or replace function public\.check_public_submission_rate_limit\([\s\S]*?security definer\s+set search_path = ''/, "Rate-limit migration RPC must use a hardened security-definer context");
+assert.match(rateLimitMigration, /revoke all on function public\.check_public_submission_rate_limit\(text, integer, integer\) from public, anon, authenticated/, "Rate-limit migration must revoke RPC access from client roles");
+assert.match(schema, /create table public\.public_submission_rate_limits[\s\S]*?request_count integer not null default 0 check \(request_count >= 0\)/, "Fresh schema must constrain request counts to non-negative values");
 assert.match(adminContentActions, /requireRole\("technical_lead", profile\.role\)/, "Robot and competition creation must require the technical-lead role");
+assert.match(adminContentActions, /created_by: profile\.id, updated_by: profile\.id/, "Robot and competition creation must stamp creator and updater provenance");
 assert.match(adminExtendedActions, /requireAnyRole\(\["super_admin", "team_lead", "technical_lead", "media"\], profile\.role\)/, "Research creation must enforce server-side role authorization");
 assert.match(adminOperationsActions, /requireAnyRole\(\["super_admin", "team_lead", "hr_operations"\], profile\.role\)/, "Team and recruitment operations must enforce server-side role authorization");
 
