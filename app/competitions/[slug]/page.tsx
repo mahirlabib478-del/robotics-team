@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
@@ -6,6 +7,16 @@ import { getPublicCompetition } from "@/lib/public-data";
 
 interface CompetitionDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: CompetitionDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const record = await getPublicCompetition(slug);
+  if (!record) return { title: "Competition Not Found" };
+  return {
+    title: record.competition,
+    description: `${record.year} ${record.level.toLowerCase()} competition record for Team Stellar. ${record.result} — ${record.organizer}.`.slice(0, 160),
+  };
 }
 
 export default async function CompetitionDetailPage({ params }: CompetitionDetailPageProps) {
