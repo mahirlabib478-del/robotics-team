@@ -60,8 +60,8 @@ begin
   end if;
 
   if old.publish_status = 'published'
-     and (to_jsonb(new) - 'updated_at' - 'updated_by')
-         is distinct from (to_jsonb(old) - 'updated_at' - 'updated_by') then
+     and (to_jsonb(new) - 'updated_at' - 'updated_by' - 'publish_status')
+         is distinct from (to_jsonb(old) - 'updated_at' - 'updated_by' - 'publish_status') then
     if not is_leader or new.publish_status <> 'draft' then
       raise exception 'Published content edits require leadership and must return to draft'
         using errcode = '42501';
