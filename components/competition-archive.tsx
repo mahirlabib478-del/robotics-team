@@ -24,7 +24,7 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
   const filtered = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
     return records.filter((record) => {
-      const searchable = [record.competition, record.organizer, record.location, record.robot, record.segment, ...record.teamMembers].join(" ").toLocaleLowerCase();
+      const searchable = [record.competition, record.organizer, record.location, record.robot, record.segment, record.result, String(record.year), record.date, record.report, ...record.teamMembers].filter(Boolean).join(" ").toLocaleLowerCase();
       return (!query || searchable.includes(query))
         && (level === "All levels" || record.level === level)
         && (year === "All years" || String(record.year) === year)
@@ -47,7 +47,7 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <label className="grid min-w-0 gap-2 text-xs text-slate-400 lg:col-span-2">
             Search archive
-            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Competition, robot, organizer, member…" className={selectClass} />
+            <input aria-label="Search competitions by event, organizer, location, robot, result, year, report or team member" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Competition, robot, organizer, result, member…" className={selectClass} />
           </label>
           <label className="grid gap-2 text-xs text-slate-400">Level
             <select value={level} onChange={(event) => setLevel(event.target.value)} className={selectClass}>
@@ -70,7 +70,7 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
             </select>
           </label>
           <div className="flex items-end justify-between gap-3 sm:col-span-2 lg:col-span-2">
-            <p className="pb-3 text-sm text-slate-400" aria-live="polite">{filtered.length} of {records.length} records</p>
+            <p className="pb-3 text-sm text-slate-400" role="status" aria-live="polite" aria-atomic="true">{filtered.length} of {records.length} records</p>
             <button type="button" onClick={resetFilters} className="rounded-full border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-[#19d3ff]/50">Clear filters</button>
           </div>
         </div>
