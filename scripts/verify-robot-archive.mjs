@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [archive, page, data, homepage] = await Promise.all([
+const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage] = await Promise.all([
   read("components/robot-archive.tsx"),
   read("app/robots/page.tsx"),
   read("lib/public-data.ts"),
   read("app/page.tsx"),
+  read("components/competition-archive.tsx"),
+  read("app/competitions/page.tsx"),
+  read("app/achievements/page.tsx"),
 ]);
 
 assert.match(page, /<RobotArchive robots=\{robots\} \/>/, "Robots page must render the interactive archive");
@@ -21,5 +24,11 @@ assert.match(data, /engineering:undefined/, "Private engineering content must no
 assert.match(homepage, /aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage hero concept art must be clearly identified as illustrative, not documentary media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
 assert.doesNotMatch(homepage, /Hero Media Placeholder/, "Homepage must not display the old plain-text media placeholder");
+assert.match(competitionArchive, /record\.result, String\(record\.year\), record\.date, record\.report/, "Competition search must index outcomes, year, dates and report text");
+assert.match(competitionArchive, /aria-label="Search competitions by event, organizer, location, robot, result, year, report or team member"/, "Competition search must have a descriptive accessible name");
+assert.match(competitionArchive, /role="status" aria-live="polite" aria-atomic="true"/, "Competition result count must be announced to assistive technology");
+assert.match(competitionsPage, /<CompetitionArchive records=\{competitions\} \/>/, "Competitions page must render the interactive archive");
+assert.match(achievementsPage, /result !== "Participation"/, "Achievements page must exclude participation-only records");
+assert.match(achievementsPage, /<CompetitionArchive records=\{achievements\} achievementsOnly \/>/, "Achievements must use the archive's achievements-only mode");
 
 console.log("Robot archive and homepage contract checks passed.");
