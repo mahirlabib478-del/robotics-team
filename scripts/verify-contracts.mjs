@@ -137,4 +137,10 @@ assert.match(achievementPage, /competitions\.filter\(\(item\) => item\.result !=
 assert.match(achievementPage, /<CompetitionArchive records=\{achievements\} achievementsOnly \/>/, "Achievements must reuse the searchable, filterable archive in award-only mode");
 assert.match(competitionArchive, /!achievementsOnly \|\| item !== "Participation"/, "Achievement result filters must not offer participation as an award");
 
+const robotDetail = await read("app/robots/[slug]/page.tsx");
+assert.match(robotDetail, /required = \["Drive \/ locomotion", "Motors", "Battery \/ power", "Controller \/ MCU", "Sensors", "Control type", "Speed", "Runtime", "Safety"\]/, "Robot detail must define the core public specification checklist");
+assert.match(robotDetail, /core fields documented/, "Robot detail must expose a specification coverage count");
+assert.match(robotDetail, /Only published values are shown; missing values are not inferred\./, "Robot detail must not imply missing specifications are verified");
+assert.match(robotDetail, /Publication checklist:/, "Robot detail must explain how specification completeness is assessed");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
