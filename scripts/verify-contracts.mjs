@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage] = await Promise.all([
+const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage, contactPage] = await Promise.all([
   read("app/actions/admin-operations.ts"),
   read("app/admin/recruitment/page.tsx"),
   read("supabase/schema.sql"),
@@ -11,12 +11,13 @@ const [operations, recruitmentPage, schema, statusMigration, publicData, adminCl
   read("lib/supabase/admin.ts"),
   read("app/actions/public-submissions.ts"),
   read("app/join-us/page.tsx"),
+  read("app/contact/page.tsx"),
 ]);
 
 function quotedValues(source, expression, label) {
   const match = source.match(expression);
   assert.ok(match, `Could not locate ${label}`);
-  return [...match[1].matchAll(/[\"']([^\"']+)[\"']/g)].map((item) => item[1]).sort();
+  return [...match[1].matchAll(/["']([^"']+)["']/g)].map((item) => item[1]).sort();
 }
 
 const actionStatuses = quotedValues(
@@ -61,5 +62,18 @@ assert.match(publicSubmissions, /await enforceRateLimit\("contact", 5\)/, "Conta
 assert.match(publicSubmissions, /createHmac\("sha256", secret\)/, "Rate-limit fingerprints must be keyed hashes");
 assert.match(joinPage, /statusAvailable && settings\?\.applications_open === true && !deadlinePassed/, "Recruitment form must fail closed when status is unavailable or expired");
 assert.match(publicSubmissions, /settings\.deadline && new Date\(settings\.deadline\)\.getTime\(\) <= Date\.now\(\)/, "Server action must enforce the recruitment deadline");
+assert.match(publicSubmissions, /const website = value\(formData, "website", 120\)/, "Public submission actions must inspect the honeypot field");
+assert.match(contactPage, /name="website" tabIndex=\{-1\} autoComplete="off"/, "Contact form must include a non-visible honeypot field");
+assert.match(joinPage, /name="website" tabIndex=\{-1\} autoComplete="off"/, "Recruitment form must include a non-visible honeypot field");
+assert.match(publicSubmissions, /!isSafeHttpsUrl\(githubOrPortfolio\)/, "Recruitment portfolio URLs must require HTTPS");
+assert.match(publicSubmissions, /!\/\^\[\^\\s@\]\+@\[\^\\s@\]\\+\\\.\[\^\\s@\]\+\$\/.test\(email\)/, "Contact email must be validated server-side");
 
-console.log("Contract checks passed: recruitment statuses/deadlines, rate limits, service-role boundary, and public robot projection.");
+assert.match(schema, /create table public\.public_submission_rate_limits[\s\S]*?enable row level security/, "Rate-limit state must have RLS enabled");
+assert.match(schema, /revoke all on table public\.public_submission_rate_limits from public, anon, authenticated/, "Rate-limit state must not be directly accessible to client roles");
+assert.match(schema, /create or replace function public\.check_public_submission_rate_limit\([\s\S]*?security definer\s+set search_path = ''/, "Rate-limit RPC must use a hardened security-definer context");
+assert.match(schema, /revoke all on function public\.check_public_submission_rate_limit\(text, integer, integer\) from public, anon, authenticated/, "Rate-limit RPC must be revoked from public client roles");
+assert.match(schema, /grant execute on function public\.check_public_submission_rate_limit\(text, integer, integer\) to service_role/, "Only the server service role should execute the rate-limit RPC");
+assert.doesNotMatch(schema, /create policy [^;]+ on public\.recruitment_applications for insert to anon/i, "Anonymous clients must not insert recruitment applications directly");
+assert.doesNotMatch(schema, /create policy [^;]+ on public\.contact_messages for insert to anon/i, "Anonymous clients must not insert contact messages directly");
+
+console.log("Contract checks passed: recruitment statuses/deadlines, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
