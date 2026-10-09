@@ -11,6 +11,7 @@ const capabilityCards = [
   ["04", "Competition Operations", "Testing, documentation, logistics and international competition readiness."],
 ];
 
+// Keep the homepage hero responsive while prioritizing verified, database-backed content.
 export default async function Home() {
   const [robots, stats] = await Promise.all([getPublicRobots(), getPublicStats()]);
   const statCards = [
