@@ -15,7 +15,7 @@ export default async function AchievementsPage() {
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading eyebrow="Proof, not claims" title="Achievements" description="Search verified outcomes by event, organizer, robot, year, level, result and segment. Every story links to its competition record; unsupported claims are not added." />
         {achievements.length ? (
-          <CompetitionArchive records={achievements} />
+          <CompetitionArchive records={achievements} achievementsOnly />
         ) : (
           <div className="mt-10">
             <EmptyState title="No verified achievements published yet." description={competitions.length ? "Competition records exist, but none currently has a result beyond participation. Verified podiums, finalist results and other achievements will appear here when published." : "The achievement archive is ready for verified results. Champion, Runner-up, Podium, Finalist and other outcomes will be published with official evidence instead of unsupported claims."} />
