@@ -12,6 +12,7 @@ const capabilityCards = [
 ];
 
 // Keep the homepage hero responsive while prioritizing verified, database-backed content.
+// Images further down the page are lazy-loaded to reduce initial transfer cost.
 export default async function Home() {
   const [robots, stats] = await Promise.all([getPublicRobots(), getPublicStats()]);
   const statCards = [
