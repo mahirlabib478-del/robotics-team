@@ -61,7 +61,7 @@ assert.match(publicSubmissions, /await enforceRateLimit\("recruitment", 3\)/, "R
 assert.match(publicSubmissions, /await enforceRateLimit\("contact", 5\)/, "Contact submissions must be rate limited");
 assert.match(publicSubmissions, /createHmac\("sha256", secret\)/, "Rate-limit fingerprints must be keyed hashes");
 assert.match(publicSubmissions, /const ip = realIp \\|\\| forwarded\\?\\.at\\(-1\\) \\|\\| "unknown"/, "Rate-limit fingerprint must not trust the requester-controlled leftmost forwarded address");
-assert.match(publicSubmissions, /x-forwarded-for.*split\\(","\\)\\.map/s, "Forwarded address chain must be parsed explicitly");
+assert.ok(publicSubmissions.includes('requestHeaders.get("x-forwarded-for")?.split(",").map'), "Forwarded address chain must be parsed explicitly");
 assert.match(joinPage, /statusAvailable && settings\?\.applications_open === true && !deadlinePassed/, "Recruitment form must fail closed when status is unavailable or expired");
 assert.match(publicSubmissions, /settings\.deadline && new Date\(settings\.deadline\)\.getTime\(\) <= Date\.now\(\)/, "Server action must enforce the recruitment deadline");
 assert.match(publicSubmissions, /const website = value\(formData, "website", 120\)/, "Public submission actions must inspect the honeypot field");
