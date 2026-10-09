@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { RobotArchive } from "@/components/robot-archive";
 import { getPublicRobots } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Robots",
+  description: "Explore Team Stellar’s published robot archive, technical specifications, development status, and public engineering summaries.",
+};
 
 export default async function RobotsPage() {
   const robots = await getPublicRobots();
