@@ -105,6 +105,20 @@ assert.ok(
 );
 
 assert.equal((publishGuardMigration.match(/before insert or update or delete on public\./g) || []).length, 6, "Delete protection must cover every content table guarded by the publishing workflow");
+assert.ok(schema.includes("create or replace function public.enforce_content_publish_workflow()"), "Fresh-install schema must include the publishing workflow trigger function");
+for (const guard of [
+  "Content must pass review before publication",
+  "Only team leadership may publish reviewed content",
+  "Archived content cannot be reopened through direct updates",
+  "Archived content is immutable",
+  "Review, published, or archived content cannot be deleted",
+]) {
+  assert.ok(schema.includes(guard), `Fresh-install schema must preserve workflow rule: ${guard}`);
+}
+assert.equal((schema.match(/before insert or update or delete on public\./g) || []).length, 6, "Fresh-install schema must guard deletes on all six publishable content tables");
+for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
+  assert.ok(schema.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow();`), `Fresh-install schema must guard ${table}`);
+}
 assert.ok(publishGuardMigration.includes("to_jsonb(new) - 'updated_at' - 'updated_by' - 'publish_status'"), "Publishing state transitions must be evaluated separately from edits to published content");
 for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
   assert.ok(publishGuardMigration.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow();`), `Database publishing guard must cover ${table}`);
