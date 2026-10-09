@@ -93,6 +93,8 @@ assert.ok(publishGuardMigration.includes("old.publish_status <> 'published'") ==
 assert.ok(publishGuardMigration.includes("Published content edits require leadership and must return to draft"), "Published content edits must be returned to draft");
 assert.ok(publishGuardMigration.includes("Archived content cannot be reopened through direct updates"), "Archived content must not be reopened by bypassing the admin workflow");
 assert.ok(publishGuardMigration.includes("Archived content is immutable"), "Archived content fields must not be edited through direct database updates");
+assert.ok(publishGuardMigration.includes("Published or archived content cannot be deleted"), "Published and archived content must not be deleted through direct database writes");
+assert.equal((publishGuardMigration.match(/before insert or update or delete on public\./g) || []).length, 6, "Delete protection must cover every content table guarded by the publishing workflow");
 assert.ok(publishGuardMigration.includes("to_jsonb(new) - 'updated_at' - 'updated_by' - 'publish_status'"), "Publishing state transitions must be evaluated separately from edits to published content");
 for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
   assert.ok(publishGuardMigration.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow();`), `Database publishing guard must cover ${table}`);
