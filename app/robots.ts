@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+// Crawler rules guide indexing; server-side admin authentication remains the actual access control.
 export default function robots(): MetadataRoute.Robots {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   let sitemap: string | undefined;
