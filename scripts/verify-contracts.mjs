@@ -76,4 +76,26 @@ assert.match(schema, /grant execute on function public\.check_public_submission_
 assert.doesNotMatch(schema, /create policy [^;]+ on public\.recruitment_applications for insert to anon/i, "Anonymous clients must not insert recruitment applications directly");
 assert.doesNotMatch(schema, /create policy [^;]+ on public\.contact_messages for insert to anon/i, "Anonymous clients must not insert contact messages directly");
 
+
+const [adminAuth, adminContent, adminExtended, adminOperations] = await Promise.all([
+  read("lib/admin-auth.ts"),
+  read("app/actions/admin-content.ts"),
+  read("app/actions/admin-extended.ts"),
+  read("app/actions/admin-operations.ts"),
+]);
+
+assert.match(adminAuth, /export async function requireAdminSession\([\s\S]*?auth\.getUser\(\)/, "Admin routes and actions must validate the current auth session");
+assert.match(adminAuth, /if \(!user\.email_confirmed_at\)[\s\S]*?auth\.signOut\(\)/, "Unverified admin accounts must be signed out");
+assert.match(adminAuth, /if \(!profile \|\| !privilegedRoles\.includes\(profile\.role as UserRole\)\)/, "Admin access must require an allowlisted profile role");
+assert.match(adminAuth, /export function requireAnyRole\(roles: UserRole\[], actual: UserRole\)[\s\S]*?if \(!roles\.includes\(actual\)\)/, "Role-restricted admin actions must reject roles outside their allowlist");
+assert.match(adminContent, /target === "published" && from === "review" && \["team_lead", "super_admin"\]\.includes\(profile\.role\)/, "Robots and competitions must require leadership approval to publish");
+assert.match(adminContent, /target === "archived" && from !== "archived" && \["team_lead", "super_admin"\]\.includes\(profile\.role\)/, "Robots and competitions must restrict archive transitions to leadership");
+assert.match(adminExtended, /target === "published" && current === "review" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Research, gallery, and sponsor publishing must require leadership approval");
+assert.match(adminExtended, /target === "archived" && current !== "archived" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Research, gallery, and sponsor archiving must require leadership approval");
+assert.match(adminOperations, /if \(target === "published"\) requireAnyRole\(\["super_admin", "team_lead"\]/, "Team member publishing must require leadership approval");
+assert.match(adminOperations, /if \(target === "review" && current\.publish_status !== "draft"\)/, "Team member review transition must only accept drafts");
+assert.match(adminOperations, /if \(target === "published" && current\.publish_status !== "review"\)/, "Team member publishing must only accept reviewed records");
+assert.match(publicData, /url\.protocol === "https:"/, "Public profile links and media must reject non-HTTPS URLs");
+assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com" \|\| hostname === "youtu\.be"/, "Public YouTube embeds must use an allowlisted host");
+
 console.log("Contract checks passed: recruitment statuses/deadlines, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
