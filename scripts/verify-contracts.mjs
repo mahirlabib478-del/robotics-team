@@ -132,4 +132,9 @@ assert.match(competitionArchive, /record\.segment === segment/, "Competition arc
 assert.match(competitionArchive, /aria-live="polite"/, "Filtered record count must be announced accessibly");
 assert.match(competitionArchive, /No records match these filters/, "Empty filtered results must provide a useful recovery state");
 
+const achievementPage = await read("app/achievements/page.tsx");
+assert.match(achievementPage, /competitions\.filter\(\(item\) => item\.result !== "Participation"\)/, "Achievements must exclude participation-only results");
+assert.match(achievementPage, /<CompetitionArchive records=\{achievements\} achievementsOnly \/>/, "Achievements must reuse the searchable, filterable archive in award-only mode");
+assert.match(competitionArchive, /!achievementsOnly \|\| item !== "Participation"/, "Achievement result filters must not offer participation as an award");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
