@@ -1,9 +1,21 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  let sitemap: string | undefined;
+  if (raw) {
+    try {
+      const url = new URL(raw);
+      if (url.protocol === "https:" || url.hostname === "localhost") {
+        sitemap = new URL("/sitemap.xml", url).toString();
+      }
+    } catch {
+      // Do not publish a malformed sitemap URL when site configuration is missing.
+    }
+  }
+
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin/", "/api/"] }],
-    sitemap: new URL("/sitemap.xml", baseUrl).toString(),
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api"] }],
+    ...(sitemap ? { sitemap } : {}),
   };
 }
