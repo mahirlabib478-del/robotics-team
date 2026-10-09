@@ -26,6 +26,7 @@ Use a disposable or staging Supabase project, never production, for the first pa
 - [ ] Confirm the six publishable content tables have the publishing-workflow trigger: `robots`, `competitions`, `team_members`, `research_posts`, `gallery_items`, and `sponsors`.
 - [ ] Confirm the rate-limit table has RLS enabled, no direct client-role access, and the rate-limit function is executable only by `service_role`.
 - [ ] Confirm audit logs reject updates and deletes, and inserts bind the actor to the authenticated user.
+- [ ] Confirm `set_updated_at()` uses an empty `search_path` and is not directly executable by client roles; apply the forward hardening migration on existing deployments.
 - [ ] Confirm creator/updater provenance columns exist once per relevant table.
 
 ## 3. Authorization and workflow smoke tests
