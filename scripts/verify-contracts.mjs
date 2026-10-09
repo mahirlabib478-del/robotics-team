@@ -96,7 +96,8 @@ assert.match(adminOperations, /if \(target === "published"\) requireAnyRole\(\["
 assert.match(adminOperations, /if \(target === "review" && current\.publish_status !== "draft"\)/, "Team member review transition must only accept drafts");
 assert.match(adminOperations, /if \(target === "published" && current\.publish_status !== "review"\)/, "Team member publishing must only accept reviewed records");
 assert.match(publicData, /url\.protocol === "https:"/, "Public profile links and media must reject non-HTTPS URLs");
-assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com" \|\| hostname === "youtu\.be"/, "Public YouTube embeds must use an allowlisted host");
+assert.ok(publicData.includes('hostname === "youtu.be" || hostname === "www.youtu.be"') && publicData.includes('hostname === "youtube.com" || hostname === "www.youtube.com"'), "Public YouTube embeds must use an allowlisted host");
+assert.match(publicData, /A-Za-z0-9_-\]\{11\}/, "Public YouTube embeds must validate the video ID format");
 
 assert.match(adminAuth, /const allowedDomain = process\.env\.ADMIN_EMAIL_DOMAIN/, "Admin email-domain restriction must remain configurable");
 assert.match(adminAuth, /user\.email\.toLowerCase\(\)\.endsWith\(/, "Admin email-domain restriction must check a normalized email suffix");
