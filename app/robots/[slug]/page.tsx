@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
@@ -6,6 +7,16 @@ import { getPublicRobot } from "@/lib/public-data";
 
 interface RobotDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: RobotDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const robot = await getPublicRobot(slug);
+  if (!robot) return { title: "Robot Not Found" };
+  return {
+    title: robot.name,
+    description: robot.summary.slice(0, 160),
+  };
 }
 
 export default async function RobotDetailPage({ params }: RobotDetailPageProps) {
