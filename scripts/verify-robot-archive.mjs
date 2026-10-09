@@ -24,7 +24,7 @@ assert.match(data, /engineering:undefined/, "Private engineering content must no
 assert.match(homepage, /aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage hero concept art must be clearly identified as illustrative, not documentary media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
 assert.doesNotMatch(homepage, /Hero Media Placeholder/, "Homepage must not display the old plain-text media placeholder");
-assert.match(competitionArchive, /record\.result, String\(record\.year\), record\.date, record\.report/, "Competition search must index outcomes, year, dates and report text");
+assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, record\.result, String\(record\.year\), record\.date, record\.report, \.\.\.record\.teamMembers/, "Competition search must index event details, outcomes, year, dates, reports and team members");
 assert.match(competitionArchive, /aria-label="Search competitions by event, organizer, location, robot, result, year, report or team member"/, "Competition search must have a descriptive accessible name");
 assert.match(competitionArchive, /role="status" aria-live="polite" aria-atomic="true"/, "Competition result count must be announced to assistive technology");
 assert.match(competitionsPage, /<CompetitionArchive records=\{competitions\} \/>/, "Competitions page must render the interactive archive");
