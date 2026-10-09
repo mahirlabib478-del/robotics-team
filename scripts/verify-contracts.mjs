@@ -98,4 +98,13 @@ assert.match(adminOperations, /if \(target === "published" && current\.publish_s
 assert.match(publicData, /url\.protocol === "https:"/, "Public profile links and media must reject non-HTTPS URLs");
 assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com" \|\| hostname === "youtu\.be"/, "Public YouTube embeds must use an allowlisted host");
 
+assert.match(adminAuth, /const allowedDomain = process\.env\.ADMIN_EMAIL_DOMAIN/, "Admin email-domain restriction must remain configurable");
+assert.match(adminAuth, /user\.email\.toLowerCase\(\)\.endsWith\(/, "Admin email-domain restriction must check a normalized email suffix");
+assert.match(adminAuth, /if \(process\.env\.REQUIRE_ADMIN_MFA === "true"\)[\s\S]*?assurance\?\.currentLevel !== "aal2"[\s\S]*?redirect\("\/admin\/mfa"\)/, "Admin MFA enforcement must require aal2 when enabled");
+assert.match(adminContent, /if \(current\.publish_status === "published" && !\["team_lead", "super_admin"\]\.includes\(profile\.role\)\)/, "Editing published robot and competition records must require leadership approval");
+assert.match(adminExtended, /if \(current\.publish_status === "published" && !\["team_lead", "super_admin"\]\.includes\(profile\.role\)\)/, "Editing published research and gallery records must require leadership approval");
+assert.match(adminOperations, /if \(current\.publish_status === "published" && !\["team_lead", "super_admin"\]\.includes\(profile\.role\)\)/, "Editing published team records must require leadership approval");
+assert.match(publicSubmissions, /Public submission rate-limit check failed[\s\S]*?return false/, "Rate limiting must fail closed if the database check fails");
+assert.match(publicSubmissions, /if \(!secret \|\| secret\.length < 32\)[\s\S]*?return null/, "Public submissions must fail closed without a sufficiently strong fingerprint secret");
+
 console.log("Contract checks passed: recruitment statuses/deadlines, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
