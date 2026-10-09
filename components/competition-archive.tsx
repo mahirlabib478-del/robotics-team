@@ -6,12 +6,13 @@ import type { CompetitionRecord } from "@/lib/types";
 
 interface CompetitionArchiveProps {
   records: CompetitionRecord[];
+  achievementsOnly?: boolean;
 }
 
 const selectClass = "min-w-0 rounded-xl border border-white/10 bg-[#07111f] px-3 py-3 text-sm text-slate-200 outline-none focus:border-[#19d3ff]/60";
 const results = ["Champion", "Runner-up", "Podium", "Finalist", "Participation"] as const;
 
-export function CompetitionArchive({ records }: CompetitionArchiveProps) {
+export function CompetitionArchive({ records, achievementsOnly = false }: CompetitionArchiveProps) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("All levels");
   const [year, setYear] = useState("All years");
@@ -60,7 +61,7 @@ export function CompetitionArchive({ records }: CompetitionArchiveProps) {
           </label>
           <label className="grid gap-2 text-xs text-slate-400">Result
             <select value={result} onChange={(event) => setResult(event.target.value)} className={selectClass}>
-              <option>All results</option>{results.map((item) => <option key={item}>{item}</option>)}
+              <option>All results</option>{results.filter((item) => !achievementsOnly || item !== "Participation").map((item) => <option key={item}>{item}</option>)}
             </select>
           </label>
           <label className="grid gap-2 text-xs text-slate-400 sm:col-span-2 lg:col-span-3">Competition segment
