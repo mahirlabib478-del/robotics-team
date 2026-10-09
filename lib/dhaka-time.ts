@@ -16,8 +16,13 @@ export function formatDhakaDateTimeLocal(value: string | Date): string {
 }
 
 export function parseDhakaDateTimeLocal(value: string): Date | null {
-  if (!/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}$/.test(value)) return null;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return null;
   const parsed = new Date(`${value}:00+06:00`);
   if (Number.isNaN(parsed.getTime()) || formatDhakaDateTimeLocal(parsed) !== value) return null;
   return parsed;
+}
+
+export function isPastDateTime(value: string): boolean {
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp <= Date.now();
 }

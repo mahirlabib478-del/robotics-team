@@ -1,7 +1,7 @@
 import { submitRecruitmentApplication } from "@/app/actions/public-submissions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { formatDhakaDateTimeLocal } from "@/lib/dhaka-time";
+import { isPastDateTime } from "@/lib/dhaka-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 interface JoinPageProps {
@@ -41,7 +41,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
     statusAvailable = false;
   }
 
-  const deadlinePassed = Boolean(settings?.deadline && new Date(settings.deadline).getTime() <= Date.now());
+  const deadlinePassed = Boolean(settings?.deadline && isPastDateTime(settings.deadline));
   const acceptingApplications = statusAvailable && settings?.applications_open === true && !deadlinePassed;
   const deadlineLabel = settings?.deadline
     ? new Intl.DateTimeFormat("en-BD", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Dhaka" }).format(new Date(settings.deadline))
