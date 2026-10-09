@@ -109,8 +109,8 @@ assert.match(publicSubmissions, /if \(!secret \|\| secret\.length < 32\)[\s\S]*?
 
 assert.match(adminAuth, /user\.email\.toLowerCase\(\)\.endsWith\(`@\$\{allowedDomain\}`\)/, "Admin email-domain restriction must match the complete domain suffix");
 assert.match(adminExtended, /function safeYouTube\([\s\S]*?new URL\(/, "Gallery YouTube links must be parsed as URLs before use");
-assert.match(adminExtended, /host === "youtu\.be" \|\| host === "youtube\.com" \|\| host === "www\.youtube\.com"/, "Gallery YouTube embeds must use an allowlisted host");
-assert.match(adminExtended, /\[A-Za-z0-9_-\]\{11\}/, "Gallery YouTube embeds must validate the video ID format");
+assert.match(adminExtended, /host\s*===\s*"(?:youtu\\.be|www\\.youtu\\.be|youtube\\.com|www\\.youtube\\.com)"/, "Gallery YouTube embeds must use an allowlisted host");
+assert.match(adminExtended, /A-Za-z0-9_-\]\{11\}/, "Gallery YouTube embeds must validate the video ID format");
 assert.match(adminExtended, /export async function transitionContent\([\s\S]*?const paths: Record<string, string> = \{[\s\S]*?research_posts:[\s\S]*?gallery_items:[\s\S]*?sponsors:/, "Generic publishing transitions must use an allowlisted content table");
 assert.match(adminExtended, /target === "published" && current === "review" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Extended content can only be published from review by leadership");
 assert.match(adminExtended, /target === "archived" && current !== "archived" && \["super_admin", "team_lead"\]\.includes\(profile\.role\)/, "Extended content archiving must be restricted to leadership");
