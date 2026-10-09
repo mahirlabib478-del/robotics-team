@@ -52,19 +52,32 @@ export async function archiveTeamMember(formData: FormData) {
   const id = value(formData, "id", 80);
   if (!/^[0-9a-f-]{36}$/i.test(id)) redirect("/admin/team?error=invalid-id");
 
+  const { data: current, error: readError } = await supabase
+    .from("team_members")
+    .select("publish_status")
+    .eq("id", id)
+    .maybeSingle();
+  if (readError || !current) redirect("/admin/team?error=not-found");
+  if (current.publish_status === "archived") redirect("/admin/team?error=archived");
+
   const { error } = await supabase.from("team_members").update({
     publish_status: "archived",
     updated_at: new Date().toISOString(),
   }).eq("id", id);
 
-  if (error) redirect("/admin/team?error=save");
+  if (error) {
+    console.error("Team member archive failed:", error);
+    redirect("/admin/team?error=save");
+  }
 
-  await supabase.from("audit_logs").insert({
+  const { error: auditError } = await supabase.from("audit_logs").insert({
     actor_id: profile.id,
     action: "archive_team_member",
     entity_type: "team_member",
     entity_id: id,
+    metadata: { from: current.publish_status, to: "archived" },
   });
+  if (auditError) console.error("Team member archive audit write failed:", auditError);
 
   redirect("/admin/team?saved=1");
 }
