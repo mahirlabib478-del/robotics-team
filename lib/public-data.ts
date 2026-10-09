@@ -29,8 +29,20 @@ function safeYouTubeUrl(value: unknown): string | undefined {
   const href = safePublicUrl(value);
   if (!href) return undefined;
   try {
-    const hostname = new URL(href).hostname.toLowerCase();
-    return hostname === "youtube.com" || hostname === "www.youtube.com" || hostname === "youtu.be" || hostname === "www.youtu.be" ? href : undefined;
+    const url = new URL(href);
+    const hostname = url.hostname.toLowerCase();
+    let videoId = "";
+    if (hostname === "youtu.be" || hostname === "www.youtu.be") {
+      videoId = url.pathname.split("/").filter(Boolean)[0] ?? "";
+    } else if (hostname === "youtube.com" || hostname === "www.youtube.com") {
+      if (url.pathname === "/watch") videoId = url.searchParams.get("v") ?? "";
+      else if (/^\/(embed|shorts|live)\//.test(url.pathname)) {
+        videoId = url.pathname.split("/").filter(Boolean)[1] ?? "";
+      }
+    } else {
+      return undefined;
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? href : undefined;
   } catch {
     return undefined;
   }
