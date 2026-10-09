@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicResearchPost } from "@/lib/public-data";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPublicResearchPost(slug);
+  if (!post) return { title: "Research Post Not Found" };
+  return {
+    title: post.title,
+    description: String(post.excerpt ?? "Public robotics research and engineering notes from Team Stellar.").slice(0, 160),
+  };
+}
 
 export default async function ResearchDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
