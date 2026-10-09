@@ -48,7 +48,6 @@ create table public.team_members (
   id uuid primary key default gen_random_uuid(), slug text unique not null, name text not null, role text not null, division text not null,
   department text, semester text, skills text[] not null default '{}', projects text[] not null default '{}', tenure text not null,
   alumni boolean not null default false, photo_url text, public_links jsonb not null default '[]'::jsonb,
-  created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   publish_status public.publish_status not null default 'draft', visibility public.visibility not null default 'public',
   created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
