@@ -121,3 +121,45 @@ export async function updateCompetition(formData: FormData) {
   redirect("/admin/competitions?saved=1");
 }
 
+
+
+function entityId(formData: FormData): string {
+  const id = value(formData, "id", 80);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) redirect("/admin?error=invalid-id");
+  return id;
+}
+
+async function transition(
+  formData: FormData,
+  table: "robots" | "competitions",
+  target: "review" | "published" | "archived",
+  roles: import("@/lib/types").UserRole[],
+  action: string,
+) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(roles, profile.role);
+  const id = entityId(formData);
+  const path = table === "robots" ? "/admin/robots" : "/admin/competitions";
+  const { data: current, error: readError } = await supabase.from(table).select("publish_status").eq("id", id).maybeSingle();
+  if (readError || !current) redirect(path + "?error=not-found");
+  const from = current.publish_status;
+  const allowed =
+    (target === "review" && from === "draft") ||
+    (target === "published" && from === "review" && ["team_lead", "super_admin"].includes(profile.role)) ||
+    (target === "archived" && from !== "archived" && ["team_lead", "super_admin"].includes(profile.role));
+  if (!allowed) redirect(path + "?error=invalid-transition");
+  const { error } = await supabase.from(table).update({
+    publish_status: target,
+    updated_by: profile.id,
+    updated_at: new Date().toISOString(),
+  }).eq("id", id);
+  if (error) {
+    console.error("Content transition failed:", error);
+    redirect(path + "?error=transition");
+  }
+  const { error: auditError } = await supabase.from("audit_logs").insert({
+    actor_id: profile.id, action, entity_type: table, entity_id: id, metadata: { from, to: target },
+  });
+  if (auditError) console.error("Content transition audit write failed:", auditError);
+  redirect(path + "?saved=1");
+}
