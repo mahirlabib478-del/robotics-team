@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { submitRecruitmentApplication } from "@/app/actions/public-submissions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { isPastDateTime } from "@/lib/dhaka-time";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+
+export const metadata: Metadata = {
+  title: "Join Team Stellar",
+  description: "Learn about recruitment opportunities and apply to join Team Stellar when applications are open.",
+};
 
 interface JoinPageProps {
   searchParams: Promise<{ submitted?: string; error?: string }>;
