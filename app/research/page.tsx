@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicResearch } from "@/lib/public-data";
+
+export const metadata: Metadata = {
+  title: "Research",
+  description: "Read public-safe robotics research, engineering reports, design summaries, and lessons from Team Stellar.",
+};
 
 const categories = [
   ["Technical Articles", "Engineering explainers and reusable lessons from the team."],
