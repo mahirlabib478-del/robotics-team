@@ -242,4 +242,17 @@ assert.ok(schema.includes("actor_id = (select auth.uid())"), "Fresh-install audi
 assert.ok(schema.includes("create or replace function public.prevent_audit_log_mutation()"), "Fresh-install schema must include the append-only audit guard");
 assert.ok(schema.includes("before update or delete on public.audit_logs"), "Fresh-install schema must guard audit-log updates and deletes");
 
+
+// SEO and public-indexing contracts: crawler rules are not access control, and
+// the sitemap must be assembled exclusively from public-facing routes/data.
+assert.match(robotsSource, /allow: "\/"/, "Public pages must remain crawlable");
+assert.match(robotsSource, /disallow: \["\/admin", "\/api"\]/, "Admin and API routes must remain excluded from crawler guidance");
+assert.match(sitemapSource, /if \(!base\) return \[\]/, "Sitemap generation must fail closed when the canonical site URL is missing");
+assert.match(sitemapSource, /getPublicRobots\(\)[\s\S]*getPublicCompetitions\(\)[\s\S]*getPublicResearch\(\)/, "Dynamic sitemap entries must use public data accessors");
+assert.doesNotMatch(sitemapSource, /\/admin|recruitment_applications|contact_messages|audit_logs|profiles/, "Sitemap must never enumerate private admin or operational records");
+assert.match(sitemapSource, /encodeURIComponent\(item\.slug\)/, "Dynamic public detail slugs must be URL-encoded");
+assert.match(sitemapSource, /url\.protocol === "https:" \|\| url\.hostname === "localhost"/, "Canonical site URL must reject insecure non-local HTTP URLs");
+assert.match(siteHeader, /aria-label="Primary navigation"/, "Primary navigation landmark must remain accessible");
+assert.match(siteHeader, /aria-label="Mobile navigation"/, "Mobile navigation landmark must remain accessible");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
