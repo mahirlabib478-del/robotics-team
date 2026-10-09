@@ -28,6 +28,11 @@ begin
     return new;
   end if;
 
+  if old.publish_status = 'archived' and new.publish_status <> 'archived' then
+    raise exception 'Archived content cannot be reopened through direct updates'
+      using errcode = '42501';
+  end if;
+
   if new.publish_status = 'published'
      and (old.publish_status <> 'review' or not is_leader) then
     raise exception 'Only team leadership may publish reviewed content'

@@ -91,6 +91,7 @@ assert.ok(publishGuardMigration.includes("security invoker") && publishGuardMigr
 assert.ok(publishGuardMigration.includes("old.publish_status <> 'review' or not is_leader"), "Database must block publication without review and leadership approval");
 assert.ok(publishGuardMigration.includes("old.publish_status <> 'published'") === false || publishGuardMigration.includes("Only leadership may unpublish content"), "Published-content transition guard must be present");
 assert.ok(publishGuardMigration.includes("Published content edits require leadership and must return to draft"), "Published content edits must be returned to draft");
+assert.ok(publishGuardMigration.includes("Archived content cannot be reopened through direct updates"), "Archived content must not be reopened by bypassing the admin workflow");
 for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
   assert.ok(publishGuardMigration.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow();`), `Database publishing guard must cover ${table}`);
 }
