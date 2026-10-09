@@ -168,6 +168,7 @@ export async function archiveCompetition(formData: FormData) {
 }
 
 
+// Editing published content requires leadership approval and returns the record to draft for review.
 export async function updateRobot(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
