@@ -86,6 +86,15 @@ const [adminAuth, adminContent, adminExtended, adminOperations] = await Promise.
   read("app/actions/admin-operations.ts"),
 ]);
 
+const publishGuardMigration = await read("supabase/migrations/20261009_database_publish_workflow_guard.sql");
+assert.match(publishGuardMigration, /create or replace function public\\.enforce_content_publish_workflow\\(\\)[\\s\\S]*?security invoker[\\s\\S]*?set search_path = ''/, "Database publishing guard must use a constrained invoker context");
+assert.match(publishGuardMigration, /new\\.publish_status = 'published'[\\s\\S]*?old\\.publish_status <> 'review'[\\s\\S]*?not is_leader/, "Database must block publication without review and leadership approval");
+assert.match(publishGuardMigration, /old\\.publish_status = 'published'[\\s\\S]*?new\\.publish_status <> 'published'[\\s\\S]*?not is_leader/, "Only leadership may unpublish existing public content");
+assert.match(publishGuardMigration, /Published content edits require leadership and must return to draft/, "Published content edits must be returned to draft");
+for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
+  assert.ok(publishGuardMigration.includes(`on public.${table}\nfor each row execute function public.enforce_content_publish_workflow()`), `Database publishing guard must cover ${table}`);
+}
+
 assert.match(adminAuth, /export async function requireAdminSession\([\s\S]*?auth\.getUser\(\)/, "Admin routes and actions must validate the current auth session");
 assert.match(adminAuth, /if \(!user\.email_confirmed_at\)[\s\S]*?auth\.signOut\(\)/, "Unverified admin accounts must be signed out");
 assert.match(adminAuth, /if \(!profile \|\| !privilegedRoles\.includes\(profile\.role as UserRole\)\)/, "Admin access must require an allowlisted profile role");
