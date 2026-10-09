@@ -278,6 +278,14 @@ for (const [label, source] of [
   assert.match(source, /create or replace function public\\.set_updated_at\\(\\)[\\s\\S]*?set search_path = ''/, `${label} updated-at trigger must use an empty search_path`);
   assert.match(source, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, `${label} updated-at trigger must not be directly executable by client roles`);
 }
+for (const [label, source] of [
+  ["data-integrity migration", dataIntegrityMigration],
+  ["fresh-install schema", schema],
+]) {
+  assert.match(source, /create policy internal_audit_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict audit-log reads to team leadership`);
+  assert.match(source, /create policy admin_profiles_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead','hr_operations'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict staff-profile reads to authorized operational roles`);
+}
+
 for (const constraint of [
   "robots_weight_nonnegative", "robots_year_reasonable", "robots_slug_format",
   "competitions_year_reasonable", "competitions_slug_format", "team_members_slug_format",
@@ -293,8 +301,6 @@ for (const [label, source] of [
   ["upgrade migration", auditIntegrityMigration],
   ["fresh-install schema", schema],
 ]) {
-  assert.match(source, /create policy internal_audit_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict audit-log reads to team leadership`);
-  assert.match(source, /create policy admin_profiles_read[\\s\\S]*?for select to authenticated[\\s\\S]*?private\\.has_any_role\\(array\\['super_admin','team_lead','hr_operations'\\]::public\\.user_role\\[\\]\\)/, `${label} must restrict staff-profile reads to authorized operational roles`);
   assert.equal((source.match(/create policy admin_audit_insert/g) || []).length, 1, `${label} must define a single authoritative audit insert policy`);
   assert.match(source, /create policy admin_audit_insert[\s\S]*?on public\.audit_logs[\s\S]*?for insert[\s\S]*?to authenticated[\s\S]*?with check \([\s\S]*?private\.has_any_role\(array\['super_admin','team_lead','technical_lead','media','hr_operations'\]::public\.user_role\[\]\)[\s\S]*?actor_id = \(select auth\.uid\(\)\)/, `${label} must restrict audit inserts to approved roles and bind actor_id to auth.uid()`);
   assert.match(source, /create or replace function public\.prevent_audit_log_mutation\(\)[\s\S]*?language plpgsql[\s\S]*?set search_path = ''/, `${label} audit guard must use an empty search_path`);
