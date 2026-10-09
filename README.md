@@ -15,6 +15,7 @@ Professional public website and future engineering platform for the BRAC Univers
 - [Roadmap and phase release gates](ROADMAP.md)
 - [Development and release workflow](docs/DEVELOPMENT.md)
 - [Security and privacy boundaries](docs/SECURITY.md)
+- [Phase 2 database release checklist](docs/PHASE2-RELEASE-CHECKLIST.md)
 
 ## Product phases
 
