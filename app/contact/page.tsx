@@ -2,6 +2,7 @@ import { submitContactMessage } from "@/app/actions/public-submissions";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
+// Keep the public inquiry form comfortable on narrow mobile screens.
 interface ContactPageProps {
   searchParams: Promise<{ submitted?: string; error?: string }>;
 }
