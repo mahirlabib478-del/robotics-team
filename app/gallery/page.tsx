@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -64,7 +65,7 @@ export default async function GalleryPage() {
                 return (
                   <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">
                     {item.source_type === "image" ? (
-                      <img src={item.source_url} alt={item.alt_text} loading="lazy" decoding="async" className="aspect-video w-full object-cover" />
+                      <Image src={item.source_url} alt={item.alt_text} width={1280} height={720} unoptimized loading="lazy" className="aspect-video w-full object-cover" />
                     ) : embedUrl ? (
                       <iframe
                         src={embedUrl}
