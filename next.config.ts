@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// Keep this frame allowlist aligned with the gallery's validated YouTube-nocookie embeds.
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
