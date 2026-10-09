@@ -119,4 +119,17 @@ assert.match(adminExtended, /if \(current\.publish_status === "archived"\) go\("
 assert.match(adminExtended, /if \(current\.publish_status === "archived"\) go\("\/admin\/sponsors", "archived"\)/, "Archived sponsors must not be edited");
 assert.match(adminOperations, /if \(current\.publish_status === "archived"\) redirect\("\/admin\/team\?error=archived"\)/, "Archived team records must not be edited");
 
-console.log("Contract checks passed: recruitment statuses/deadlines, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
+const [competitionArchive, competitionPage] = await Promise.all([
+  read("components/competition-archive.tsx"),
+  read("app/competitions/page.tsx"),
+]);
+assert.match(competitionPage, /<CompetitionArchive records=\{competitions\} \/>/, "Competition page must render the interactive archive from public records");
+assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, \.\.\.record\.teamMembers/, "Competition search must cover event, organizer, location, robot, segment, and team members");
+assert.match(competitionArchive, /record\.level === level/, "Competition archive must filter by national/international level");
+assert.match(competitionArchive, /String\(record\.year\) === year/, "Competition archive must filter by event year");
+assert.match(competitionArchive, /record\.result === result/, "Competition archive must filter by result");
+assert.match(competitionArchive, /record\.segment === segment/, "Competition archive must filter by competition segment");
+assert.match(competitionArchive, /aria-live="polite"/, "Filtered record count must be announced accessibly");
+assert.match(competitionArchive, /No records match these filters/, "Empty filtered results must provide a useful recovery state");
+
+console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
