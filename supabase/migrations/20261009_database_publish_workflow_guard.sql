@@ -19,8 +19,8 @@ begin
   -- Published and archived records must not be removable through direct table deletes.
   -- Keep historical/approved content auditable; use the archive workflow instead.
   if tg_op = 'DELETE' then
-    if old.publish_status in ('published', 'archived') then
-      raise exception 'Published or archived content cannot be deleted; archive or retain it instead'
+    if old.publish_status in ('review', 'published', 'archived') then
+      raise exception 'Review, published, or archived content cannot be deleted; return to draft before removal'
         using errcode = '42501';
     end if;
     return old;
