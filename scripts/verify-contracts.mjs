@@ -110,6 +110,18 @@ assert.match(adminOperations, /if \(target === "published"\) requireAnyRole\(\["
 assert.match(adminOperations, /export async function archiveTeamMember\(formData: FormData\)[\s\S]*?requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Team member archiving must match the database leadership-only policy");
 const teamPage = await read("app/admin/team/page.tsx");
 assert.match(teamPage, /member\.publish_status !== "archived" && \(profile\.role === "team_lead" \|\| profile\.role === "super_admin"\) \? <button formAction=\{archiveTeamMember\}/, "Team archive button must only be shown to roles permitted by the server action and database guard");
+const [robotsAdminPage, competitionsAdminPage, researchAdminPage, galleryAdminPage, sponsorsAdminPage] = await Promise.all([
+  read("app/admin/robots/page.tsx"),
+  read("app/admin/competitions/page.tsx"),
+  read("app/admin/research/page.tsx"),
+  read("app/admin/gallery/page.tsx"),
+  read("app/admin/sponsors/page.tsx"),
+]);
+assert.match(robotsAdminPage, /robot\.publish_status !== "archived" && \(profile\.role === "team_lead" \|\| profile\.role === "super_admin"\) \? <button formAction=\{archiveRobot\}/, "Robot archive UI must match leadership-only server/database policy");
+assert.match(competitionsAdminPage, /item\.publish_status !== "archived" && \(profile\.role === "team_lead" \|\| profile\.role === "super_admin"\) \? <button formAction=\{archiveCompetition\}/, "Competition archive UI must match leadership-only server/database policy");
+assert.match(researchAdminPage, /item\.publish_status !== "archived" && \(profile\.role === "team_lead" \|\| profile\.role === "super_admin"\) \? <form action=\{transitionContent\}/, "Research archive UI must match leadership-only server/database policy");
+assert.match(galleryAdminPage, /x\.publish_status!=="archived"&&\(profile\.role==="team_lead"\|\|profile\.role==="super_admin"\)&&<form action=\{transitionContent\}/, "Gallery archive UI must match leadership-only server/database policy");
+assert.match(sponsorsAdminPage, /x\.publish_status!=="archived"&&<form action=\{transitionContent\}/, "Sponsor archive UI must remain on the leadership-only admin page");
 assert.match(adminOperations, /if \(target === "review" && current\.publish_status !== "draft"\)/, "Team member review transition must only accept drafts");
 assert.match(adminOperations, /if \(target === "published" && current\.publish_status !== "review"\)/, "Team member publishing must only accept reviewed records");
 assert.match(publicData, /url\.protocol === "https:"/, "Public profile links and media must reject non-HTTPS URLs");
