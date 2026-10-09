@@ -140,11 +140,11 @@ for (const table of ["team_members", "research_posts", "gallery_items", "sponsor
 }
 for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors"]) {
   const definition = schema.match(new RegExp("create table public\\." + table + " \\(([\\s\\S]*?)\\n\\);"));
-  assert.ok(definition, \`Fresh schema must define provenance table \${table}\`);
-  assert.match(definition[1], /created_by uuid references public\.profiles\(id\)/, \`Fresh schema must include creator provenance for \${table}\`);
-  assert.match(definition[1], /updated_by uuid references public\.profiles\(id\)/, \`Fresh schema must include updater provenance for \${table}\`);
+  assert.ok(definition, `Fresh schema must define provenance table ${table}`);
+  assert.match(definition[1], /created_by uuid references public\.profiles\(id\)/, `Fresh schema must include creator provenance for ${table}`);
+  assert.match(definition[1], /updated_by uuid references public\.profiles\(id\)/, `Fresh schema must include updater provenance for ${table}`);
   const columns = [...definition[1].matchAll(/^\s*([a-z_]+)\s+/gm)].map((match) => match[1]);
-  assert.equal(new Set(columns).size, columns.length, \`Fresh schema must not duplicate columns in \${table}\`);
+  assert.equal(new Set(columns).size, columns.length, `Fresh schema must not duplicate columns in ${table}`);
 }
 assert.match(adminExtended, /created_by: profile\.id, updated_by: profile\.id/, "Extended content creation must record creator and updater");
 assert.match(adminOperations, /created_by: profile\.id, updated_by: profile\.id/, "Team member creation must record creator and updater");
