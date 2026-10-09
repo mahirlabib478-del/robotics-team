@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
+
+export const metadata: Metadata = {
+  title: "About Team Stellar",
+  description: "Learn about Team Stellar, the BRAC University Robotics Team, its engineering principles, and public mission.",
+};
 
 const principles = [
   ["Engineering first", "Mechanical design, electronics, embedded systems, software, AI and control are treated as one engineering system."],
