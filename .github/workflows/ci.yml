@@ -30,5 +30,8 @@ jobs:
       - name: Contract checks
         run: npm run verify:contracts
 
+      - name: Robot archive regression checks
+        run: node scripts/verify-robot-archive.mjs
+
       - name: Production build
         run: npm run build
