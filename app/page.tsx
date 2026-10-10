@@ -39,10 +39,10 @@ export default async function Home() {
             <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
               Team Stellar designs, builds, tests and documents robotics systems across mechanical engineering, embedded electronics, software, AI and autonomous control.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/robots" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold transition hover:bg-[#1479ff]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Explore Our Robots</Link>
-              <Link href="/achievements" className="rounded-full border border-white/15 px-6 py-3 font-semibold transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">View Achievements</Link>
-              <Link href="/sponsors" className="rounded-full border border-[#ff7a00]/50 px-6 py-3 font-semibold text-[#ffb36f] transition hover:bg-[#ff7a00]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Partner With Us</Link>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <Link href="/robots" className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#1479ff] px-6 py-3 text-center font-semibold leading-snug transition hover:bg-[#1479ff]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff] sm:w-auto">Explore Our Robots</Link>
+              <Link href="/achievements" className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-white/15 px-6 py-3 text-center font-semibold leading-snug transition hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff] sm:w-auto">View Achievements</Link>
+              <Link href="/sponsors" className="inline-flex min-h-12 w-full items-center justify-center rounded-full border border-[#ff7a00]/50 px-6 py-3 text-center font-semibold leading-snug text-[#ffb36f] transition hover:bg-[#ff7a00]/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff] sm:w-auto">Partner With Us</Link>
             </div>
             <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
           </div>
