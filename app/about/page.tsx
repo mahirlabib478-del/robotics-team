@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
 import { getPublicRobots } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "About Team Stellar",
   description: "Learn about Team Stellar, the BRAC University Robotics Team, its engineering principles, and public mission.",
