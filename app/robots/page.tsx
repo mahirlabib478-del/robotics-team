@@ -16,7 +16,7 @@ export default async function RobotsPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading eyebrow="Engineering archive" title="Robots" description="Search the published engineering archive by robot name, category, development status and technical specification. Each public record separates verified information from restricted engineering data." />
+        <SectionHeading level="h1" eyebrow="Engineering archive" title="Robots" description="Search the published engineering archive by robot name, category, development status and technical specification. Each public record separates verified information from restricted engineering data." />
         <RobotArchive robots={robots} />
       </section>
       <SiteFooter />
