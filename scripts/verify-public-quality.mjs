@@ -70,7 +70,7 @@ assert.match(researchActions, /cover_image_alt: coverImageUrl \? coverImageAlt :
 assert.match(publicData, /safePublicUrl\(result\.data\.cover_image_url\)/, "Research cover URLs must be sanitized before public rendering");
 assert.match(researchPage, /post\.cover_image_url \? <Image/, "Research listing cards must render approved cover images");
 assert.match(researchDetail, /post\.cover_image_url \? <Image/, "Research article detail must render approved cover images");
-assert.match(schema, /cover_image_alt text, check \(cover_image_url is null or \(cover_image_alt is not null and length\(trim\(cover_image_alt\)\) > 0\)\)/, "Fresh schema must require alt text for research covers");
+assert.match(schema, /cover_image_alt text, constraint research_posts_cover_image_alt_required check \(cover_image_url is null or \(cover_image_alt is not null and length\(trim\(cover_image_alt\)\) > 0\)\)/, "Fresh schema must require alt text for research covers");
 assert.match(researchMigration, /research_posts_cover_image_alt_required/, "Upgrade migration must enforce research cover accessibility metadata");
 assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");
 assert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
