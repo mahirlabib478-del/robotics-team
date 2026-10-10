@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: CompetitionDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const record = await getPublicCompetition(slug);
+  const record = await getPublicCompetition(slug).catch((error) => { console.error("[competition-detail] Metadata data unavailable", error); return null; });
   if (!record) return { title: "Competition Not Found" };
   return {
     title: record.competition,
