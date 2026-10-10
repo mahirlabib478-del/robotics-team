@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +27,9 @@ const categories = [
 ];
 
 export default async function ResearchPage() {
-  const posts = await getPublicResearch();
+  let posts: Awaited<ReturnType<typeof getPublicResearch>>;
+  try { posts = await getPublicResearch(); }
+  catch (error) { console.error("[research] Public research archive is unavailable", error); return <PublicDataUnavailable resource="research posts" />; }
   return (
     <main className="min-h-screen">
       <SiteHeader />
