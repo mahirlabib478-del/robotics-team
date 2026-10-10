@@ -24,9 +24,9 @@ function adminClientOrRedirect(target: string) {
 }
 
 async function getRequesterFingerprint(formType: "recruitment" | "contact") {
-  const secret = process.env.PUBLIC_FORM_RATE_LIMIT_SECRET;
+  const secret = process.env.FORM_RATE_LIMIT_SECRET;
   if (!secret || secret.length < 32) {
-    console.error("PUBLIC_FORM_RATE_LIMIT_SECRET must be configured with at least 32 characters.");
+    console.error("FORM_RATE_LIMIT_SECRET must be configured with at least 32 characters.");
     return null;
   }
 
