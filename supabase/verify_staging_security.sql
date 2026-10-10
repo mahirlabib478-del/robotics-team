@@ -270,6 +270,28 @@ checks as (
 
   union all
   select
+    'Engineering audit triggers are enabled',
+    exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_projects') and g.tgname='engineering_projects_audit' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_project_members') and g.tgname='engineering_project_members_audit' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_tasks') and g.tgname='engineering_tasks_audit' and not g.tgisinternal and g.tgenabled <> 'D'),
+    'Apply and enable the database audit triggers for projects, memberships and tasks'
+
+  union all
+  select
+    'Engineering audit trigger function is hardened and not directly executable',
+    exists (
+      select 1 from pg_proc p
+      where p.oid=to_regprocedure('private.audit_engineering_mutation()')
+        and p.prosecdef
+        and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
+    )
+      and to_regprocedure('private.audit_engineering_mutation()') is not null
+      and not has_function_privilege('anon','private.audit_engineering_mutation()','EXECUTE')
+      and not has_function_privilege('authenticated','private.audit_engineering_mutation()','EXECUTE'),
+    'Recreate private.audit_engineering_mutation as SECURITY DEFINER with empty search_path and revoke direct execution'
+
+  union all
+  select
     'Engineering task history trigger is enabled',
     exists (
       select 1 from pg_trigger g
