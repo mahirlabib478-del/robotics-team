@@ -17,6 +17,8 @@ const [layout, header, footer, contact, join, sitemap, robots, home, notFound] =
 assert.match(layout, /<html lang="en">/, "Document must declare its language");
 assert.match(layout, /title: \{ default: "Team Stellar \| BRAC University Robotics Team", template: "%s \| Team Stellar" \}/, "Site must provide default and templated page titles");
 assert.match(layout, /description:/, "Site must provide a default meta description");
+assert.match(layout, /href="#main-content"/, "Every route must offer a keyboard skip link");
+assert.match(layout, /id="main-content" tabIndex=\{-1\}/, "Skip link target must be programmatically focusable");
 
 assert.match(header, /aria-label="Primary navigation"/, "Desktop navigation needs an accessible name");
 assert.match(header, /aria-label="Mobile navigation"/, "Mobile navigation needs an accessible name");
