@@ -456,4 +456,16 @@ for (const table of ["profiles", "robots", "competitions", "team_members", "rese
 
 
 
+const [updatedAtHardening, stagingBootstrap] = await Promise.all([
+  read("supabase/migrations/20261010_harden_updated_at_search_path.sql"),
+  read("docs/SUPABASE-STAGING-SETUP.md"),
+]);
+assert.match(updatedAtHardening, /set search_path = ''/, "Updated-at hardening migration must use an empty search_path");
+assert.match(updatedAtHardening, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, "Updated-at trigger function must not be directly executable by client roles");
+assert.match(schema, /create or replace function public\\.set_updated_at\\(\\)[\\s\\S]*?set search_path = ''/, "Fresh-install schema must include the hardened updated-at function");
+assert.match(schema, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, "Fresh-install schema must revoke direct client execution of updated-at function");
+assert.match(stagingBootstrap, /Do not run every file in \`supabase\\/migrations\\/\` on top of this current schema snapshot/, "Staging runbook must distinguish fresh installs from migration upgrades");
+assert.match(stagingBootstrap, /leave the decision \\*\\*BLOCKED \\/ NOT VERIFIED\\*\\*/, "Staging runbook must not permit release approval while checks are pending");
+assert.match(stagingBootstrap, /Never prefix a secret with \`NEXT_PUBLIC_\`/, "Staging runbook must preserve server-only secret guidance");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public projections.");
