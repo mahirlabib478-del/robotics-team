@@ -38,7 +38,7 @@ Set these server/client environment variables in the production project:
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — Supabase publishable key.
 - `SUPABASE_SERVICE_ROLE_KEY` — server-only; never expose to client code.
-- `PUBLIC_FORM_RATE_LIMIT_SECRET` — random server-only secret, at least 32 characters.
+- `FORM_RATE_LIMIT_SECRET` — random server-only secret, at least 32 characters.
 - `ADMIN_EMAIL_DOMAIN` — recommended university domain restriction.
 - `REQUIRE_ADMIN_MFA=true` — only after every privileged admin account has a verified TOTP factor and recovery has been tested.
 
