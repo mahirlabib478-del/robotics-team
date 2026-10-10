@@ -76,7 +76,7 @@ export async function createEngineeringTask(formData: FormData) {
   const priority = value(formData, "priority", 20);
   const dueDate = value(formData, "due_date", 10);
   const assigneeEmail = value(formData, "assignee_email", 254).toLowerCase();
-  if (!validId(projectId) || !title || !["low", "normal", "high", "urgent"].includes(priority) || !validDate(dueDate) || (assigneeEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(assigneeEmail))) {
+  if (!validId(projectId) || !title || !["low", "normal", "high", "urgent"].includes(priority) || !validDate(dueDate) || (assigneeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(assigneeEmail))) {
     redirect("/engineering/projects?error=invalid-task");
   }
   let assigneeId: string | null = null;
