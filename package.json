@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "verify:contracts": "node scripts/verify-contracts.mjs"
+    "verify:contracts": "node scripts/verify-contracts.mjs",
+    "verify:smoke": "node scripts/smoke-production-routes.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
