@@ -262,6 +262,14 @@ checks as (
 
   union all
   select
+    'Engineering immutable-attribution triggers are enabled',
+    exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_projects') and g.tgname='engineering_project_creator_immutable' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_tasks') and g.tgname='engineering_task_identity_immutable' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_project_members') and g.tgname='engineering_membership_identity_immutable' and not g.tgisinternal and g.tgenabled <> 'D'),
+    'Apply the engineering migration and enable immutable project/task/membership attribution triggers'
+
+  union all
+  select
     'Engineering task history trigger is enabled',
     exists (
       select 1 from pg_trigger g
