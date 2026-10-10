@@ -474,7 +474,6 @@ assert.ok(stagingBootstrap.includes("Never prefix a secret with `NEXT_PUBLIC_`")
 
 const publicEngineeringMigration = await read("supabase/migrations/20261010_public_robot_engineering.sql");
 const robotAdminPage = await read("app/admin/robots/page.tsx");
-const adminContentActions = await read("app/actions/admin-content.ts");
 assert.match(publicEngineeringMigration, /add column if not exists public_engineering jsonb not null default '\{\}'::jsonb/, "Upgrade migration must add a separate public engineering field");
 assert.match(schema, /public_engineering jsonb not null default '\{\}'::jsonb check \(jsonb_typeof\(public_engineering\) = 'object'\)/, "Fresh schema must constrain public engineering content to a JSON object");
 assert.match(publicData, /safePublicEngineering\(robot\.public_engineering\)/, "Public projection must pass engineering content through an allowlist");
