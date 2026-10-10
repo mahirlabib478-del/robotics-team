@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage] = await Promise.all([
+const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth] = await Promise.all([
   read("app/layout.tsx"),
   read("components/site-header.tsx"),
   read("components/site-footer.tsx"),
