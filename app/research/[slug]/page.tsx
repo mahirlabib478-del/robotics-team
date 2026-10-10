@@ -8,7 +8,7 @@ import { getPublicResearchPost } from "@/lib/public-data";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPublicResearchPost(slug);
+  const post = await getPublicResearchPost(slug).catch((error) => { console.error("[research-detail] Metadata data unavailable", error); return null; });
   if (!post) return { title: "Research Post Not Found" };
   return {
     title: post.title,
