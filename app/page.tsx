@@ -182,6 +182,23 @@ export default async function Home() {
         <Link href="/sponsors" className="mt-8 inline-flex rounded-full bg-[#ff7a00] px-6 py-3 font-bold text-white transition hover:bg-[#ff7a00]/90">Explore Partnership →</Link>
       </section>
 
+
+      <section className="border-y border-white/10 bg-[linear-gradient(120deg,rgba(20,121,255,.12),rgba(25,211,255,.04)_55%,transparent)]">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#19d3ff]">Join the mission</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Build what comes next.</h2>
+            <p className="mt-4 text-base leading-7 text-slate-300">
+              Bring your curiosity to mechanical design, embedded systems, software, AI, testing or competition operations. Explore the team and apply when recruitment is open.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <Link href="/join-us" className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#1479ff] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#1479ff]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Explore Recruitment <span aria-hidden="true" className="ml-2">→</span></Link>
+            <Link href="/contact" className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/15 px-6 py-3 text-center text-sm font-semibold text-white transition hover:border-[#19d3ff]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Contact the Team</Link>
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
     </main>
   );
