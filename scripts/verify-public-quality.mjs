@@ -32,7 +32,7 @@ for (const [source, label] of [[contact, "Contact"], [join, "Recruitment"]]) {
   assert.match(source, /name="website" tabIndex=\{-1\} autoComplete="off"/, `${label} form must include its spam honeypot`);
 }
 assert.match(contact, /<label[\s\S]*Message[\s\S]*<textarea name="message"/, "Contact message field must have a visible label");
-assert.match(join, /htmlFor=/, "Recruitment fields must use explicit labels");
+assert.match(join, /function Field[\\s\\S]*?<label[\\s\\S]*?<input name=\{name\}/, "Recruitment inputs must be nested in their visible labels");
 
 assert.match(sitemap, /if \(!base\) return \[\]/, "Sitemap must fail closed without a valid canonical site URL");
 assert.match(sitemap, /getPublicRobots\(\)/, "Sitemap robot routes must use public-safe data");
