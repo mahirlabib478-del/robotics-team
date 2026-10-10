@@ -121,9 +121,9 @@ export async function transitionContent(f: FormData) {
 export async function updateResearchPost(f: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
-  const id = v(f, "id", 80), title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120), coverImageUrl = v(f, "cover_image_url", 1200);
+  const id = v(f, "id", 80), title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120), coverImageUrl = v(f, "cover_image_url", 1200), coverImageAlt = v(f, "cover_image_alt", 300);
   if (!/^[0-9a-f-]{36}$/i.test(id) || !title || !validSlug(slug) || !excerpt || !body || !category) go("/admin/research", "invalid");
-  if (coverImageUrl && !safeHttps(coverImageUrl)) go("/admin/research", "invalid-url");
+  if (coverImageUrl && (!safeHttps(coverImageUrl) || !coverImageAlt)) go("/admin/research", "invalid-url");
   const { data: current, error: readError } = await supabase.from("research_posts").select("publish_status").eq("id", id).maybeSingle();
   if (readError || !current) { go("/admin/research", "not-found"); return; }
   if (current.publish_status === "archived") go("/admin/research", "archived");
