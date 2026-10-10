@@ -93,6 +93,8 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 
 **Status: Planned; do not treat the public portfolio or CMS as the engineering portal.**
 
+Security/data model proposal: [Private Engineering Portal — Data and Access Design](docs/engineering-portal-security-design.md). This is a design artifact, not a migration or proof of staging security; keep Phase 3 implementation items unchecked until tests pass.
+
 Implement in this order:
 
 1. **Private access boundary**
