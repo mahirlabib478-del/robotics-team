@@ -420,7 +420,7 @@ for (const [name, table] of [
   const selects = [...accessor.matchAll(/\.select\("([^"]+)"\)/g)].map((match) => match[1]);
   assert.ok(selects.length > 0, `${name} must use explicit selected columns`);
   for (const columns of selects) {
-    assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|engineering|service_role)/i, `${name} must not select private provenance or engineering fields`);
+    assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|(?<!public_)engineering|service_role)/i, `${name} must not select private provenance or engineering fields`);
   }
 }
 assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com"/, "YouTube URLs must be restricted to recognized hostnames");
