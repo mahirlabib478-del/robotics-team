@@ -48,13 +48,14 @@ function youtubeEmbedUrl(source: string) {
   }
 }
 
+const categoryDescriptions = new Map<string, string>(categories);
 const buttonClass = "rounded-full border px-3 py-2 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#19d3ff]";
 
 export function GalleryArchive({ items }: GalleryArchiveProps) {
   const [activeCategory, setActiveCategory] = useState("All media");
   const [search, setSearch] = useState("");
   const availableCategories = useMemo(
-    () => categories.filter(([category]) => items.some((item) => item.category === category)),
+    () => [...new Set(items.map((item) => item.category).filter(Boolean))].sort((a, b) => a.localeCompare(b)),
     [items],
   );
   const filtered = useMemo(() => {
@@ -77,8 +78,8 @@ export function GalleryArchive({ items }: GalleryArchiveProps) {
         </div>
         <div className="mt-5 flex flex-wrap gap-2" aria-label="Filter gallery by category">
           <button type="button" aria-pressed={activeCategory === "All media"} onClick={() => setActiveCategory("All media")} className={`${buttonClass} ${activeCategory === "All media" ? "border-[#19d3ff]/50 bg-[#19d3ff]/10 text-[#b6f4ff]" : "border-white/10 text-slate-300 hover:border-white/25"}`}>All media</button>
-          {availableCategories.map(([category, description]) => (
-            <button key={category} type="button" title={description} aria-pressed={activeCategory === category} onClick={() => setActiveCategory(category)} className={`${buttonClass} ${activeCategory === category ? "border-[#19d3ff]/50 bg-[#19d3ff]/10 text-[#b6f4ff]" : "border-white/10 text-slate-300 hover:border-white/25"}`}>{category}</button>
+          {availableCategories.map((category) => (
+            <button key={category} type="button" title={categoryDescriptions.get(category) ?? "Published media category"} aria-pressed={activeCategory === category} onClick={() => setActiveCategory(category)} className={`${buttonClass} ${activeCategory === category ? "border-[#19d3ff]/50 bg-[#19d3ff]/10 text-[#b6f4ff]" : "border-white/10 text-slate-300 hover:border-white/25"}`}>{category}</button>
           ))}
         </div>
       </div>
