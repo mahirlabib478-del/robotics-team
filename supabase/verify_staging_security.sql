@@ -159,6 +159,66 @@ checks as (
     coalesce((select c.relrowsecurity from pg_class c where c.oid=to_regclass('public.recruitment_applications')),false)
       and coalesce((select c.relrowsecurity from pg_class c where c.oid=to_regclass('public.contact_messages')),false),
     'Enable RLS on recruitment_applications and contact_messages'
+  union all
+  select
+    'Publishing guard is SECURITY INVOKER with empty search_path',
+    exists (
+      select 1 from pg_proc p
+      where p.oid=to_regprocedure('public.enforce_content_publish_workflow()')
+        and not p.prosecdef
+        and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
+    ),
+    'Apply the database publish-workflow guard migration and preserve SECURITY INVOKER with an empty search_path'
+
+  union all
+  select
+    'Publishing guard is not directly executable by client roles',
+    to_regprocedure('public.enforce_content_publish_workflow()') is not null
+      and not has_function_privilege('anon','public.enforce_content_publish_workflow()','EXECUTE')
+      and not has_function_privilege('authenticated','public.enforce_content_publish_workflow()','EXECUTE'),
+    'Revoke direct execution of public.enforce_content_publish_workflow() from PUBLIC, anon, and authenticated'
+
+  union all
+  select
+    'Audit table RLS enabled',
+    coalesce((select c.relrowsecurity from pg_class c where c.oid=to_regclass('public.audit_logs')),false),
+    'Enable row-level security on public.audit_logs'
+
+  union all
+  select
+    'Audit table denies direct client updates and deletes',
+    to_regclass('public.audit_logs') is not null
+      and not has_table_privilege('anon','public.audit_logs','UPDATE')
+      and not has_table_privilege('anon','public.audit_logs','DELETE')
+      and not has_table_privilege('authenticated','public.audit_logs','UPDATE')
+      and not has_table_privilege('authenticated','public.audit_logs','DELETE'),
+    'Revoke UPDATE and DELETE on public.audit_logs from anon and authenticated'
+
+  union all
+  select
+    'Audit append-only trigger is enabled',
+    exists (
+      select 1 from pg_trigger g
+      where g.tgrelid=to_regclass('public.audit_logs')
+        and g.tgname='audit_logs_append_only'
+        and not g.tgisinternal
+        and g.tgenabled <> 'D'
+    ),
+    'Enable the audit_logs_append_only trigger after applying the audit integrity migration'
+
+  union all
+  select
+    'updated-at trigger installed: ' || t.table_name,
+    exists (
+      select 1 from pg_trigger g
+      where g.tgrelid=to_regclass('public.' || t.table_name)
+        and g.tgname=t.table_name || '_set_updated_at'
+        and not g.tgisinternal
+        and g.tgenabled <> 'D'
+    ),
+    'Install or enable the ' || t.table_name || '_set_updated_at trigger'
+  from (values ('profiles'),('robots'),('competitions'),('team_members'),('research_posts'),('sponsors'),('recruitment_settings')) as t(table_name)
+
 )
 select
   case when passed then 'PASS' else 'FAIL' end as result,
