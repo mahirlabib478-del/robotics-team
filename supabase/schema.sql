@@ -19,6 +19,7 @@ create table public.robots (
   id uuid primary key default gen_random_uuid(), slug text unique not null, name text not null, category text not null,
   version text not null, weight_kg numeric, dimensions text, status text not null, development_year integer not null,
   summary text not null, specifications jsonb not null default '{}'::jsonb, engineering jsonb not null default '{}'::jsonb,
+  public_engineering jsonb not null default '{}'::jsonb check (jsonb_typeof(public_engineering) = 'object'),
   sensitive_fields_hidden text[] not null default '{}', publish_status public.publish_status not null default 'draft',
   visibility public.visibility not null default 'public', created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id),
   created_at timestamptz not null default now(), updated_at timestamptz not null default now()
