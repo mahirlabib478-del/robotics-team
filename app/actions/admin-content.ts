@@ -79,6 +79,7 @@ export async function addRobotMedia(formData: FormData) {
   if (!validId || !["image", "video", "cad"].includes(mediaType) || !validHttpsUrl(sourceUrl) || !altText || !["public", "internal"].includes(visibility) || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 10000) {
     redirect("/admin/robots?error=invalid-media");
   }
+  if (visibility === "public" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/robots?error=media-approval-required");
 
   const { data: robot, error: robotError } = await supabase.from("robots").select("id,publish_status").eq("id", robotId).maybeSingle();
   if (robotError || !robot) redirect("/admin/robots?error=not-found");
@@ -124,6 +125,7 @@ export async function updateRobotMedia(formData: FormData) {
   if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(robotId) || !["image", "video", "cad"].includes(mediaType) || !validHttpsUrl(sourceUrl) || !altText || !["public", "internal"].includes(visibility) || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 10000) {
     redirect("/admin/robots?error=invalid-media");
   }
+  if (visibility === "public" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/robots?error=media-approval-required");
 
   const { data: current, error: readError } = await supabase.from("robot_media").select("robot_id").eq("id", id).maybeSingle();
   if (readError || !current || current.robot_id !== robotId) redirect("/admin/robots?error=not-found");
