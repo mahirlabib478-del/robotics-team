@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -47,6 +48,7 @@ export default async function ResearchPage() {
             <div className="grid gap-5 md:grid-cols-2">
               {posts.map((post) => (
                 <article key={post.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-6 transition hover:-translate-y-0.5 hover:border-[#19d3ff]/30">
+                  {post.cover_image_url ? <Image src={post.cover_image_url} alt={post.cover_image_alt ?? ""} width={1280} height={720} unoptimized loading="lazy" className="mb-5 aspect-[16/9] w-full rounded-xl object-cover" /> : null}
                   <p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{post.category}</p>
                   <h2 className="mt-2 text-2xl font-bold">{post.title}</h2>
                   <p className="mt-3 text-sm leading-6 text-slate-400">{post.excerpt}</p>

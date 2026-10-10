@@ -416,7 +416,7 @@ for (const [name, table] of [
 ]) {
   const accessor = publicAccessor(name);
   assert.ok(accessor.includes(`.from("${table}")`), `${name} must query the expected public content table`);
-  assert.ok(accessor.includes('.eq("publish_status","published").eq("visibility","public")'), `${name} must expose only published, public records`);
+  assert.match(accessor, /\.eq\("publish_status",\s*"published"\)\.eq\("visibility",\s*"public"\)/, `${name} must expose only published, public records`);
   const selects = [...accessor.matchAll(/\.select\("([^"]+)"\)/g)].map((match) => match[1]);
   assert.ok(selects.length > 0, `${name} must use explicit selected columns`);
   for (const columns of selects) {
