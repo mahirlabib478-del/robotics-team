@@ -57,7 +57,8 @@ assert.ok(
   !robotQuery[1].split(",").map((field) => field.trim()).includes("engineering"),
   "Public robot query must not select private engineering JSON",
 );
-assert.match(publicData, /engineering:\s*undefined/, "Public robot projection must omit engineering data");
+assert.match(publicData, /engineering:publicEngineeringBySlug\.get\(r\.slug\)/, "Public robot projection must use the separate approved engineering field");
+assert.match(publicData, /safePublicEngineering\(robot\.public_engineering\)/, "Public engineering content must be allowlisted before rendering");
 
 assert.match(publicSubmissions, /await enforceRateLimit\("recruitment", 3\)/, "Recruitment submissions must be rate limited");
 assert.match(publicSubmissions, /await enforceRateLimit\("contact", 5\)/, "Contact submissions must be rate limited");
