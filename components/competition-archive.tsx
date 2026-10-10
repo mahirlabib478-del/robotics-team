@@ -18,9 +18,13 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
   const [year, setYear] = useState("All years");
   const [result, setResult] = useState("All results");
   const [segment, setSegment] = useState("All segments");
+  const [country, setCountry] = useState("All countries");
+  const [robot, setRobot] = useState("All robots");
 
   const years = useMemo(() => [...new Set(records.map((record) => String(record.year)))].sort((a, b) => Number(b) - Number(a)), [records]);
   const segments = useMemo(() => [...new Set(records.map((record) => record.segment).filter(Boolean))].sort((a, b) => a.localeCompare(b)), [records]);
+  const countries = useMemo(() => [...new Set(records.map((record) => record.country).filter((item): item is string => Boolean(item?.trim())))].sort((a, b) => a.localeCompare(b)), [records]);
+  const robots = useMemo(() => [...new Set(records.map((record) => record.robot).filter((item) => item && item !== "Not published"))].sort((a, b) => a.localeCompare(b)), [records]);
   const filtered = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
     return records.filter((record) => {
@@ -29,9 +33,11 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
         && (level === "All levels" || record.level === level)
         && (year === "All years" || String(record.year) === year)
         && (result === "All results" || record.result === result)
-        && (segment === "All segments" || record.segment === segment);
+        && (segment === "All segments" || record.segment === segment)
+        && (country === "All countries" || record.country === country)
+        && (robot === "All robots" || record.robot === robot);
     });
-  }, [records, search, level, year, result, segment]);
+  }, [records, search, level, year, result, segment, country, robot]);
 
   function resetFilters() {
     setSearch("");
@@ -39,6 +45,8 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
     setYear("All years");
     setResult("All results");
     setSegment("All segments");
+    setCountry("All countries");
+    setRobot("All robots");
   }
 
   return (
