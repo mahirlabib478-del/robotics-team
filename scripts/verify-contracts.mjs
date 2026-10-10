@@ -434,6 +434,15 @@ assert.match(stagingSecuritySql, /Audit insert policy binds actor to auth\.uid\(
 assert.match(stagingSecuritySql, /Audit mutation guard uses empty search_path and blocks direct execution/, "Staging verification must inspect audit mutation-guard hardening");
 assert.match(stagingSecuritySql, /Public form tables reject direct anonymous inserts/, "Staging verification must reject direct anonymous writes to public-form tables");
 assert.match(stagingSecuritySql, /has_table_privilege\('authenticated','public\.public_submission_rate_limits','DELETE'\)/, "Staging verification must check delete grants on rate-limit storage");
+assert.match(stagingSecuritySql, /Publishing guard is SECURITY INVOKER with empty search_path/, "Staging verification must inspect publishing guard execution context");
+assert.match(stagingSecuritySql, /Publishing guard is not directly executable by client roles/, "Staging verification must inspect publishing guard execute grants");
+assert.match(stagingSecuritySql, /Audit table RLS enabled/, "Staging verification must check audit-log RLS");
+assert.match(stagingSecuritySql, /Audit table denies direct client updates and deletes/, "Staging verification must check audit-log table mutation grants");
+assert.match(stagingSecuritySql, /Audit append-only trigger is enabled/, "Staging verification must ensure the audit append-only trigger is enabled");
+assert.match(stagingSecuritySql, /updated-at trigger installed: /, "Staging verification must inspect updated-at trigger installation");
+for (const table of ["profiles", "robots", "competitions", "team_members", "research_posts", "sponsors", "recruitment_settings"]) {
+  assert.ok(stagingSecuritySql.includes("('" + table + "')"), "Staging verification must check the " + table + " updated-at trigger");
+}
 
 
 
