@@ -15,6 +15,7 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 - [ ] Add evidence-backed competition results, certificates and official source links
 - [ ] Add approved member/alumni profiles and sponsor records
 - [ ] Complete accessibility, responsive, metadata and production smoke tests
+- [x] Add CI source-level regression checks for hero responsive ordering, navigation/form accessibility contracts, metadata defaults and sitemap privacy boundaries (supplemental; browser/device smoke tests remain required)
 
 ### Homepage and identity requirements
 - [ ] Hero banner uses approved robot action photography or team video, clear team identity, concise engineering/competition tagline, and Explore Robots / Achievements / Partner CTAs.
