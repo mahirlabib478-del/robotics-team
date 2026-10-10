@@ -65,6 +65,7 @@ assert.match(schema, /create policy public_robot_media_read/, "Public robot medi
 assert.match(schema, /create policy media_robot_media_write/, "Robot media writes must remain role-restricted by RLS");
 assert.match(homepage, /featuredRobotImage \? `Published image of \$\{featuredRobot\?\.name\}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage must label approved robot imagery accurately and identify fallback concept art as illustrative");
 assert.match(homepage, /Approved media from the public engineering archive/, "Homepage featured photography must be sourced from published robot media");
+assert.match(homepage, /robots\.slice\(0, 6\)[\s\S]*?robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "Homepage robot archive cards must render approved robot images when available");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
 assert.doesNotMatch(homepage, /Hero Media Placeholder/, "Homepage must not display the old plain-text media placeholder");
 assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, record\.result, String\(record\.year\), record\.date, record\.report, \.\.\.record\.teamMembers/, "Competition search must index event details, outcomes, year, dates, reports and team members");
