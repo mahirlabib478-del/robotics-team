@@ -84,6 +84,7 @@ assert.match(publicSubmissions, /const website = value\(formData, "website", 120
 assert.match(contactPage, /name="website" tabIndex=\{-1\} autoComplete="off"/, "Contact form must include a non-visible honeypot field");
 assert.match(joinPage, /name="website" tabIndex=\{-1\} autoComplete="off"/, "Recruitment form must include a non-visible honeypot field");
 assert.match(publicSubmissions, /!isSafeHttpsUrl\(githubOrPortfolio\)/, "Recruitment portfolio URLs must require HTTPS");
+assert.match(publicSubmissions, /url\.protocol === "https:" && Boolean\(url\.hostname\) && !url\.username && !url\.password/, "Recruitment portfolio URLs must reject missing hosts and embedded credentials");
 assert.match(publicSubmissions, /!\/\^\[\^\\s@\].*\.test\(email\)/, "Contact email must be validated server-side");
 
 assert.match(schema, /create table public\.public_submission_rate_limits[\s\S]*?enable row level security/, "Rate-limit state must have RLS enabled");
