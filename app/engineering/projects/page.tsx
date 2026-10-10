@@ -5,6 +5,7 @@ import { signOutAdmin } from "@/app/actions/admin-auth";
 import { EmptyState } from "@/components/empty-state";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ const taskStatuses = ["backlog", "todo", "in_progress", "blocked", "done"] as co
 function errorMessage(code?: string) {
   if (!code) return "";
   const messages: Record<string, string> = {
+    "domain-required": "Engineering actions are disabled until the approved university email domain is configured.",
     "invalid-project": "Project fields are invalid. Check the name, slug, division and due date.",
     "project-save": "The project could not be saved. Check your project permissions and database migration.",
     "invalid-member": "Enter a valid university email and membership capability.",
@@ -37,8 +39,10 @@ function errorMessage(code?: string) {
 }
 
 export default async function EngineeringProjectsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase, profile, user } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "viewer"], profile.role);
+  const allowedDomain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
+  if (!allowedDomain || !user.email || !user.email.toLowerCase().endsWith(`@${allowedDomain}`)) redirect("/admin/login?error=domain");
   const params = await searchParams;
 
   const projectResult = await supabase.from("engineering_projects")
