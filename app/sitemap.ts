@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getPublicCompetitions, getPublicResearch, getPublicRobots } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 function getSiteBase() {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (!raw) return null;
