@@ -390,4 +390,34 @@ assert.match(adminContentActions, /created_by: profile\.id, updated_by: profile\
 assert.match(adminExtendedActions, /requireAnyRole\(\["super_admin", "team_lead", "technical_lead", "media"\], profile\.role\)/, "Research creation must enforce server-side role authorization");
 assert.match(adminOperationsActions, /requireAnyRole\(\["super_admin", "team_lead", "hr_operations"\], profile\.role\)/, "Team and recruitment operations must enforce server-side role authorization");
 
-console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public robot projection.");
+
+function publicAccessor(name) {
+  const start = publicData.indexOf(`export async function ${name}`);
+  assert.ok(start >= 0, `Public data accessor ${name} must exist`);
+  const next = publicData.indexOf("\nexport async function ", start + 1);
+  return publicData.slice(start, next < 0 ? publicData.length : next);
+}
+for (const [name, table] of [
+  ["getPublicRobots", "robots"],
+  ["getPublicCompetitions", "competitions"],
+  ["getPublicCompetition", "competitions"],
+  ["getPublicTeamMembers", "team_members"],
+  ["getPublicResearchPost", "research_posts"],
+  ["getPublicResearch", "research_posts"],
+  ["getPublicGallery", "gallery_items"],
+  ["getPublicSponsors", "sponsors"],
+]) {
+  const accessor = publicAccessor(name);
+  assert.match(accessor, new RegExp(`from\\("\${table}"\\)`), `${name} must query the expected public content table`);
+  assert.match(accessor, /eq\\("publish_status","published"\\)\\.eq\\("visibility","public"\\)/, `${name} must expose only published, public records`);
+  const selects = [...accessor.matchAll(/\\.select\\("([^"]+)"\\)/g)].map((match) => match[1]);
+  assert.ok(selects.length > 0, `${name} must use explicit selected columns`);
+  for (const columns of selects) {
+    assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|engineering|service_role)/i, `${name} must not select private provenance or engineering fields`);
+  }
+}
+assert.match(publicData, /hostname === "youtube\\.com" \|\| hostname === "www\\.youtube\\.com"/, "YouTube URLs must be restricted to recognized hostnames");
+assert.match(publicData, /\^\[A-Za-z0-9_-\]\{11\}\$/, "YouTube URLs must contain a valid-length video ID");
+assert.match(publicData, /safePublicLink\(item\)\.filter|map\(safePublicLink\)/, "Team-member public links must be validated before projection");
+
+console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public projections.");
