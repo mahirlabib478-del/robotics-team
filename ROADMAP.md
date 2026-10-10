@@ -63,6 +63,8 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 
 **Status: Core admin/CMS flows are present; validate in a real Supabase staging project before launch.**
 
+First-time staging setup: follow [the Supabase staging bootstrap runbook](docs/SUPABASE-STAGING-SETUP.md). A real project is still required for database and role-based release verification.
+
 - [x] Role-aware admin dashboard and authentication
 - [x] Robot and competition record management
 - [x] Draft → Review → Published content workflow
@@ -138,6 +140,7 @@ Implement in this order:
 
 ## Technology and deployment requirements
 - [ ] Keep the existing Next.js + TypeScript + Tailwind stack unless a documented decision changes it; use Framer Motion sparingly.
+- [ ] Generate and commit `package-lock.json`, then switch CI and developer instructions to reproducible `npm ci` installs (the current repository has no lockfile and CI currently uses `npm install`).
 - [ ] Backend/CMS may use Next.js + Supabase or a documented CMS option such as Strapi/Sanity; PostgreSQL is the planned database.
 - [ ] Use Cloudinary or approved media hosting for public media; YouTube for video embeds; Google Drive only for internal files when access is configured safely.
 - [ ] Deployment: Vercel-ready, custom domain chosen after trademark and social-handle availability checks.
