@@ -19,7 +19,7 @@ export default async function AchievementsPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading eyebrow="Proof, not claims" title="Achievements" description="Search verified outcomes by event, organizer, robot, year, level, result and segment. Every story links to its competition record; unsupported claims are not added." />
+        <SectionHeading level="h1" eyebrow="Proof, not claims" title="Achievements" description="Search verified outcomes by event, organizer, robot, year, level, result and segment. Every story links to its competition record; unsupported claims are not added." />
         {achievements.length ? (
           <CompetitionArchive records={achievements} achievementsOnly />
         ) : (
