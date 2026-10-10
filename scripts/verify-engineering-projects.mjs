@@ -25,6 +25,10 @@ assert.match(migration, /after insert or update on public\.engineering_tasks[\s\
 assert.match(migration, /engineering_project_creator_immutable/, "Project creator attribution must be immutable");
 assert.match(migration, /engineering_task_identity_immutable/, "Tasks cannot be moved between projects or have creator attribution rewritten");
 assert.match(migration, /engineering_membership_identity_immutable/, "Membership identity and added-by attribution must be immutable");
+assert.match(migration, /create trigger engineering_projects_audit after insert or update or delete/, "Project mutations must be audited in the same database transaction");
+assert.match(migration, /create trigger engineering_project_members_audit after insert or update or delete/, "Membership mutations must be audited in the same database transaction");
+assert.match(migration, /create trigger engineering_tasks_audit after insert or update or delete/, "Task mutations must be audited in the same database transaction");
+assert.match(migration, /insert into public\.audit_logs\(actor_id, action, entity_type, entity_id, metadata\)/, "Audit records must be written by a database trigger, not a best-effort client call");
 assert.match(stagingSecurity, /Engineering immutable-attribution triggers are enabled/, "Staging checks must verify immutable-attribution triggers");
 assert.match(migration, /revoke all on public\.engineering_projects,[\s\S]*?grant select on public\.engineering_task_events to authenticated/, "Task history must be read-only to authenticated clients");
 assert.doesNotMatch(migration, /create policy engineering_tasks_delete/, "Tasks must not be silently deleted; preserve task history");
@@ -39,10 +43,6 @@ assert.match(page, /createSupabaseAdminClient\(\)[\s\S]*?select\("id,display_nam
 assert.match(actions, /assignee-not-member/, "Task assignment must reject users who are not project members");
 assert.match(actions, /\["super_admin", "team_lead", "technical_lead", "viewer"\]\.includes\(member\.role\)/, "HR and media roles must not be granted engineering project membership");
 assert.match(actions, /assignee_id: assigneeId/, "Task records must persist the validated project-member assignment");
-assert.match(actions, /action: "create_engineering_project"/, "Project creation must be attributed in audit logs");
-assert.match(actions, /action: "add_engineering_project_member"/, "Membership changes must be attributed in audit logs");
-assert.match(actions, /action: "create_engineering_task"/, "Task creation must be attributed in audit logs");
-assert.match(actions, /action: "update_engineering_task_status"/, "Task status changes must be attributed in audit logs");
 assert.match(migration, /assignee_id is null or exists \([\s\S]*?m\.project_id = engineering_tasks\.project_id and m\.user_id = engineering_tasks\.assignee_id/, "Database policy must prevent assigning tasks to non-members");
 assert.match(page, /No projects assigned yet/, "Users without membership must see an empty state, not other projects");
 assert.match(actions, /requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Only approved leads can create projects and manage memberships");
