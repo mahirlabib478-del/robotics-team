@@ -52,8 +52,12 @@ checks as (
     to_regclass('public.public_submission_rate_limits') is not null
       and not has_table_privilege('anon','public.public_submission_rate_limits','SELECT')
       and not has_table_privilege('anon','public.public_submission_rate_limits','INSERT')
+      and not has_table_privilege('anon','public.public_submission_rate_limits','UPDATE')
+      and not has_table_privilege('anon','public.public_submission_rate_limits','DELETE')
       and not has_table_privilege('authenticated','public.public_submission_rate_limits','SELECT')
-      and not has_table_privilege('authenticated','public.public_submission_rate_limits','INSERT'),
+      and not has_table_privilege('authenticated','public.public_submission_rate_limits','INSERT')
+      and not has_table_privilege('authenticated','public.public_submission_rate_limits','UPDATE')
+      and not has_table_privilege('authenticated','public.public_submission_rate_limits','DELETE'),
     'Revoke direct grants from anon and authenticated on public.public_submission_rate_limits'
 
   union all
@@ -65,7 +69,7 @@ checks as (
         and p.prosecdef
         and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
     ),
-    'Recreate the rate-limit RPC with SECURITY DEFINER and SET search_path = '''
+    'Recreate the rate-limit RPC with SECURITY DEFINER and an empty search_path'
 
   union all
   select
@@ -115,6 +119,28 @@ checks as (
         and lower(coalesce(p.with_check,'')) like '%auth.uid%'
     ),
     'Recreate admin_audit_insert so actor_id must equal auth.uid()'
+
+  union all
+  select
+    'Audit mutation guard uses empty search_path and blocks direct execution',
+    exists (
+      select 1 from pg_proc p
+      where p.oid=to_regprocedure('public.prevent_audit_log_mutation()')
+        and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
+    )
+      and to_regprocedure('public.prevent_audit_log_mutation()') is not null
+      and not has_function_privilege('anon','public.prevent_audit_log_mutation()','EXECUTE')
+      and not has_function_privilege('authenticated','public.prevent_audit_log_mutation()','EXECUTE'),
+    'Apply the audit integrity migration and revoke direct execution of the audit trigger function'
+
+  union all
+  select
+    'Public form tables reject direct anonymous inserts',
+    to_regclass('public.recruitment_applications') is not null
+      and to_regclass('public.contact_messages') is not null
+      and not has_table_privilege('anon','public.recruitment_applications','INSERT')
+      and not has_table_privilege('anon','public.contact_messages','INSERT'),
+    'Revoke direct INSERT grants from anon on recruitment_applications and contact_messages'
 
   union all
   select
