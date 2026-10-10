@@ -392,8 +392,8 @@ assert.match(adminOperationsActions, /requireAnyRole\(\["super_admin", "team_lea
 
 
 function publicAccessor(name) {
-  const start = publicData.indexOf(\`export async function \${name}\`);
-  assert.ok(start >= 0, \`Public data accessor \${name} must exist\`);
+  const start = publicData.indexOf(`export async function ${name}`);
+  assert.ok(start >= 0, `Public data accessor ${name} must exist`);
   const next = publicData.indexOf("\nexport async function ", start + 1);
   return publicData.slice(start, next < 0 ? publicData.length : next);
 }
@@ -408,12 +408,12 @@ for (const [name, table] of [
   ["getPublicSponsors", "sponsors"],
 ]) {
   const accessor = publicAccessor(name);
-  assert.ok(accessor.includes(\`.from("\${table}")\`), \`\${name} must query the expected public content table\`);
-  assert.ok(accessor.includes('.eq("publish_status","published").eq("visibility","public")'), \`\${name} must expose only published, public records\`);
+  assert.ok(accessor.includes(`.from("${table}")`), `${name} must query the expected public content table`);
+  assert.ok(accessor.includes('.eq("publish_status","published").eq("visibility","public")'), `${name} must expose only published, public records`);
   const selects = [...accessor.matchAll(/\.select\("([^"]+)"\)/g)].map((match) => match[1]);
-  assert.ok(selects.length > 0, \`\${name} must use explicit selected columns\`);
+  assert.ok(selects.length > 0, `${name} must use explicit selected columns`);
   for (const columns of selects) {
-    assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|engineering|service_role)/i, \`\${name} must not select private provenance or engineering fields\`);
+    assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|engineering|service_role)/i, `${name} must not select private provenance or engineering fields`);
   }
 }
 assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com"/, "YouTube URLs must be restricted to recognized hostnames");
