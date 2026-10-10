@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [layout, header, footer, about, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth, styles] = await Promise.all([
+const [layout, header, footer, about, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth, styles, researchPage, researchDetail, researchAdmin, researchActions, publicData, schema, researchMigration] = await Promise.all([
   read("app/layout.tsx"),
   read("components/site-header.tsx"),
   read("components/site-footer.tsx"),
@@ -16,6 +16,13 @@ const [layout, header, footer, about, contact, join, sitemap, robots, home, notF
   read("app/error.tsx"),
   read("app/actions/admin-auth.ts"),
   read("app/globals.css"),
+  read("app/research/page.tsx"),
+  read("app/research/[slug]/page.tsx"),
+  read("app/admin/research/page.tsx"),
+  read("app/actions/admin-extended.ts"),
+  read("lib/public-data.ts"),
+  read("supabase/schema.sql"),
+  read("supabase/migrations/20261010_research_cover_images.sql"),
 ]);
 
 assert.match(layout, /<html lang="en">/, "Document must declare its language");
@@ -56,6 +63,15 @@ assert.match(about, /getPublicRobots\(\)/, "About page should reuse approved pub
 assert.match(about, /robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "About page must use only published robot images");
 assert.match(about, /Only robots with approved public images are featured here/, "About page must not fabricate robot imagery when no approved media exists");
 assert.match(about, /View robot record/, "Featured robot imagery must link to its public detail page");
+assert.match(researchAdmin, /name="cover_image_url"/, "Research CMS must support approved cover image URLs");
+assert.match(researchAdmin, /name="cover_image_alt"/, "Research CMS must require descriptive cover image alt text");
+assert.match(researchActions, /safeHttps\(coverImageUrl\)/, "Research cover images must use HTTPS URLs");
+assert.match(researchActions, /cover_image_alt: coverImageUrl \? coverImageAlt : null/, "Research cover image alt text must be saved with the image");
+assert.match(publicData, /safePublicUrl\(result\.data\.cover_image_url\)/, "Research cover URLs must be sanitized before public rendering");
+assert.match(researchPage, /post\.cover_image_url \? <Image/, "Research listing cards must render approved cover images");
+assert.match(researchDetail, /post\.cover_image_url \? <Image/, "Research article detail must render approved cover images");
+assert.match(schema, /cover_image_alt text, check \(cover_image_url is null or \(cover_image_alt is not null and length\(trim\(cover_image_alt\)\) > 0\)\)/, "Fresh schema must require alt text for research covers");
+assert.match(researchMigration, /research_posts_cover_image_alt_required/, "Upgrade migration must enforce research cover accessibility metadata");
 assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");
 assert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
 assert.match(adminAuth, /if \(!\/\^\\d\{6\}\$\/\.test\(code\)\)/, "Admin MFA must validate exactly six numeric digits");
