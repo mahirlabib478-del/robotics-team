@@ -98,9 +98,11 @@ First-time staging setup: follow [the Supabase staging bootstrap runbook](docs/S
 
 ## Phase 3 — Private engineering portal
 
-**Status: Planned; do not treat the public portfolio or CMS as the engineering portal.**
+**Status: Project/task board implemented in code with scoped RLS and append-only task events; staging verification is still required. Documents, BOM/procurement, test/readiness and private storage remain planned. Do not treat the public portfolio or CMS as the engineering portal.**
 
 Security/data model proposal: [Private Engineering Portal — Data and Access Design](docs/engineering-portal-security-design.md). This is a design artifact, not a migration or proof of staging security; keep Phase 3 implementation items unchecked until tests pass.
+
+Implemented code slice (not yet staging-verified): `supabase/migrations/20261010_engineering_project_task_board.sql`, `/engineering/projects`, scoped project membership, task creation/status updates and database-generated task history. The checklist remains unchecked until a clean staging migration and role-denial tests pass.
 
 Implement in this order:
 
