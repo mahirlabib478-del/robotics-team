@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicSponsors } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Sponsors and Partners",
   description: "Learn how organizations can support Team Stellar and its robotics engineering and competition work.",
