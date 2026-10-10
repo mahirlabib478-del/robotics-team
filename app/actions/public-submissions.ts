@@ -11,7 +11,12 @@ function value(formData: FormData, name: string, maxLength = 5000) {
 }
 
 function isSafeHttpsUrl(value: string) {
-  try { return new URL(value).protocol === "https:"; } catch { return false; }
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && Boolean(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
 }
 
 function adminClientOrRedirect(target: string) {
