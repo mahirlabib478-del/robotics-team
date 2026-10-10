@@ -127,10 +127,10 @@ export async function updateEngineeringTaskStatus(formData: FormData) {
   if (!validId(taskId) || !["backlog", "todo", "in_progress", "blocked", "done"].includes(status)) {
     redirect("/engineering/projects?error=invalid-task");
   }
-  const { error } = await supabase.from("engineering_tasks").update({
+  const { data: updated, error } = await supabase.from("engineering_tasks").update({
     status, updated_by: profile.id, updated_at: new Date().toISOString(),
-  }).eq("id", taskId);
-  if (error) {
+  }).eq("id", taskId).select("id").maybeSingle();
+  if (error || !updated) {
     console.error("Engineering task status update failed:", error);
     redirect("/engineering/projects?error=task-update");
   }
