@@ -35,6 +35,7 @@ assert.doesNotMatch(migration, /create policy engineering_tasks_delete/, "Tasks 
 assert.match(page, /requireAdmin\(\)/, "Project board must require a confirmed authenticated session");
 assert.match(page, /if \(!allowedDomain \|\| !user\.email \|\| !user\.email\.toLowerCase\(\)\.endsWith\(`@\$\{allowedDomain\}`\)\)/, "Project board must fail closed until the university domain is configured");
 assert.match(actions, /function requireEngineeringDomain\(email\?: string\)/, "Engineering server actions must enforce the configured university domain");
+assert.match(actions, /function validDate\(value: string\)[\s\S]*?parsed\.toISOString\(\)\.slice\(0, 10\) === value/, "Engineering due dates must reject impossible calendar dates instead of accepting Date.parse normalization");
 assert.match(actions, /if \(!domain \|\| !email \|\| !email\.toLowerCase\(\)\.endsWith\(`@\$\{domain\}`\)\)/, "Engineering mutations must fail closed when the university domain is missing");
 assert.match(page, /robots: \{ index: false, follow: false, noarchive: true \}/, "Project board must not be indexed");
 assert.match(page, /Project permissions could not be verified/, "Project board must fail closed when membership/task queries fail");
