@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -25,7 +26,8 @@ export default async function ResearchDetailPage({ params }: { params: Promise<{
       <SiteHeader />
       <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-20">
         <Link href="/research" className="inline-flex text-sm font-semibold text-[#19d3ff] hover:text-white">← All research</Link>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#19d3ff]">{post.category}</p>
+        {post.cover_image_url ? <Image src={post.cover_image_url} alt={post.cover_image_alt ?? ""} width={1600} height={900} unoptimized priority className="mt-8 aspect-[16/9] w-full rounded-2xl border border-white/10 object-cover" /> : null}
+        <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-[#19d3ff]">{post.category}</p>
         <h1 className="mt-6 break-words text-3xl font-black tracking-tight sm:text-5xl">{post.title}</h1>
         {post.author_name ? <p className="mt-4 text-sm text-slate-500">Published by {post.author_name}</p> : null}
         <p className="mt-8 text-lg leading-8 text-slate-300">{post.excerpt}</p>
