@@ -20,7 +20,7 @@ export default async function TeamPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading eyebrow="People & continuity" title="The Team" description="Leadership, technical divisions, active members and alumni are designed as a long-lived record of the team—not a temporary roster." />
+        <SectionHeading level="h1" eyebrow="People & continuity" title="The Team" description="Leadership, technical divisions, active members and alumni are designed as a long-lived record of the team—not a temporary roster." />
         <section className="mt-12">
           <h2 className="text-2xl font-bold">Leadership</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
