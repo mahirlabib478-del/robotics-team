@@ -189,11 +189,18 @@ checks as (
   select
     'Audit table denies direct client updates and deletes',
     to_regclass('public.audit_logs') is not null
-      and not has_table_privilege('anon','public.audit_logs','UPDATE')
-      and not has_table_privilege('anon','public.audit_logs','DELETE')
-      and not has_table_privilege('authenticated','public.audit_logs','UPDATE')
-      and not has_table_privilege('authenticated','public.audit_logs','DELETE'),
-    'Revoke UPDATE and DELETE on public.audit_logs from anon and authenticated'
+      and coalesce((select c.relrowsecurity from pg_class c where c.oid=to_regclass('public.audit_logs')),false)
+      and not exists (
+        select 1 from pg_policies p
+        where p.schemaname='public' and p.tablename='audit_logs'
+          and upper(p.cmd) in ('UPDATE','DELETE','ALL')
+          and (
+            p.roles::text like '%anon%'
+            or p.roles::text like '%authenticated%'
+            or p.roles::text like '%public%'
+          )
+      ),
+    'Keep RLS enabled and ensure no anon, authenticated, or PUBLIC update/delete policy exists on public.audit_logs'
 
   union all
   select
