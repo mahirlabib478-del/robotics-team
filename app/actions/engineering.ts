@@ -52,16 +52,16 @@ export async function addEngineeringProjectMember(formData: FormData) {
     redirect("/engineering/projects?error=invalid-member");
   }
 
-  let member: { id: string; university_email: string | null } | null = null;
+  let member: { id: string; university_email: string | null; role: string } | null = null;
   try {
     const admin = createSupabaseAdminClient();
-    const lookup = await admin.from("profiles").select("id,university_email").ilike("university_email", email).maybeSingle();
+    const lookup = await admin.from("profiles").select("id,university_email,role").ilike("university_email", email).maybeSingle();
     if (!lookup.error) member = lookup.data;
     if (member) {
       const { data: authRecord, error: authError } = await admin.auth.admin.getUserById(member.id);
       const allowedDomain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
       const confirmedEmail = authRecord.user?.email?.toLowerCase();
-      if (authError || !authRecord.user?.email_confirmed_at || !confirmedEmail || (allowedDomain && !confirmedEmail.endsWith(`@${allowedDomain}`))) {
+      if (authError || !authRecord.user?.email_confirmed_at || !confirmedEmail || (allowedDomain && !confirmedEmail.endsWith(`@${allowedDomain}`)) || !["super_admin", "team_lead", "technical_lead", "viewer"].includes(member.role)) {
         member = null;
       }
     }
