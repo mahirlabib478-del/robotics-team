@@ -14,11 +14,11 @@ export default async function AdminResearchPage({ searchParams }: { searchParams
   ]);
   let coverImagesById = new Map<string, { url: string; alt: string }>();
   let coverImagesAvailable = true;
-  if (items?.length) {
-    const { data: coverRows, error: coverError } = await supabase.from("research_posts").select("id,cover_image_url,cover_image_alt").in("id", items.map((item) => item.id));
-    if (coverError) { coverImagesAvailable = false; console.warn("Research cover image migration is not applied; article thumbnails are disabled.", coverError); }
-    else coverImagesById = new Map((coverRows ?? []).filter((item) => typeof item.cover_image_url === "string" && typeof item.cover_image_alt === "string" && item.cover_image_alt.trim()).map((item) => [item.id, { url: item.cover_image_url, alt: item.cover_image_alt }] as const));
-  }
+  const { data: coverRows, error: coverError } = items?.length
+    ? await supabase.from("research_posts").select("id,cover_image_url,cover_image_alt").in("id", items.map((item) => item.id))
+    : await supabase.from("research_posts").select("cover_image_url,cover_image_alt").limit(1);
+  if (coverError) { coverImagesAvailable = false; console.warn("Research cover image migration is not applied; article thumbnails are disabled.", coverError); }
+  else if (items?.length) coverImagesById = new Map((coverRows ?? []).filter((item) => typeof item.cover_image_url === "string" && typeof item.cover_image_alt === "string" && item.cover_image_alt.trim()).map((item) => [item.id, { url: item.cover_image_url, alt: item.cover_image_alt }] as const));
   const researchItems = (items ?? []).map((item) => ({ ...item, cover_image_url: coverImagesById.get(item.id)?.url ?? "", cover_image_alt: coverImagesById.get(item.id)?.alt ?? "" }));
 
   return (
