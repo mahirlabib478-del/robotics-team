@@ -29,12 +29,12 @@ const future = [
 ];
 
 export default async function AboutPage() {
-  let robotMediaUnavailable = false;
-  const robots = await getPublicRobots().catch((error) => {
-    console.error("[about] Approved robot media could not be loaded", error);
-    robotMediaUnavailable = true;
-    return [];
-  });
+  const { robots, robotMediaUnavailable } = await getPublicRobots()
+    .then((robots) => ({ robots, robotMediaUnavailable: false }))
+    .catch((error) => {
+      console.error("[about] Approved robot media could not be loaded", error);
+      return { robots: [], robotMediaUnavailable: true };
+    });
   const featuredRobots = robots.flatMap((robot) => {
     const image = robot.media?.find((media) => media.type === "image");
     return image ? [{ robot, image }] : [];
