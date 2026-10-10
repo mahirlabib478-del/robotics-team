@@ -16,7 +16,7 @@ for (const table of ["engineering_projects", "engineering_project_members", "eng
   assert.match(migration, new RegExp(`alter table public\\.${table} enable row level security`), `RLS must be enabled for ${table}`);
   assert.match(schema, new RegExp(`create table if not exists public\\.${table}`), `Fresh schema must include ${table}`);
 }
-assert.match(migration, /security definer[\s\S]*?set search_path = ""/, "Private project access helper must use a hardened search path");
+assert.match(migration, /security definer[\s\S]*?set search_path = ''/, "Private project access helper must use a hardened empty search_path");
 assert.match(migration, /private\.can_access_engineering_project\(project_id, 'editor'\)/, "Task writes must require project editor capability");
 assert.match(migration, /private\.can_access_engineering_project\(project_id, 'lead'\)/, "Membership management must require project-lead capability");
 assert.match(migration, /user_id <> \(select auth\.uid\(\)\)/, "Project members must not self-enroll or alter their own capability");
