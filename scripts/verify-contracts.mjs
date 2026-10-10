@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage, contactPage] = await Promise.all([
+const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage, contactPage, preflightSql] = await Promise.all([
   read("app/actions/admin-operations.ts"),
   read("app/admin/recruitment/page.tsx"),
   read("supabase/schema.sql"),
@@ -12,6 +12,7 @@ const [operations, recruitmentPage, schema, statusMigration, publicData, adminCl
   read("app/actions/public-submissions.ts"),
   read("app/join-us/page.tsx"),
   read("app/contact/page.tsx"),
+  read("supabase/preflight_data_integrity.sql"),
 ]);
 
 function quotedValues(source, expression, label) {
@@ -419,5 +420,11 @@ for (const [name, table] of [
 assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com"/, "YouTube URLs must be restricted to recognized hostnames");
 assert.match(publicData, /\^\[A-Za-z0-9_-\]\{11\}\$/, "YouTube URLs must contain a valid-length video ID");
 assert.match(publicData, /map\(safePublicLink\)/, "Team-member public links must be validated before projection");
+assert.match(preflightSql, /^-- Read-only preflight/m, "Data-integrity preflight must clearly identify itself as read-only");
+for (const table of ["robots", "competitions", "team_members", "research_posts", "gallery_items", "sponsors", "recruitment_applications", "contact_messages", "robot_media", "competition_evidence"]) {
+  assert.ok(preflightSql.includes(`from public.${table}`), `Data-integrity preflight must check existing rows in ${table}`);
+}
+assert.doesNotMatch(preflightSql, /\b(?:insert into|update public\.|delete from|alter table|drop table)\b/i, "Data-integrity preflight must not mutate the database");
+
 
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public projections.");
