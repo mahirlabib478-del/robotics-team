@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site-header";
 import { CompetitionArchive } from "@/components/competition-archive";
 import { getPublicCompetitions } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Competitions",
   description: "Browse Team Stellar’s verified competition records, event details, outcomes, and public reports.",
