@@ -28,6 +28,9 @@ assert.match(data, /\.eq\("publish_status","published"\)\.eq\("visibility","publ
 assert.match(data, /engineering:undefined/, "Private engineering content must not be projected into public robot records");
 assert.match(data, /robot_media\(media_type,source_url,alt_text,caption,sort_order,visibility\)/, "Published robot records must fetch their associated media metadata");
 assert.match(data, /safePublicUrl\(item\.source_url\)/, "Robot media sources must be restricted to safe HTTPS URLs");
+assert.match(data, /throw new PublicDataUnavailableError\("robot"\)/, "Robot query failures must not masquerade as a legitimate empty archive");
+assert.match(data, /throw new PublicDataUnavailableError\("competition"\)/, "Competition query failures must not masquerade as a legitimate empty archive");
+assert.match(data, /throw new PublicDataUnavailableError\("team member"\)/, "Team query failures must not masquerade as a legitimate empty directory");
 assert.match(data, /sort\(\(a,b\)=>\(a\.sort_order\?\?0\)-\(b\.sort_order\?\?0\)\)/, "Robot media must respect the CMS display order");
 assert.match(archive, /robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "Robot archive cards must display approved robot images when available");
 assert.match(robotDetail, /aria-labelledby="robot-media-heading"/, "Robot detail pages must include an accessible media section");
