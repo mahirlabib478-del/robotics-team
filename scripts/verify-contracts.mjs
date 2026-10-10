@@ -423,6 +423,24 @@ for (const [name, table] of [
     assert.doesNotMatch(columns, /(?:created_by|updated_by|internal_notes|private_notes|(?<!public_)engineering|service_role)/i, `${name} must not select private provenance or engineering fields`);
   }
 }
+// A query failure must never be reported as a legitimate empty archive or a 404.
+for (const [name, resource] of [
+  ["getPublicRobots", "robot"],
+  ["getPublicCompetitions", "competition"],
+  ["getPublicCompetition", "competition"],
+  ["getPublicTeamMembers", "team member"],
+  ["getPublicResearchPost", "research"],
+  ["getPublicResearch", "research"],
+  ["getPublicGallery", "gallery"],
+  ["getPublicSponsors", "sponsor"],
+]) {
+  const accessor = publicAccessor(name);
+  const lastCatch = accessor.lastIndexOf("catch");
+  assert.ok(lastCatch >= 0, `${name} must explicitly handle unexpected query failures`);
+  assert.ok(accessor.slice(lastCatch).includes(`throw new PublicDataUnavailableError("${resource}")`), `${name} must fail closed rather than masquerade as an empty result when its data source is unavailable`);
+}
+assert.doesNotMatch(publicData, /return fallback(Robots|Competitions|TeamMembers)/, "Public accessors must not silently substitute local fallback data for failed database queries");
+
 assert.match(publicData, /hostname === "youtube\.com" \|\| hostname === "www\.youtube\.com"/, "YouTube URLs must be restricted to recognized hostnames");
 assert.match(publicData, /\^\[A-Za-z0-9_-\]\{11\}\$/, "YouTube URLs must contain a valid-length video ID");
 assert.match(publicData, /map\(safePublicLink\)/, "Team-member public links must be validated before projection");
