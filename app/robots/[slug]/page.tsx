@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -37,6 +38,8 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
           </div>
           <span className="rounded-full border border-[#19d3ff]/30 bg-[#19d3ff]/5 px-4 py-2 text-sm text-[#8deaff]">{robot.status}</span>
         </div>
+
+        {robot.media?.length ? <section className="mt-10" aria-labelledby="robot-media-heading"><div className="flex flex-wrap items-end justify-between gap-3"><div><h2 id="robot-media-heading" className="text-2xl font-bold">Robot Media</h2><p className="mt-2 text-sm text-slate-400">Approved public media attached to this robot record.</p></div><span className="font-mono text-xs text-slate-500">{robot.media.length} asset{robot.media.length === 1 ? "" : "s"}</span></div><div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{robot.media.map((media, index) => <article key={`${media.src}-${index}`} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">{media.type === "image" ? <Image src={media.src} alt={media.alt} width={1280} height={800} unoptimized loading="lazy" className="aspect-[4/3] w-full object-cover" /> : <a href={media.src} target="_blank" rel="noreferrer" className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-[#07111f] p-6 text-center transition hover:bg-[#102033]"><span className="rounded-full border border-[#19d3ff]/30 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#8deaff]">{media.type === "video" ? "Watch video" : "View CAD / model"}</span><span className="text-sm text-slate-400">{media.alt}</span></a>}{media.caption ? <p className="p-4 text-sm text-slate-400">{media.caption}</p> : null}</article>)}</div></section> : null}
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[

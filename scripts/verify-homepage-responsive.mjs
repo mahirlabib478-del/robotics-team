@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
 const headingIndex = page.indexOf("Engineering Robots.");
-const artworkIndex = page.indexOf('aria-label="Abstract robotics engineering illustration');
+const artworkIndex = page.indexOf("role=\"img\" className=\"relative z-0 mt-4");
 const actionsIndex = page.indexOf('href="/robots"', artworkIndex);
 assert.ok(headingIndex >= 0, "Homepage hero heading must remain present");
 assert.ok(artworkIndex > headingIndex, "Robot artwork must follow the hero heading in document order");

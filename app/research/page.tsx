@@ -28,15 +28,16 @@ export default async function ResearchPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading
+        <SectionHeading level="h1"
           eyebrow="Knowledge base"
           title="Research & Projects"
           description="A public-safe technical knowledge base for engineering lessons, development reports, research outputs and competition retrospectives."
         />
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {categories.map(([title, description]) => (
-            <article key={title} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
-              <h2 className="font-bold">{title}</h2>
+            <article key={title} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_100%_0%,rgba(20,121,255,.12),transparent_55%),#0b1727] p-4 transition hover:border-[#19d3ff]/30 sm:p-6">
+              <span aria-hidden="true" className="font-mono text-xs tracking-[0.2em] text-[#19d3ff]">KNOWLEDGE / {String(categories.findIndex((item) => item[0] === title) + 1).padStart(2, "0")}</span>
+              <h2 className="mt-4 font-bold">{title}</h2>
               <p className="mt-3 text-sm leading-6 text-slate-500">{description}</p>
             </article>
           ))}

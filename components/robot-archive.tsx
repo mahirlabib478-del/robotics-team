@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { Robot } from "@/lib/types";
 
@@ -77,6 +78,7 @@ export function RobotArchive({ robots }: { robots: Robot[] }) {
                 <p className="text-xs uppercase tracking-[0.18em] text-[#19d3ff]">{robot.category}</p>
                 <span className="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-slate-400">{robot.status}</span>
               </div>
+              {robot.media?.find((media) => media.type === "image") ? <Image src={robot.media.find((media) => media.type === "image")!.src} alt={robot.media.find((media) => media.type === "image")!.alt || `${robot.name} robot`} width={1280} height={800} unoptimized loading="lazy" className="mb-5 aspect-[16/10] w-full rounded-xl border border-white/10 object-cover" /> : <div aria-hidden="true" className="mb-5 flex aspect-[16/10] items-center justify-center rounded-xl border border-white/10 bg-[radial-gradient(circle_at_50%_30%,rgba(20,121,255,.22),transparent_50%),linear-gradient(145deg,#102033,#07111f)]"><span className="font-mono text-xs uppercase tracking-[0.25em] text-slate-500">Engineering archive</span></div>}
               <h2 className="mt-3 break-words text-2xl font-bold">{robot.name}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-400">{robot.summary}</p>
               <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-white/10 pt-4 text-sm">

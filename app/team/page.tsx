@@ -14,23 +14,21 @@ export const metadata: Metadata = {
 
 export default async function TeamPage() {
   const teamMembers = await getPublicTeamMembers();
-  const leadership = ["Faculty Advisor", "Team Lead / Captain", "Technical Lead", "Operations Lead", "Finance / Sponsorship Lead"];
+  const leadership = teamMembers.filter((member) => /advisor|captain|lead/i.test(member.role));
 
   return (
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading eyebrow="People & continuity" title="The Team" description="Leadership, technical divisions, active members and alumni are designed as a long-lived record of the team—not a temporary roster." />
-        <section className="mt-12">
-          <h2 className="text-2xl font-bold">Leadership</h2>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {leadership.map((role) => <div key={role} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5 text-sm font-semibold text-slate-300">{role}<span className="mt-2 block text-xs font-normal text-slate-600">Profile pending verification</span></div>)}
-          </div>
+        <SectionHeading level="h1" eyebrow="People & continuity" title="The Team" description="Leadership, technical divisions, active members and alumni are designed as a long-lived record of the team—not a temporary roster." />
+        <section className="mt-12" aria-labelledby="team-leadership-heading">
+          <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 id="team-leadership-heading" className="text-2xl font-bold">Leadership</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Leadership profiles are shown only when a verified public member record has been approved.</p></div><span className="font-mono text-xs uppercase tracking-[0.16em] text-slate-500">{leadership.length} published profile{leadership.length === 1 ? "" : "s"}</span></div>
+          {leadership.length ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{leadership.map((member) => <article key={member.slug} className="relative overflow-hidden rounded-2xl border border-[#19d3ff]/20 bg-[radial-gradient(circle_at_100%_0%,rgba(20,121,255,.18),transparent_55%),#0b1727] p-5 sm:p-6">{member.photo ? <Image src={member.photo} alt={`${member.name} profile`} width={80} height={80} unoptimized loading="lazy" className="h-20 w-20 rounded-2xl object-cover" /> : <div aria-hidden="true" className="flex h-20 w-20 items-center justify-center rounded-2xl border border-white/10 bg-[#07111f] text-2xl font-bold text-[#19d3ff]">{member.name.charAt(0).toUpperCase()}</div>}<h3 className="mt-4 text-lg font-bold">{member.name}</h3><p className="mt-1 text-sm text-[#8deaff]">{member.role}</p><p className="mt-2 text-xs text-slate-500">{member.division}</p></article>)}</div> : <div className="mt-5 rounded-2xl border border-dashed border-white/15 bg-[#0b1727]/80 p-6 sm:p-8"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#19d3ff]">Verified directory</p><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">No leadership profile is currently published. Approved names, roles and photos will appear here when verified; no placeholder identities are displayed.</p></div>}
         </section>
         <section className="mt-14">
           <h2 className="text-2xl font-bold">Technical Divisions</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {divisions.map((division) => <div key={division} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6"><h3 className="font-bold">{division}</h3><p className="mt-2 text-sm text-slate-500">Verified members and projects will be linked here.</p></div>)}
+            {divisions.map((division, index) => <article key={division} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727] p-5 transition hover:border-[#19d3ff]/30 sm:p-6"><span aria-hidden="true" className="font-mono text-xs tracking-[0.2em] text-[#19d3ff]">DIVISION / {String(index + 1).padStart(2, "0")}</span><h3 className="mt-4 text-lg font-bold">{division}</h3><div aria-hidden="true" className="mt-5 h-px w-full bg-gradient-to-r from-[#19d3ff]/50 via-white/10 to-transparent" /><p className="mt-4 text-xs leading-5 text-slate-500">Approved member profiles and public project records appear in the directory below.</p></article>)}
           </div>
         </section>
         <section className="mt-14">

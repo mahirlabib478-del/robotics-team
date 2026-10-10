@@ -22,6 +22,9 @@ assert.match(layout, /title: \{ default: "Team Stellar \| BRAC University Roboti
 assert.match(layout, /description:/, "Site must provide a default meta description");
 assert.match(styles, /prefers-reduced-motion:\s*reduce/, "Global styles must respect reduced-motion preferences");
 assert.match(layout, /openGraph:\s*\{[\s\S]*?siteName: "Team Stellar"/, "Site must define social sharing metadata");
+assert.match(layout, /Space_Grotesk/, "Brand heading font must be loaded through Next font optimization");
+assert.match(layout, /JetBrains_Mono/, "Technical values must have the planned monospace font available");
+assert.match(styles, /font-family: var\(--font-space-grotesk\)/, "Headings must use the brand display typeface");
 assert.match(layout, /href="#main-content"/, "Every route must offer a keyboard skip link");
 assert.match(layout, /id="main-content" tabIndex=\{-1\}/, "Skip link target must be programmatically focusable");
 
