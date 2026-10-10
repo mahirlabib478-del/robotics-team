@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage, contactPage, preflightSql] = await Promise.all([
+const [operations, recruitmentPage, schema, statusMigration, publicData, adminClient, publicSubmissions, joinPage, contactPage, preflightSql, stagingSecuritySql] = await Promise.all([
   read("app/actions/admin-operations.ts"),
   read("app/admin/recruitment/page.tsx"),
   read("supabase/schema.sql"),
@@ -13,6 +13,7 @@ const [operations, recruitmentPage, schema, statusMigration, publicData, adminCl
   read("app/join-us/page.tsx"),
   read("app/contact/page.tsx"),
   read("supabase/preflight_data_integrity.sql"),
+  read("supabase/verify_staging_security.sql"),
 ]);
 
 function quotedValues(source, expression, label) {
@@ -425,6 +426,12 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
   assert.ok(preflightSql.includes(`from public.${table}`), `Data-integrity preflight must check existing rows in ${table}`);
 }
 assert.doesNotMatch(preflightSql, /\b(?:insert into|update public\.|delete from|alter table|drop table)\b/i, "Data-integrity preflight must not mutate the database");
+assert.match(stagingSecuritySql, /from pg_trigger/, "Staging verification must inspect installed database triggers");
+assert.match(stagingSecuritySql, /from pg_policies/, "Staging verification must inspect applied RLS policies");
+assert.match(stagingSecuritySql, /has_function_privilege\('service_role'/, "Staging verification must inspect service-role RPC access");
+assert.match(stagingSecuritySql, /'robots'.*'competitions'.*'team_members'/s, "Staging verification must cover all content workflow tables");
+assert.match(stagingSecuritySql, /Audit insert policy binds actor to auth\.uid\(\)/, "Staging verification must check audit actor binding");
+
 
 
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public projections.");
