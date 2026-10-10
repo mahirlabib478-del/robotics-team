@@ -40,6 +40,13 @@ try {
     const response = await fetch(`${base}${route}`, { redirect: "manual", signal: AbortSignal.timeout(5000) });
     assert.equal(response.status, 200, `Public route ${route} must render successfully`);
     const html = await response.text();
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+      assert.doesNotMatch(
+        html,
+        /We couldn[’']t load the /i,
+        `Route ${route} must not silently pass smoke checks while public Supabase data is unavailable`,
+      );
+    }
     assert.match(html, /<html[^>]*lang="en"/i, `Route ${route} must include the document language`);
     assert.match(html, /href="#main-content"/i, `Route ${route} must expose a skip link`);
     assert.match(html, /id="main-content"/i, `Route ${route} must include the skip-link target`);
