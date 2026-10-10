@@ -12,6 +12,17 @@ function validSlug(slug: string) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
+const publicEngineeringFields = ["problem", "mechanicalDesign", "electronicsArchitecture", "controlLogic", "componentChoices", "limitations", "futureImprovements"] as const;
+
+function publicEngineeringFromForm(formData: FormData) {
+  const result: Record<string, string> = {};
+  for (const field of publicEngineeringFields) {
+    const content = value(formData, `public_engineering_${field}`, 2000);
+    if (content) result[field] = content;
+  }
+  return result;
+}
+
 const robotStatuses = ["Competition Ready", "In Development", "Retired", "Prototype"] as const;
 const competitionLevels = ["National", "International"] as const;
 const competitionResults = ["Champion", "Runner-up", "Podium", "Finalist", "Participation"] as const;
@@ -27,7 +38,7 @@ export async function createRobot(formData: FormData) {
   if (!name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) redirect("/admin/robots?error=missing");
   const { data: created, error } = await supabase.from("robots").insert({
     name, slug, category, version, status, development_year: year, summary, weight_kg: weight,
-    dimensions: value(formData, "dimensions", 160) || null, specifications: {}, engineering: {},
+    dimensions: value(formData, "dimensions", 160) || null, specifications: {}, engineering: {}, public_engineering: publicEngineeringFromForm(formData),
     sensitive_fields_hidden: ["weapon geometry", "custom control code", "sensitive CAD", "firmware", "competition strategy"],
     publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id,
   }).select("id").single();
@@ -96,7 +107,7 @@ export async function updateRobot(formData: FormData) {
   if (readError || !current) redirect("/admin/robots?error=not-found");
   if (current.publish_status === "archived") redirect("/admin/robots?error=archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/robots?error=review-required");
-  const { error } = await supabase.from("robots").update({ name, slug, category, version, status, development_year: year, summary, weight_kg: weight, dimensions: value(formData, "dimensions", 160) || null, publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabase.from("robots").update({ name, slug, category, version, status, development_year: year, summary, weight_kg: weight, dimensions: value(formData, "dimensions", 160) || null, public_engineering: publicEngineeringFromForm(formData), publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
   if (error) { console.error("Robot update failed:", error); redirect("/admin/robots?error=save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_robot", entity_type: "robot", entity_id: id, metadata: { from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Robot audit write failed:", auditError);
