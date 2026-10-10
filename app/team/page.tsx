@@ -7,6 +7,8 @@ import { SiteHeader } from "@/components/site-header";
 import { divisions } from "@/lib/data";
 import { getPublicTeamMembers } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Team",
   description: "Meet the publicly listed members and divisions of Team Stellar, the BRAC University Robotics Team.",
