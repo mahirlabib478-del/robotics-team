@@ -28,7 +28,7 @@ export default function AboutPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading
+        <SectionHeading level="h1"
           eyebrow="About Team Stellar"
           title="A robotics team built around engineering, competition and continuity."
           description="Team Stellar is the robotics team of BRAC University. This platform is designed to document what the team builds, prove what it achieves and preserve engineering knowledge across generations of members."
