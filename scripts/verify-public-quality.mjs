@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth] = await Promise.all([
+const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth, styles] = await Promise.all([
   read("app/layout.tsx"),
   read("components/site-header.tsx"),
   read("components/site-footer.tsx"),
@@ -14,11 +14,14 @@ const [layout, header, footer, contact, join, sitemap, robots, home, notFound, e
   read("app/not-found.tsx"),
   read("app/error.tsx"),
   read("app/actions/admin-auth.ts"),
+  read("app/globals.css"),
 ]);
 
 assert.match(layout, /<html lang="en">/, "Document must declare its language");
 assert.match(layout, /title: \{ default: "Team Stellar \| BRAC University Robotics Team", template: "%s \| Team Stellar" \}/, "Site must provide default and templated page titles");
 assert.match(layout, /description:/, "Site must provide a default meta description");
+assert.match(styles, /prefers-reduced-motion:\s*reduce/, "Global styles must respect reduced-motion preferences");
+assert.match(layout, /openGraph:\s*\{[\s\S]*?siteName: "Team Stellar"/, "Site must define social sharing metadata");
 assert.match(layout, /href="#main-content"/, "Every route must offer a keyboard skip link");
 assert.match(layout, /id="main-content" tabIndex=\{-1\}/, "Skip link target must be programmatically focusable");
 
