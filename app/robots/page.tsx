@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function RobotsPage() {
-  const robots = await getPublicRobots();
+  let robots: Awaited<ReturnType<typeof getPublicRobots>>;
+  try { robots = await getPublicRobots(); }
+  catch (error) { console.error("[robots] Public robot archive is unavailable", error); return <PublicDataUnavailable resource="robot records" />; }
   return (
     <main className="min-h-screen">
       <SiteHeader />
