@@ -28,7 +28,7 @@ export default async function ResearchPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading
+        <SectionHeading level="h1"
           eyebrow="Knowledge base"
           title="Research & Projects"
           description="A public-safe technical knowledge base for engineering lessons, development reports, research outputs and competition retrospectives."
