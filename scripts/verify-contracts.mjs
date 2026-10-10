@@ -375,6 +375,10 @@ const teamMembersDefinition = freshSchema.match(/create table public\.team_membe
 assert.ok(teamMembersDefinition, "Fresh-install schema must define the team_members table");
 const teamMemberColumns = [...teamMembersDefinition[1].matchAll(/^\s*([a-z_]+)\s+/gm)].map((match) => match[1]);
 assert.equal(new Set(teamMemberColumns).size, teamMemberColumns.length, "Fresh-install team_members schema must not declare duplicate columns");
+for (const [label, source] of [["publish-workflow migration", publishWorkflowMigration], ["fresh-install schema", freshSchema]]) {
+  assert.match(source, /create or replace function public\.enforce_content_publish_workflow\(\)[\s\S]*?security invoker[\s\S]*?set search_path = ''/i, label + " publish guard must be SECURITY INVOKER with an empty search_path");
+  assert.match(source, /revoke all on function public\.enforce_content_publish_workflow\(\) from public, anon, authenticated/i, label + " publish guard must not be directly executable by client roles");
+}
 for (const source of [publishWorkflowMigration, freshSchema]) {
   assert.match(source, /new\.publish_status = 'published'[\s\S]*old\.publish_status <> 'review' or not is_leader/, "Database must restrict publication to leadership and reviewed records");
   assert.match(source, /old\.publish_status = 'published'[\s\S]*new\.publish_status <> 'published'[\s\S]*not is_leader/, "Unpublishing must be leadership-controlled");
