@@ -52,7 +52,7 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
   return (
     <div className="mt-10">
       <div className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <label className="grid min-w-0 gap-2 text-xs text-slate-400 lg:col-span-2">
             Search archive
             <input aria-label="Search competitions by event, organizer, location, robot, result, year, report or team member" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Competition, robot, organizer, result, member…" className={selectClass} />
@@ -75,6 +75,16 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
           <label className="grid gap-2 text-xs text-slate-400 sm:col-span-2 lg:col-span-3">Competition segment
             <select value={segment} onChange={(event) => setSegment(event.target.value)} className={selectClass}>
               <option>All segments</option>{segments.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-2 text-xs text-slate-400">Country
+            <select value={country} onChange={(event) => setCountry(event.target.value)} className={selectClass}>
+              <option>All countries</option>{countries.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-2 text-xs text-slate-400">Robot
+            <select value={robot} onChange={(event) => setRobot(event.target.value)} className={selectClass}>
+              <option>All robots</option>{robots.map((item) => <option key={item}>{item}</option>)}
             </select>
           </label>
           <div className="flex items-end justify-between gap-3 sm:col-span-2 lg:col-span-2">
