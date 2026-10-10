@@ -35,7 +35,7 @@ export default async function SponsorsPage() {
           <h2 className="text-3xl font-bold">Partnership Opportunities</h2>
           <p className="mt-3 text-sm text-slate-500">Public pages intentionally do not display sponsor amounts; commercial terms belong in the official sponsorship proposal.</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {packages.map((item) => <div key={item} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6"><p className="font-semibold">{item}</p><p className="mt-2 text-xs text-slate-500">Proposal details to be published after team approval.</p></div>)}
+            {packages.map((item, index) => <article key={item} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_100%_0%,rgba(25,211,255,.1),transparent_55%),#0b1727] p-4 transition hover:border-[#19d3ff]/30 sm:p-6"><div className="flex items-center justify-between gap-3"><span className="font-mono text-xs tracking-[0.2em] text-[#19d3ff]">PARTNER / {String(index + 1).padStart(2, "0")}</span><span aria-hidden="true" className="h-2 w-2 rounded-full border border-[#19d3ff]/60 bg-[#19d3ff]/20" /></div><h3 className="mt-5 font-semibold">{item}</h3><div aria-hidden="true" className="mt-5 h-px bg-gradient-to-r from-[#19d3ff]/50 via-white/10 to-transparent" /><p className="mt-4 text-xs leading-5 text-slate-500">Scope and benefits are confirmed in the approved proposal.</p></article>)}
           </div>
         </section>
 
