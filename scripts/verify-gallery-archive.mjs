@@ -11,6 +11,7 @@ const [page, archive, data] = await Promise.all([
 assert.match(page, /<GalleryArchive items=\{items\} \/>/, "Gallery page must use the interactive archive component");
 assert.match(archive, /useState\("All media"\)/, "Gallery must provide an all-media filter");
 assert.match(archive, /aria-pressed=\{activeCategory === category\}/, "Category controls must expose their selected state accessibly");
+assert.match(archive, /new Set\(items\.map\(\(item\) => item\.category\)/, "Gallery filter options must preserve every published custom category");
 assert.match(archive, /item\.category === activeCategory/, "Gallery category controls must filter the actual records");
 assert.match(archive, /item\.title, item\.category, item\.caption \?\? "", item\.alt_text/, "Gallery search must cover title, category, caption and accessible description");
 assert.ok(archive.includes('setActiveCategory("All media"); setSearch("")'), "Clear filters must reset category and search together");
