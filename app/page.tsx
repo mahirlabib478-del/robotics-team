@@ -14,6 +14,8 @@ const capabilityCards = [
 
 // Keep the homepage hero responsive while prioritizing verified, database-backed content.
 // Images further down the page are lazy-loaded to reduce initial transfer cost.
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [robots, competitions, members] = await Promise.all([getPublicRobots(), getPublicCompetitions(), getPublicTeamMembers()]);
   const stats = await getPublicStats(robots, competitions, members);
