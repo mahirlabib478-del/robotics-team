@@ -35,10 +35,15 @@ assert.match(data, /sort\(\(a,b\)=>\(a\.sort_order\?\?0\)-\(b\.sort_order\?\?0\)
 assert.match(archive, /robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "Robot archive cards must display approved robot images when available");
 assert.match(robotDetail, /aria-labelledby="robot-media-heading"/, "Robot detail pages must include an accessible media section");
 assert.match(robotDetail, /media\.type === "image" \? <Image/, "Robot detail pages must render published images and link other public media");
+assert.match(robotDetail, /getPublicCompetitions\(\)/, "Robot details must load published competition records");
+assert.match(robotDetail, /record\.robot\.trim\(\)\.toLocaleLowerCase\(\) === robot\.name\.trim\(\)\.toLocaleLowerCase\(\)/, "Robot history must match published events to the robot name");
+assert.match(robotDetail, /View event record/, "Robot competition history must link to each verified event record");
 assert.match(heading, /level = "h2"/, "Section headings must preserve h2 as the default for in-page sections");
 assert.match(heading, /level === "h1" \? <h1/, "Section headings must support semantic page-level h1 headings");
 assert.match(teamMembers, /<SectionHeading level="h1"/, "Team listing must use a page-level heading");
 assert.match(homepage, /getPublicStats\(robots, competitions, members\)/, "Homepage statistics must reuse already-loaded public data rather than duplicate database queries");
+assert.match(homepage, /statCards\.filter\(\(\[, value\]\) => value > 0\)/, "Homepage must not present unavailable metrics as confirmed zero values");
+assert.match(homepage, /Published public records/, "Homepage metrics must disclose that counts reflect published records only");
 assert.match(homepage, /featuredRobotImage \? `Published image of \$\{featuredRobot\?\.name\}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage must label approved robot imagery accurately and identify fallback concept art as illustrative");
 assert.match(homepage, /Approved media from the public engineering archive/, "Homepage featured photography must be sourced from published robot media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getPublicRobot } from "@/lib/public-data";
+import { getPublicCompetitions, getPublicRobot } from "@/lib/public-data";
 
 interface RobotDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -22,8 +22,9 @@ export async function generateMetadata({ params }: RobotDetailPageProps): Promis
 
 export default async function RobotDetailPage({ params }: RobotDetailPageProps) {
   const { slug } = await params;
-  const robot = await getPublicRobot(slug);
+  const [robot, competitions] = await Promise.all([getPublicRobot(slug), getPublicCompetitions()]);
   if (!robot) notFound();
+  const robotCompetitions = competitions.filter((record) => record.robot.trim().toLocaleLowerCase() === robot.name.trim().toLocaleLowerCase());
 
   return (
     <main className="min-h-screen">
@@ -80,6 +81,11 @@ export default async function RobotDetailPage({ params }: RobotDetailPageProps) 
           <div className="mt-5 rounded-xl border border-white/10 bg-[#0b1727]/70 p-4 text-sm leading-6 text-slate-400">
             <strong className="text-slate-200">Publication checklist:</strong> core field matching is based on exact labels. Unlisted or differently named fields are not counted automatically, and no hardware values are fabricated.
           </div>
+        </section>
+
+        <section className="mt-16" aria-labelledby="robot-competition-heading">
+          <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 id="robot-competition-heading" className="text-2xl font-bold">Competition History</h2><p className="mt-2 text-sm text-slate-400">Only published event records linked to this robot are shown.</p></div><span className="font-mono text-xs text-slate-500">{robotCompetitions.length} record{robotCompetitions.length === 1 ? "" : "s"}</span></div>
+          {robotCompetitions.length ? <div className="mt-5 grid gap-4 md:grid-cols-2">{robotCompetitions.map((record) => <article key={record.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-5 sm:p-6"><div className="flex flex-wrap items-start justify-between gap-3"><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#19d3ff]">{record.level} · {record.year}</p><span className="rounded-full border border-[#19d3ff]/25 bg-[#19d3ff]/5 px-3 py-1 text-xs font-semibold text-[#8deaff]">{record.result}</span></div><h3 className="mt-3 text-lg font-bold">{record.competition}</h3><p className="mt-2 text-sm text-slate-400">{record.organizer} · {record.location}</p><p className="mt-2 text-xs text-slate-500">{record.segment}</p><Link href={`/competitions/${record.slug}`} className="mt-5 inline-flex text-sm font-semibold text-[#19d3ff] hover:text-white">View event record →</Link></article>)}</div> : <div className="mt-5 rounded-2xl border border-dashed border-white/15 bg-[#0b1727]/70 p-6"><p className="text-sm leading-6 text-slate-400">No published competition record is linked to this robot yet. Event history will appear when a verified competition record names this robot.</p></div>}
         </section>
 
         {robot.engineering ? (

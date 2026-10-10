@@ -21,10 +21,10 @@ export default async function Home() {
   const featuredRobotImage = featuredRobot?.media?.find((media) => media.type === "image");
   const recentAchievements = competitions.filter((record) => record.result !== "Participation").slice(0, 3);
   const statCards = [
-    ["Robots Built", stats.robots],
-    ["National Awards", stats.nationalAwards],
-    ["International Participations", stats.internationalParticipations],
-    ["Active Members", stats.activeMembers],
+    ["Published Robot Records", stats.robots],
+    ["National Podium Records", stats.nationalAwards],
+    ["International Event Records", stats.internationalParticipations],
+    ["Published Active Profiles", stats.activeMembers],
   ] as const;
 
   return (
@@ -82,18 +82,16 @@ export default async function Home() {
 
       <section className="border-y border-white/10 bg-[#0b1727]">
         <div className="mx-auto max-w-7xl px-6 py-12">
-          <SectionHeading eyebrow="Verified record" title="The numbers will come from the archive." description="No fabricated team statistics are shown. Once verified records are entered, this section can expose robots built, awards, international participations and active members directly from the database." />
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {statCards.map(([label, value]) => (
+          <SectionHeading eyebrow="Verified record" title="Published team metrics." description="Counts reflect published public records only; missing data is never presented as a confirmed zero." />
+          {statCards.some(([, value]) => value > 0) ? <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {statCards.filter(([, value]) => value > 0).map(([label, value]) => (
               <div key={label} className="rounded-2xl border border-white/10 bg-[#07111f] p-6">
                 <div className="font-mono text-3xl font-bold text-[#19d3ff]">{value}</div>
                 <div className="mt-2 text-sm text-slate-400">{label}</div>
-                <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">
-                  {value > 0 ? "Verified published records" : "Awaiting verified data"}
-                </div>
+                <div className="mt-4 text-[11px] uppercase tracking-[0.16em] text-slate-600">Published public records</div>
               </div>
             ))}
-          </div>
+          </div> : <div className="mt-8 rounded-2xl border border-dashed border-white/15 bg-[#07111f]/70 p-6 sm:p-8"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#19d3ff]">Awaiting verified data</p><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">No public statistics are published yet. Counts will appear automatically as verified robot, competition and member records are approved.</p></div>}
         </div>
       </section>
 
