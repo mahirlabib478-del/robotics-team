@@ -49,7 +49,8 @@ export async function createEngineeringProject(formData: FormData) {
 }
 
 export async function addEngineeringProjectMember(formData: FormData) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase, profile, user } = await requireAdmin();
+  requireEngineeringDomain(user.email);
   requireAnyRole(["super_admin", "team_lead"], profile.role);
   const projectId = value(formData, "project_id", 80);
   const email = value(formData, "university_email", 254).toLowerCase();
@@ -87,7 +88,8 @@ export async function addEngineeringProjectMember(formData: FormData) {
 }
 
 export async function createEngineeringTask(formData: FormData) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase, profile, user } = await requireAdmin();
+  requireEngineeringDomain(user.email);
   requireAnyRole(["super_admin", "team_lead", "technical_lead"], profile.role);
   const projectId = value(formData, "project_id", 80);
   const title = value(formData, "title", 200);
@@ -126,7 +128,8 @@ export async function createEngineeringTask(formData: FormData) {
 }
 
 export async function updateEngineeringTaskStatus(formData: FormData) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase, profile, user } = await requireAdmin();
+  requireEngineeringDomain(user.email);
   requireAnyRole(["super_admin", "team_lead", "technical_lead"], profile.role);
   const taskId = value(formData, "task_id", 80);
   const status = value(formData, "status", 20);
