@@ -21,8 +21,14 @@ function validDate(value: string) {
   return !value || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)));
 }
 
+function requireEngineeringDomain(email?: string) {
+  const domain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
+  if (!domain || !email || !email.toLowerCase().endsWith(`@${domain}`)) redirect("/engineering/projects?error=domain-required");
+}
+
 export async function createEngineeringProject(formData: FormData) {
-  const { supabase, profile } = await requireAdmin();
+  const { supabase, profile, user } = await requireAdmin();
+  requireEngineeringDomain(user.email);
   requireAnyRole(["super_admin", "team_lead"], profile.role);
   const name = value(formData, "name", 160);
   const slug = value(formData, "slug", 120).toLowerCase();
@@ -61,7 +67,7 @@ export async function addEngineeringProjectMember(formData: FormData) {
       const { data: authRecord, error: authError } = await admin.auth.admin.getUserById(member.id);
       const allowedDomain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
       const confirmedEmail = authRecord.user?.email?.toLowerCase();
-      if (authError || !authRecord.user?.email_confirmed_at || !confirmedEmail || (allowedDomain && !confirmedEmail.endsWith(`@${allowedDomain}`)) || !["super_admin", "team_lead", "technical_lead", "viewer"].includes(member.role)) {
+      if (authError || !allowedDomain || !authRecord.user?.email_confirmed_at || !confirmedEmail || !confirmedEmail.endsWith(`@${allowedDomain}`) || !["super_admin", "team_lead", "technical_lead", "viewer"].includes(member.role)) {
         member = null;
       }
     }
