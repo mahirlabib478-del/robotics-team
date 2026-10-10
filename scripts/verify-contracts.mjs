@@ -482,6 +482,7 @@ assert.match(adminContentActions, /publicEngineeringFields = \["problem", "mecha
 assert.match(adminContentActions, /publicEngineeringFromForm\(formData\)/, "Robot CMS writes must use the public engineering field allowlist");
 assert.match(robotAdminPage, /Public engineering summary/, "CMS must clearly label public engineering fields");
 assert.match(robotAdminPage, /Restricted design details remain in private engineering records/, "CMS must warn editors not to place restricted data in public summaries");
+assert.match(robotAdminPage, /Basic robot edits still work, but these summary fields will not be saved until the migration is applied/, "CMS must disclose when the public engineering migration is missing");
 assert.match(adminContentActions, /createResult\.error\?\.message\?\.includes\("public_engineering"\)/, "Robot creation must remain functional before the optional migration is applied");
 assert.match(adminContentActions, /updateResult\.error\?\.message\?\.includes\("public_engineering"\)/, "Robot editing must remain functional before the optional migration is applied");
 
