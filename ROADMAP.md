@@ -21,7 +21,7 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 - [ ] Use real footage rather than decorative/random animation; avoid performance-heavy motion.
 - [ ] Add quick statistics only after each number is verified (robots built, national awards, international participation, members, years active).
 - [ ] Feature the principal robot categories with image, name, category, weight class, control system, status and detail link.
-- [ ] Show recent achievements with competition, year, location, category, position, robot and evidence.
+- [x] Show recent published award results on the homepage with competition, year, location, category, result, robot and a link to the detailed record/evidence (empty state remains when no award results are published).
 - [ ] Show international competition targets only when confirmed; include country, expected date, robot/category and preparation status.
 - [ ] Show sponsor/partner logos and partnership CTA; provide a sponsorship proposal download only when an approved document exists.
 
