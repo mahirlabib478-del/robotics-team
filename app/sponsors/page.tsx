@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicSponsors } from "@/lib/public-data";
@@ -40,7 +41,8 @@ export default async function SponsorsPage() {
 
         <div className="mt-12 rounded-2xl border border-[#19d3ff]/20 bg-[#19d3ff]/5 p-7">
           <h2 className="text-xl font-bold">Become a Partner</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-400">The official sponsorship proposal PDF and verified partnership contact will be linked here once approved by Team Stellar.</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Interested in supporting Team Stellar? Contact the team to discuss partnership options and request the approved sponsorship proposal. A download link will appear here once the official document is approved.</p>
+          <Link href="/contact" className="mt-5 inline-flex rounded-full bg-[#1479ff] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#1479ff]/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Request a Sponsorship Proposal →</Link>
         </div>
       </section>
       <SiteFooter />
