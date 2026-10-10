@@ -22,6 +22,10 @@ assert.match(migration, /private\.can_access_engineering_project\(project_id, 'l
 assert.match(migration, /user_id <> \(select auth\.uid\(\)\)/, "Project members must not self-enroll or alter their own capability");
 assert.match(migration, /after insert on public\.engineering_projects[\s\S]*?private\.add_engineering_project_creator/, "Project creator must receive lead membership atomically");
 assert.match(migration, /after insert or update on public\.engineering_tasks[\s\S]*?private\.record_engineering_task_event/, "Task creation and updates must be recorded by a database trigger");
+assert.match(migration, /engineering_project_creator_immutable/, "Project creator attribution must be immutable");
+assert.match(migration, /engineering_task_identity_immutable/, "Tasks cannot be moved between projects or have creator attribution rewritten");
+assert.match(migration, /engineering_membership_identity_immutable/, "Membership identity and added-by attribution must be immutable");
+assert.match(stagingSecurity, /Engineering immutable-attribution triggers are enabled/, "Staging checks must verify immutable-attribution triggers");
 assert.match(migration, /revoke all on public\.engineering_projects,[\s\S]*?grant select on public\.engineering_task_events to authenticated/, "Task history must be read-only to authenticated clients");
 assert.doesNotMatch(migration, /create policy engineering_tasks_delete/, "Tasks must not be silently deleted; preserve task history");
 assert.match(page, /requireAdmin\(\)/, "Project board must require a confirmed authenticated session");
