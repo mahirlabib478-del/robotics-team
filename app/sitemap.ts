@@ -32,11 +32,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/contact", priority: 0.5, changeFrequency: "monthly" as const },
   ];
 
-  const [robots, competitions, research] = await Promise.all([
-    getPublicRobots(),
-    getPublicCompetitions(),
-    getPublicResearch(),
-  ]);
+  let robots: Awaited<ReturnType<typeof getPublicRobots>>;
+  let competitions: Awaited<ReturnType<typeof getPublicCompetitions>>;
+  let research: Awaited<ReturnType<typeof getPublicResearch>>;
+  try {
+    [robots, competitions, research] = await Promise.all([
+      getPublicRobots(),
+      getPublicCompetitions(),
+      getPublicResearch(),
+    ]);
+  } catch (error) {
+    console.error("[sitemap] Dynamic public routes could not be loaded; serving the verified static route index", error);
+    const lastModified = new Date();
+    return staticRoutes.map((route) => ({
+      url: new URL(route.path, base).toString(),
+      lastModified,
+      priority: route.priority,
+      changeFrequency: route.changeFrequency,
+    }));
+  }
   const lastModified = new Date();
 
   return [
