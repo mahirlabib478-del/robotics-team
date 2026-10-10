@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
@@ -14,7 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function CompetitionsPage() {
-  const competitions = await getPublicCompetitions();
+  let competitions: Awaited<ReturnType<typeof getPublicCompetitions>>;
+  try { competitions = await getPublicCompetitions(); }
+  catch (error) { console.error("[competitions] Public competition records are unavailable", error); return <PublicDataUnavailable resource="competition records" />; }
   return (
     <main className="min-h-screen">
       <SiteHeader />
