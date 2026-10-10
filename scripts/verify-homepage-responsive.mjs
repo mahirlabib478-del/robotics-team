@@ -32,7 +32,7 @@ for (const [href, label] of [
   ['href="/sponsors"', "Partner With Us"],
 ]) {
   const start = page.indexOf(href, actionsIndex);
-  assert.ok(start > actionsIndex, `Missing hero CTA: ${label}`);
+  assert.ok(start >= actionsIndex && start >= 0, `Missing hero CTA: ${label}`);
   const end = page.indexOf("</Link>", start);
   const link = page.slice(start, end);
   assert.match(link, /w-full/, `${label} must be full width on mobile`);
