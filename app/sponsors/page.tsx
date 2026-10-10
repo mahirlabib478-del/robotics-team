@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
 const packages = ["Title Partner", "Platinum Partner", "Gold Partner", "Technology Partner", "Travel Partner", "Manufacturing Partner", "Media Partner"];
 
 export default async function SponsorsPage() {
-  const sponsors = await getPublicSponsors();
+  let sponsors: Awaited<ReturnType<typeof getPublicSponsors>>;
+  try { sponsors = await getPublicSponsors(); }
+  catch (error) { console.error("[sponsors] Public sponsor records are unavailable", error); return <PublicDataUnavailable resource="sponsor records" />; }
   return (
     <main className="min-h-screen">
       <SiteHeader />
