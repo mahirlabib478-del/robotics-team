@@ -460,10 +460,13 @@ const [updatedAtHardening, stagingBootstrap] = await Promise.all([
   read("supabase/migrations/20261010_harden_updated_at_search_path.sql"),
   read("docs/SUPABASE-STAGING-SETUP.md"),
 ]);
-assert.match(updatedAtHardening, /set search_path = ''/, "Updated-at hardening migration must use an empty search_path");
-assert.match(updatedAtHardening, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, "Updated-at trigger function must not be directly executable by client roles");
-assert.match(schema, /create or replace function public\\.set_updated_at\\(\\)[\\s\\S]*?set search_path = ''/, "Fresh-install schema must include the hardened updated-at function");
-assert.match(schema, /revoke all on function public\\.set_updated_at\\(\\) from public, anon, authenticated/, "Fresh-install schema must revoke direct client execution of updated-at function");
+assert.ok(updatedAtHardening.includes("set search_path = ''"), "Updated-at hardening migration must use an empty search_path");
+assert.ok(updatedAtHardening.includes("revoke all on function public.set_updated_at() from public, anon, authenticated"), "Updated-at trigger function must not be directly executable by client roles");
+const updatedAtFunctionStart = schema.indexOf("create or replace function public.set_updated_at()");
+const updatedAtFunctionEnd = schema.indexOf("$$;", updatedAtFunctionStart) + 3;
+assert.ok(updatedAtFunctionStart >= 0 && updatedAtFunctionEnd > updatedAtFunctionStart, "Fresh-install schema must define the updated-at function");
+assert.ok(schema.slice(updatedAtFunctionStart, updatedAtFunctionEnd).includes("set search_path = ''"), "Fresh-install schema must include the hardened updated-at function");
+assert.ok(schema.includes("revoke all on function public.set_updated_at() from public, anon, authenticated"), "Fresh-install schema must revoke direct client execution of updated-at function");
 assert.ok(stagingBootstrap.includes("Do not run every file in `supabase/migrations/` on top of this current schema snapshot"), "Staging runbook must distinguish fresh installs from migration upgrades");
 assert.ok(stagingBootstrap.includes("leave the decision **BLOCKED / NOT VERIFIED**"), "Staging runbook must not permit release approval while checks are pending");
 assert.ok(stagingBootstrap.includes("Never prefix a secret with `NEXT_PUBLIC_`"), "Staging runbook must preserve server-only secret guidance");
