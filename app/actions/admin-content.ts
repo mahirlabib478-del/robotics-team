@@ -109,6 +109,48 @@ export async function addRobotMedia(formData: FormData) {
   redirect("/admin/robots?saved=media");
 }
 
+export async function updateRobotMedia(formData: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(["super_admin", "team_lead", "technical_lead"], profile.role);
+
+  const id = value(formData, "media_id", 80);
+  const robotId = value(formData, "robot_id", 80);
+  const mediaType = value(formData, "media_type", 20);
+  const sourceUrl = value(formData, "source_url", 1000);
+  const altText = value(formData, "alt_text", 300);
+  const caption = value(formData, "caption", 500);
+  const visibility = value(formData, "visibility", 20);
+  const sortOrder = Number(value(formData, "sort_order", 10));
+  if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f-]{36}$/i.test(robotId) || !["image", "video", "cad"].includes(mediaType) || !validHttpsUrl(sourceUrl) || !altText || !["public", "internal"].includes(visibility) || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 10000) {
+    redirect("/admin/robots?error=invalid-media");
+  }
+
+  const { data: current, error: readError } = await supabase.from("robot_media").select("robot_id").eq("id", id).maybeSingle();
+  if (readError || !current || current.robot_id !== robotId) redirect("/admin/robots?error=not-found");
+  const { error } = await supabase.from("robot_media").update({
+    media_type: mediaType,
+    source_url: sourceUrl,
+    alt_text: altText,
+    caption: caption || null,
+    sort_order: sortOrder,
+    visibility,
+  }).eq("id", id).eq("robot_id", robotId);
+  if (error) {
+    console.error("Robot media update failed:", error);
+    redirect("/admin/robots?error=media-save");
+  }
+
+  const { error: auditError } = await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action: "update_robot_media",
+    entity_type: "robot_media",
+    entity_id: id,
+    metadata: { robot_id: robotId, media_type: mediaType, visibility, sort_order: sortOrder },
+  });
+  if (auditError) console.error("Robot media update audit write failed:", auditError);
+  redirect("/admin/robots?saved=media");
+}
+
 export async function createCompetition(formData: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
