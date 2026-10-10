@@ -62,7 +62,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
         <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-400">Apply through a structured engineering-team intake covering your division, skills, projects, portfolio and weekly availability.</p>
 
         {params.submitted ? <div role="status" className="mt-8 rounded-2xl border border-emerald-400/20 bg-emerald-400/5 p-5 text-sm text-emerald-200">Application received. The operations team can now review it through the private recruitment workflow.</div> : null}
-        {params.error ? <div role="alert" className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">{params.error === "closed" ? "Recruitment applications are currently closed or the deadline has passed." : params.error === "rate" ? "Too many submission attempts from this network. Please wait before trying again." : params.error === "invalid" ? "Please use valid HTTPS links and do not fill the hidden verification field." : "We could not submit the application. Please verify the required fields and try again; if the issue persists, contact the team."}</div> : null}
+        {params.error ? <div role="alert" className="mt-8 rounded-2xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-5 text-sm text-[#ffbd85]">{params.error === "closed" ? "Recruitment applications are currently closed or the deadline has passed." : params.error === "rate" ? "Too many submission attempts from this network, or submission protection is temporarily unavailable. Please wait a little and try again." : params.error === "invalid" ? "Please use valid HTTPS links and do not fill the hidden verification field." : params.error === "missing" ? "Please complete all required fields before submitting." : params.error === "config" ? "The application service is temporarily unavailable. Please try again later." : "We could not save the application. Please try again later; if the problem continues, contact the team."}</div> : null}
 
         <section className="mt-10 rounded-2xl border border-white/10 bg-[#0b1727] p-5 sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -103,7 +103,7 @@ export default async function JoinPage({ searchParams }: JoinPageProps) {
                 <textarea name="why_join" rows={5} required className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 text-sm text-white outline-none focus:border-[#19d3ff]/50" />
               </label>
               <div className="md:col-span-2">
-                <button type="submit" className="rounded-full bg-[#1479ff] px-6 py-3 font-semibold transition hover:bg-[#1479ff]/85">Submit Application</button>
+                <button type="submit" className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#1479ff] px-6 py-3 text-center font-semibold transition hover:bg-[#1479ff]/85 sm:w-auto">Submit Application</button>
               </div>
             </form>
           ) : (
