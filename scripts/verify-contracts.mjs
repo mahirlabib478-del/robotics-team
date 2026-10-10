@@ -444,6 +444,7 @@ assert.match(stagingSecuritySql, /Publishing guard is SECURITY INVOKER with empt
 assert.match(stagingSecuritySql, /Publishing guard is not directly executable by client roles/, "Staging verification must inspect publishing guard execute grants");
 assert.match(stagingSecuritySql, /Audit table RLS enabled/, "Staging verification must check audit-log RLS");
 assert.match(stagingSecuritySql, /Audit table denies direct client updates and deletes/, "Staging verification must check audit-log table mutation grants");
+assert.match(stagingSecuritySql, /upper\(p\.cmd\) in \('UPDATE','DELETE','ALL'\)/, "Staging verification must inspect client-facing audit mutation policies");
 assert.match(stagingSecuritySql, /Audit append-only trigger is enabled/, "Staging verification must ensure the audit append-only trigger is enabled");
 assert.match(stagingSecuritySql, /updated-at trigger installed: /, "Staging verification must inspect updated-at trigger installation");
 for (const table of ["profiles", "robots", "competitions", "team_members", "research_posts", "sponsors", "recruitment_settings"]) {
