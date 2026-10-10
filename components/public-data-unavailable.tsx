@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export function PublicDataUnavailable({ resource = "public records" }: { resource?: string }) {
   return (
-    <main className="flex min-h-screen flex-col bg-[#07111f] text-[#f5f8fc]">
+    <main id="main-content" className="flex min-h-screen flex-col bg-[#07111f] text-[#f5f8fc]">
       <SiteHeader />
       <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center px-4 py-20 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#19d3ff]">Temporarily unavailable</p>
