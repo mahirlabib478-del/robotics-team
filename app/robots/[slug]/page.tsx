@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,7 +25,10 @@ export const dynamic = "force-dynamic";
 
 export default async function RobotDetailPage({ params }: RobotDetailPageProps) {
   const { slug } = await params;
-  const [robot, competitions] = await Promise.all([getPublicRobot(slug), getPublicCompetitions()]);
+  let robot: Awaited<ReturnType<typeof getPublicRobot>>;
+  let competitions: Awaited<ReturnType<typeof getPublicCompetitions>>;
+  try { [robot, competitions] = await Promise.all([getPublicRobot(slug), getPublicCompetitions()]); }
+  catch (error) { console.error("[robot-detail] Public robot data unavailable", error); return <PublicDataUnavailable resource="robot record" />; }
   if (!robot) notFound();
   const robotCompetitions = competitions.filter((record) => record.robot.trim().toLocaleLowerCase() === robot.name.trim().toLocaleLowerCase());
 
