@@ -27,6 +27,9 @@ function errorMessage(code?: string) {
     "invalid-task": "Task fields or status are invalid.",
     "task-save": "The task could not be saved. Confirm you have editor access to this project.",
     "task-update": "The task status could not be updated. Confirm you have editor access.",
+    "assignee-not-found": "No matching account was found for the task assignee.",
+    "assignee-not-member": "Task assignees must already be members of this project.",
+    "assignee-lookup": "Task assignment is unavailable because the account lookup failed safely.",
   };
   return messages[code] ?? "The requested action could not be completed.";
 }
@@ -146,6 +149,7 @@ export default async function EngineeringProjectsPage({ searchParams }: { search
                   <input type="hidden" name="project_id" value={project.id} />
                   <h4 className="font-bold">Add task</h4>
                   <label className="grid gap-2 text-xs text-slate-400">Task title<input name="title" required maxLength={200} className={inputClass} /></label>
+                  <label className="grid gap-2 text-xs text-slate-400">Assignee university email (optional)<input name="assignee_email" type="email" maxLength={254} className={inputClass} placeholder="Existing project member" /></label>
                   <label className="grid gap-2 text-xs text-slate-400">Priority<select name="priority" defaultValue="normal" className={inputClass}><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></label>
                   <label className="grid gap-2 text-xs text-slate-400">Due date<input name="due_date" type="date" className={inputClass} /></label>
                   <label className="grid gap-2 text-xs text-slate-400">Description<textarea name="description" maxLength={3000} rows={4} className={inputClass} /></label>
