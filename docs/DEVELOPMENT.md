@@ -15,6 +15,11 @@ Run the same checks used by CI before opening a pull request. This repository do
 npm install --no-audit --no-fund
 npm run lint
 npm run verify:contracts
+node scripts/verify-homepage-responsive.mjs
+node scripts/verify-public-quality.mjs
+node scripts/verify-robot-archive.mjs
+node scripts/verify-engineering-portal.mjs
+node scripts/verify-engineering-design.mjs
 npm run build
 ```
 
