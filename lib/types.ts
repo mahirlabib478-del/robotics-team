@@ -12,7 +12,7 @@ export interface Robot {
 }
 export interface CompetitionRecord {
   slug: string; competition: string; organizer: string; date?: string; year: number; location: string; country?: string;
-  level: CompetitionLevel; segment: string; robot: string; result: AchievementResult; teamMembers: string[];
+  level: CompetitionLevel; segment: string; robot: string; robotCategory?: string; result: AchievementResult; teamMembers: string[];
   evidence?: { label: string; href: string }[]; report?: string;
 }
 export interface TeamMember {
