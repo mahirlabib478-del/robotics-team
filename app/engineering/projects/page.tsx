@@ -68,6 +68,17 @@ export default async function EngineeringProjectsPage({ searchParams }: { search
 
   if (membershipResult.error || taskResult.error) {
     console.error("[engineering] Project membership/task query failed:", membershipResult.error ?? taskResult.error);
+    return (
+      <main className="min-h-screen bg-[#07111f] px-4 py-10 text-[#f5f8fc] sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/engineering" className="text-sm text-[#19d3ff]">← Engineering workspace</Link>
+          <section role="alert" className="mt-8 rounded-3xl border border-[#ff7a00]/25 bg-[#0b1727] p-6 sm:p-8">
+            <h1 className="text-2xl font-bold">Project permissions could not be verified.</h1>
+            <p className="mt-4 leading-7 text-slate-300">The project membership or task query failed. For safety, this page is not showing task data or write controls until access can be verified.</p>
+          </section>
+        </div>
+      </main>
+    );
   }
   const membershipByProject = new Map((membershipResult.data ?? []).map((membership) => [membership.project_id, membership.capability] as const));
   const tasks = taskResult.data ?? [];
