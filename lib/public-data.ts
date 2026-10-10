@@ -39,7 +39,7 @@ function safePublicUrl(value: unknown): string | undefined {
   if (typeof value !== "string" || !value) return undefined;
   try {
     const url = new URL(value);
-    return url.protocol === "https:" ? url.toString() : undefined;
+    return url.protocol === "https:" && !url.username && !url.password ? url.toString() : undefined;
   } catch {
     return undefined;
   }
