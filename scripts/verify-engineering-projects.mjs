@@ -1,0 +1,36 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const [migration, schema, page, actions, overview] = await Promise.all([
+  read("supabase/migrations/20261010_engineering_project_task_board.sql"),
+  read("supabase/schema.sql"),
+  read("app/engineering/projects/page.tsx"),
+  read("app/actions/engineering.ts"),
+  read("app/engineering/page.tsx"),
+]);
+
+for (const table of ["engineering_projects", "engineering_project_members", "engineering_tasks", "engineering_task_events"]) {
+  assert.match(migration, new RegExp(`create table if not exists public\\.${table}`), `Migration must create ${table}`);
+  assert.match(migration, new RegExp(`alter table public\\.${table} enable row level security`), `RLS must be enabled for ${table}`);
+  assert.match(schema, new RegExp(`create table if not exists public\\.${table}`), `Fresh schema must include ${table}`);
+}
+assert.match(migration, /security definer[\s\S]*?set search_path = ""/, "Private project access helper must use a hardened search path");
+assert.match(migration, /private\.can_access_engineering_project\(project_id, 'editor'\)/, "Task writes must require project editor capability");
+assert.match(migration, /private\.can_access_engineering_project\(project_id, 'lead'\)/, "Membership management must require project-lead capability");
+assert.match(migration, /user_id <> \(select auth\.uid\(\)\)/, "Project members must not self-enroll or alter their own capability");
+assert.match(migration, /after insert on public\.engineering_projects[\s\S]*?private\.add_engineering_project_creator/, "Project creator must receive lead membership atomically");
+assert.match(migration, /after insert or update on public\.engineering_tasks[\s\S]*?private\.record_engineering_task_event/, "Task creation and updates must be recorded by a database trigger");
+assert.match(migration, /revoke all on public\.engineering_task_events from public, anon, authenticated[\s\S]*?grant select on public\.engineering_task_events to authenticated/, "Task history must be read-only to authenticated clients");
+assert.doesNotMatch(migration, /create policy engineering_tasks_delete/, "Tasks must not be silently deleted; preserve task history");
+assert.match(page, /requireAdmin\(\)/, "Project board must require a confirmed authenticated session");
+assert.match(page, /robots: \{ index: false, follow: false, noarchive: true \}/, "Project board must not be indexed");
+assert.match(page, /Project permissions could not be verified/, "Project board must fail closed when membership/task queries fail");
+assert.match(page, /addEngineeringProjectMember/, "Project leads must be able to grant explicit membership to existing accounts");
+assert.match(page, /No projects assigned yet/, "Users without membership must see an empty state, not other projects");
+assert.match(actions, /requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Only approved leads can create projects and manage memberships");
+assert.match(actions, /export async function createEngineeringTask/, "Authorized project members must be able to create tasks");
+assert.match(actions, /export async function updateEngineeringTaskStatus/, "Authorized project members must be able to update task status");
+assert.match(actions, /\["backlog", "todo", "in_progress", "blocked", "done"\]/, "Task status updates must use an explicit allowlist");
+assert.match(overview, /href: "\/engineering\/projects"/, "Engineering overview must link to the project/task module");
+console.log("Engineering project/task board access-boundary checks passed.");
