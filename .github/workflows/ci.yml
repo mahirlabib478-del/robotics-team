@@ -33,5 +33,8 @@ jobs:
       - name: Robot archive regression checks
         run: node scripts/verify-robot-archive.mjs
 
+      - name: Private engineering portal access checks
+        run: node scripts/verify-engineering-portal.mjs
+
       - name: Production build
         run: npm run build
