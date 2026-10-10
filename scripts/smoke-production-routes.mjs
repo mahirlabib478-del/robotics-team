@@ -41,7 +41,8 @@ try {
     assert.equal(response.status, 200, `Public route ${route} must render successfully`);
     const html = await response.text();
     assert.match(html, /<html[^>]*lang="en"/i, `Route ${route} must include the document language`);
-    assert.match(html, /<main[^>]*id="main-content"/i, `Route ${route} must expose the skip-link target`);
+    assert.match(html, /href="#main-content"/i, `Route ${route} must expose a skip link`);
+    assert.match(html, /id="main-content"/i, `Route ${route} must include the skip-link target`);
   }
 
   const robots = await fetch(`${base}/robots.txt`, { signal: AbortSignal.timeout(5000) });
