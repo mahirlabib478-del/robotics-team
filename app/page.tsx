@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import Link from "next/link";
 import Image from "next/image";
 import { SiteFooter } from "@/components/site-footer";
@@ -17,7 +18,15 @@ const capabilityCards = [
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [robots, competitions, members] = await Promise.all([getPublicRobots(), getPublicCompetitions(), getPublicTeamMembers()]);
+  let robots: Awaited<ReturnType<typeof getPublicRobots>>;
+  let competitions: Awaited<ReturnType<typeof getPublicCompetitions>>;
+  let members: Awaited<ReturnType<typeof getPublicTeamMembers>>;
+  try {
+    [robots, competitions, members] = await Promise.all([getPublicRobots(), getPublicCompetitions(), getPublicTeamMembers()]);
+  } catch (error) {
+    console.error("[home] Public archive data is unavailable", error);
+    return <PublicDataUnavailable resource="robot, competition, and team records" />;
+  }
   const stats = await getPublicStats(robots, competitions, members);
   const featuredRobot = robots.find((robot) => robot.media?.some((media) => media.type === "image"));
   const featuredRobotImage = featuredRobot?.media?.find((media) => media.type === "image");
