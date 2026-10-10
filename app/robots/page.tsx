@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { RobotArchive } from "@/components/robot-archive";
 import { getPublicRobots } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Robots",
   description: "Explore Team Stellar’s published robot archive, technical specifications, development status, and public engineering summaries.",
