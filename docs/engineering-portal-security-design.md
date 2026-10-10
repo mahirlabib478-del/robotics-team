@@ -1,6 +1,6 @@
 # Private Engineering Portal — Data and Access Design
 
-**Status:** Design proposal only. This document does not create tables, grant access, or prove production security. Do not enable Phase 3 modules until the design is reviewed and tested against a clean staging Supabase project.
+**Status:** Security baseline and design reference. The first project/task slice now has a versioned migration, server actions and a private UI, but source-level tests do not prove database security. Documents, BOM/procurement, testing/readiness and storage remain unimplemented. Do not treat any Phase 3 module as production-ready until migrations are applied and role/RLS tests pass against a clean staging Supabase project.
 
 ## Security boundary
 
