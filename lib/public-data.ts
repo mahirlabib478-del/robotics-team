@@ -88,13 +88,27 @@ export async function getPublicRobots(): Promise<Robot[]> {
   }
 }
 export async function getPublicRobot(slug:string){return (await getPublicRobots()).find((item)=>item.slug===slug)??null;}
+async function attachPublishedRobotCategories(records: CompetitionRecord[], supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>): Promise<CompetitionRecord[]> {
+  if (!records.length) return records;
+  const { data, error } = await supabase.from("robots").select("name,category").eq("publish_status", "published").eq("visibility", "public");
+  if (error) {
+    console.warn("[public-data] Robot categories are unavailable for competition filtering.", error);
+    return records;
+  }
+  const categories = new Map((data ?? []).map((robot) => [robot.name.trim().toLocaleLowerCase(), robot.category] as const));
+  return records.map((record) => {
+    const robotCategory = categories.get(record.robot.trim().toLocaleLowerCase());
+    return robotCategory ? { ...record, robotCategory } : record;
+  });
+}
+
 export async function getPublicCompetitions(): Promise<CompetitionRecord[]> {
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from("competitions").select("slug,official_name,organizer,event_date,year,city,country,level,segment,robot_name,result,team_members,report").eq("publish_status","published").eq("visibility","public").order("year",{ascending:false});
     if (error) { console.error("[public-data] Failed to load published competitions", error); throw new PublicDataUnavailableError("competition"); }
     if (!data) return fallbackCompetitions;
-    return data.map((r)=>({slug:r.slug,competition:r.official_name,organizer:r.organizer,date:r.event_date??undefined,year:r.year,location:[r.city,r.country].filter(Boolean).join(", ")||"Location not published",country:r.country??undefined,level:r.level as CompetitionRecord["level"],segment:r.segment,robot:r.robot_name,result:r.result as CompetitionRecord["result"],teamMembers:r.team_members??[],report:r.report??undefined}));
+    return attachPublishedRobotCategories(data.map((r)=>({slug:r.slug,competition:r.official_name,organizer:r.organizer,date:r.event_date??undefined,year:r.year,location:[r.city,r.country].filter(Boolean).join(", ")||"Location not published",country:r.country??undefined,level:r.level as CompetitionRecord["level"],segment:r.segment,robot:r.robot_name,result:r.result as CompetitionRecord["result"],teamMembers:r.team_members??[],report:r.report??undefined})), supabase);
   } catch (error) { if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published competitions",error); return fallbackCompetitions; }
 }
 export async function getPublicCompetition(slug:string): Promise<CompetitionRecord|null>{
@@ -104,7 +118,7 @@ export async function getPublicCompetition(slug:string): Promise<CompetitionReco
     if(error){console.error("[public-data] Failed to load published competition detail",error);throw new PublicDataUnavailableError("competition");} if(!data)return (await getPublicCompetitions()).find((item)=>item.slug===slug)??null;
     const {data:evidence,error:evidenceError}=await supabase.from("competition_evidence").select("label,href").eq("competition_id",data.id).order("created_at",{ascending:true});
     if(evidenceError){console.error("[public-data] Failed to load competition evidence",evidenceError);throw new PublicDataUnavailableError("competition evidence");}
-    return {slug:data.slug,competition:data.official_name,organizer:data.organizer,date:data.event_date??undefined,year:data.year,location:[data.city,data.country].filter(Boolean).join(", ")||"Location not published",country:data.country??undefined,level:data.level as CompetitionRecord["level"],segment:data.segment,robot:data.robot_name,result:data.result as CompetitionRecord["result"],teamMembers:data.team_members??[],report:data.report??undefined,evidence:(evidence??[]).map((item)=>safePublicLink({label:item.label,href:item.href})).filter((item): item is {label:string;href:string} => Boolean(item))};
+    const record: CompetitionRecord = {slug:data.slug,competition:data.official_name,organizer:data.organizer,date:data.event_date??undefined,year:data.year,location:[data.city,data.country].filter(Boolean).join(", ")||"Location not published",country:data.country??undefined,level:data.level as CompetitionRecord["level"],segment:data.segment,robot:data.robot_name,result:data.result as CompetitionRecord["result"],teamMembers:data.team_members??[],report:data.report??undefined,evidence:(evidence??[]).map((item)=>safePublicLink({label:item.label,href:item.href})).filter((item): item is {label:string;href:string} => Boolean(item))}; return (await attachPublishedRobotCategories([record], supabase))[0] ?? record;
   } catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published competition detail",error); return (await getPublicCompetitions()).find((item)=>item.slug===slug)??null;}
 }
 export async function getPublicTeamMembers(): Promise<TeamMember[]>{

@@ -16,6 +16,7 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 - [ ] Add approved member/alumni profiles and sponsor records
 - [ ] Complete accessibility, responsive, metadata and production smoke tests
 - [x] Add CI source-level regression checks for hero responsive ordering, navigation/form accessibility contracts, metadata defaults and sitemap privacy boundaries (supplemental; browser/device smoke tests remain required)
+- [x] Add production HTTP smoke checks for public routes, language/skip-link shell, sitemap/robots policy, 404 handling and private-route redirects where staging credentials are configured
 
 ### Homepage and identity requirements
 - [ ] Hero banner uses approved robot action photography or team video, clear team identity, concise engineering/competition tagline, and Explore Robots / Achievements / Partner CTAs.
@@ -39,7 +40,7 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 
 ### Competitions and achievements
 - [ ] Structured competition records include official name, organizer, year/date, city/country, national/international level, segment, robot, team members, result, evidence/certificate/official result link and short report.
-- [ ] Filters cover national/international, year, robot category, award type, country, and champion/runner-up/participation.
+- [x] Filters cover national/international, year, published robot category, robot, segment, award type, country, and champion/runner-up/participation.
 - [ ] Major achievement detail pages explain challenge, preparation, robot used, match/mission result, problems and solutions, award, photos/videos and media coverage.
 - [ ] Never publish unverified results or awards.
 
