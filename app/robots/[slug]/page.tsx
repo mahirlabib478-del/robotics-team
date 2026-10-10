@@ -20,6 +20,8 @@ export async function generateMetadata({ params }: RobotDetailPageProps): Promis
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function RobotDetailPage({ params }: RobotDetailPageProps) {
   const { slug } = await params;
   const [robot, competitions] = await Promise.all([getPublicRobot(slug), getPublicCompetitions()]);
