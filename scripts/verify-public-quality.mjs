@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [layout, header, footer, contact, join, sitemap, robots, home, notFound] = await Promise.all([
+const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage] = await Promise.all([
   read("app/layout.tsx"),
   read("components/site-header.tsx"),
   read("components/site-footer.tsx"),
@@ -43,6 +43,6 @@ assert.doesNotMatch(sitemap, /\/admin|\/api\/|recruitment_applications|contact_m
 assert.match(robots, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must exclude admin and API routes");
 assert.match(robots, /server-side admin authentication remains the actual access control/, "Crawler rules must not be confused with authorization");
 assert.match(home, /focus-visible:outline/, "Homepage calls to action must retain visible keyboard focus");
-assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");
+assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");\nassert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
 
 console.log("Public accessibility and metadata contract checks passed.");
