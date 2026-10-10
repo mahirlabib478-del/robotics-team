@@ -142,6 +142,8 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="border-y border-white/10 bg-[#0b1727]">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
           <SectionHeading eyebrow="Capabilities" title="One team, multiple engineering disciplines." />
           <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
             {capabilityCards.map(([number, title, description]) => (
