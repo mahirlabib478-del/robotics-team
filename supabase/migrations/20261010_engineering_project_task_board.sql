@@ -185,6 +185,57 @@ create trigger engineering_task_event_on_change
 after insert or update on public.engineering_tasks
 for each row execute function private.record_engineering_task_event();
 
+create or replace function private.audit_engineering_mutation()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  row_data jsonb;
+  target_id uuid;
+  target_type text;
+  target_action text;
+  details jsonb;
+begin
+  row_data := case when tg_op = 'DELETE' then to_jsonb(old) else to_jsonb(new) end;
+
+  if tg_table_name = 'engineering_projects' then
+    target_type := 'engineering_project';
+    target_id := (row_data ->> 'id')::uuid;
+    target_action := lower(tg_op) || '_engineering_project';
+    details := jsonb_build_object('slug', row_data ->> 'slug', 'division', row_data ->> 'division', 'status', row_data ->> 'status');
+  elsif tg_table_name = 'engineering_project_members' then
+    target_type := 'engineering_project';
+    target_id := (row_data ->> 'project_id')::uuid;
+    target_action := case tg_op when 'INSERT' then 'add_engineering_project_member' when 'UPDATE' then 'update_engineering_project_member' else 'remove_engineering_project_member' end;
+    details := jsonb_build_object('member_id', row_data ->> 'user_id', 'capability', row_data ->> 'capability');
+  else
+    target_type := 'engineering_task';
+    target_id := (row_data ->> 'id')::uuid;
+    target_action := lower(tg_op) || '_engineering_task';
+    details := jsonb_build_object('project_id', row_data ->> 'project_id', 'priority', row_data ->> 'priority', 'status', row_data ->> 'status', 'assignee_id', row_data ->> 'assignee_id');
+  end if;
+
+  insert into public.audit_logs(actor_id, action, entity_type, entity_id, metadata)
+  values ((select auth.uid()), target_action, target_type, target_id, details);
+
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
+end;
+$;
+revoke all on function private.audit_engineering_mutation() from public, anon, authenticated;
+
+drop trigger if exists engineering_projects_audit on public.engineering_projects;
+create trigger engineering_projects_audit after insert or update or delete on public.engineering_projects
+for each row execute function private.audit_engineering_mutation();
+drop trigger if exists engineering_project_members_audit on public.engineering_project_members;
+create trigger engineering_project_members_audit after insert or update or delete on public.engineering_project_members
+for each row execute function private.audit_engineering_mutation();
+drop trigger if exists engineering_tasks_audit on public.engineering_tasks;
+create trigger engineering_tasks_audit after insert or update or delete on public.engineering_tasks
+for each row execute function private.audit_engineering_mutation();
+
 drop trigger if exists engineering_projects_set_updated_at on public.engineering_projects;
 create trigger engineering_projects_set_updated_at before update on public.engineering_projects
 for each row execute function public.set_updated_at();
