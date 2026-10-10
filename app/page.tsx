@@ -29,7 +29,7 @@ export default async function Home() {
       <section className="relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(20,121,255,.22),transparent_35%),radial-gradient(circle_at_25%_70%,rgba(25,211,255,.09),transparent_30%)]" />
         <div className="relative mx-auto grid min-h-[70vh] max-w-7xl items-center gap-8 px-4 py-16 sm:gap-12 sm:px-6 sm:py-24 lg:grid-cols-[1.1fr_.9fr]">
-          <div>
+          <div className="relative z-10 min-w-0">
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-[#19d3ff]">BRAC University Robotics Team</p>
             <h1 className="mt-5 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl lg:text-8xl">
               Engineering Robots.
@@ -46,7 +46,7 @@ export default async function Home() {
             </div>
             <p className="mt-5 text-xs text-slate-600">Public claims are published only after verification by the team.</p>
           </div>
-          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 bg-[#07111f] shadow-2xl shadow-blue-950/40">
+          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative z-0 mt-4 isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 sm:mt-0 bg-[#07111f] shadow-2xl shadow-blue-950/40">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(20,121,255,.28),transparent_42%),linear-gradient(145deg,rgba(25,211,255,.07),transparent_45%)]" />
             <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(125,211,252,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,.18)_1px,transparent_1px)] [background-size:34px_34px]" />
             <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-[#19d3ff]/20 bg-[#07111f]/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#8deaff]"><span className="h-2 w-2 rounded-full bg-[#19d3ff] shadow-[0_0_12px_#19d3ff]" /> Engineering systems</div>
