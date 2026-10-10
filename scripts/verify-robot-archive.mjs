@@ -84,4 +84,12 @@ assert.match(robots, /url\.protocol === "https:" \|\| url\.hostname === "localho
 assert.match(robots, /if \(raw\)/, "Robots sitemap URL must be omitted when canonical site configuration is missing");
 assert.match(robots, /server-side admin authentication remains the actual access control/, "Robots policy must explicitly distinguish crawler guidance from authorization");
 
+const robotMediaMigration = await read("supabase/migrations/20261010_robot_media_metadata_constraints.sql");
+assert.match(data, /Boolean\(item\.alt_text\.trim\(\)\)/, "Public robot media must exclude empty accessibility descriptions");
+assert.match(data, /Number\.isInteger\(item\.sort_order\)&&item\.sort_order>=0/, "Public robot media must exclude invalid display order");
+assert.match(schema, /constraint robot_media_alt_text_nonempty check \(length\(trim\(alt_text\)\) > 0\)/, "Fresh schema must reject empty robot media alt text");
+assert.match(schema, /constraint robot_media_sort_order_nonnegative check \(sort_order >= 0\)/, "Fresh schema must reject negative media order");
+assert.match(robotMediaMigration, /add constraint robot_media_alt_text_nonempty[\s\S]*?not valid/, "Upgrade migration must enforce alt text on new rows without silently deleting existing data");
+assert.match(robotMediaMigration, /add constraint robot_media_sort_order_nonnegative[\s\S]*?not valid/, "Upgrade migration must enforce non-negative media order on new rows");
+
 console.log("Robot archive, homepage and public sitemap contract checks passed.");
