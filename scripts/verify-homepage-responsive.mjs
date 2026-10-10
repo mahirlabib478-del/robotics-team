@@ -5,7 +5,7 @@ const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8")
 
 const headingIndex = page.indexOf("Engineering Robots.");
 const artworkIndex = page.indexOf('aria-label="Abstract robotics engineering illustration');
-const actionsIndex = page.indexOf('href="/robots"');
+const actionsIndex = page.indexOf('href="/robots"', artworkIndex);
 assert.ok(headingIndex >= 0, "Homepage hero heading must remain present");
 assert.ok(artworkIndex > headingIndex, "Robot artwork must follow the hero heading in document order");
 assert.ok(actionsIndex > artworkIndex, "Mobile document order must place robot artwork before the hero CTA buttons");
