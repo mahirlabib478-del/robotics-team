@@ -26,6 +26,7 @@ The build may require the same non-secret public configuration expected by the d
 - Keep `supabase/schema.sql` aligned with migrations for fresh installs.
 - Add contract checks for security-sensitive behavior and workflow invariants.
 - Test both a fresh database and an upgrade from the previous migration state.
+- Before applying constraints to an existing database, run `supabase/preflight_data_integrity.sql` against staging, review every returned row, and correct invalid data before continuing.
 - Verify RLS through direct database/API requests as anonymous and authenticated users; UI hiding is not an authorization control.
 - Never grant anonymous direct writes to contact or recruitment tables as a shortcut around server actions and rate limiting.
 
