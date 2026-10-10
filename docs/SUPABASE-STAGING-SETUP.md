@@ -8,7 +8,7 @@ This runbook is for the first **staging** setup. It does not mean that a Supabas
 - Use a strong database password and store it in a password manager.
 - Do not use production applicant data or real private engineering files during testing.
 - Never commit credentials, paste secret keys into chat/issues, or include them in screenshots.
-- Keep the Supabase service-role key and `PUBLIC_FORM_RATE_LIMIT_SECRET` server-only.
+- Keep the Supabase service-role key and `FORM_RATE_LIMIT_SECRET` server-only.
 
 ## 1. Initialize a new, empty staging project
 
@@ -28,7 +28,7 @@ Use the repository's `.env.example` as the variable-name reference. Configure va
 - `NEXT_PUBLIC_SUPABASE_URL`: staging project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: staging publishable key.
 - `SUPABASE_SERVICE_ROLE_KEY`: staging service-role secret; server-side only.
-- `PUBLIC_FORM_RATE_LIMIT_SECRET`: independently generated random secret of at least 32 characters.
+- `FORM_RATE_LIMIT_SECRET`: independently generated random secret of at least 32 characters.
 - `NEXT_PUBLIC_SITE_URL`: the correct local or staging HTTPS site URL.
 - `ADMIN_EMAIL_DOMAIN`: optional approved university domain restriction.
 - `REQUIRE_ADMIN_MFA`: leave disabled until all intended admin accounts have enrolled MFA and recovery has been tested.
