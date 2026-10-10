@@ -51,18 +51,14 @@ export default async function GalleryPage() {
           title="Gallery & Media"
           description="A curated visual archive organized around engineering work, competition, awards and team activity. YouTube is preferred for video delivery so the site does not become a large video-hosting server."
         />
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 flex flex-wrap gap-2" aria-label="Gallery archive categories">
           {categories.map(([title, description]) => (
-            <article key={title} className="group aspect-[4/3] rounded-2xl border border-white/10 bg-[#0b1727] p-6 transition hover:-translate-y-0.5 hover:border-[#19d3ff]/30">
-              <div className="flex h-full flex-col justify-end">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#19d3ff]">Media category</p>
-                <h2 className="mt-2 font-bold">{title}</h2>
-                <p className="mt-2 text-xs leading-5 text-slate-500">{description}</p>
-              </div>
-            </article>
+            <span key={title} title={description} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0b1727]/80 px-3 py-2 text-xs font-medium text-slate-300">
+              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#19d3ff]" />{title}
+            </span>
           ))}
         </div>
-        <div className="mt-12">
+        <div className="mt-8">
           {items.length ? (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => {
