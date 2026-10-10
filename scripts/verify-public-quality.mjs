@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [layout, header, footer, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth, styles] = await Promise.all([
+const [layout, header, footer, about, contact, join, sitemap, robots, home, notFound, errorPage, adminAuth, styles] = await Promise.all([
   read("app/layout.tsx"),
   read("components/site-header.tsx"),
   read("components/site-footer.tsx"),
+  read("app/about/page.tsx"),
   read("app/contact/page.tsx"),
   read("app/join-us/page.tsx"),
   read("app/sitemap.ts"),
@@ -51,6 +52,10 @@ assert.doesNotMatch(sitemap, /\/admin|\/api\/|recruitment_applications|contact_m
 assert.match(robots, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must exclude admin and API routes");
 assert.match(robots, /server-side admin authentication remains the actual access control/, "Crawler rules must not be confused with authorization");
 assert.match(home, /focus-visible:outline/, "Homepage calls to action must retain visible keyboard focus");
+assert.match(about, /getPublicRobots\(\)/, "About page should reuse approved public robot records for visual storytelling");
+assert.match(about, /robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "About page must use only published robot images");
+assert.match(about, /Only robots with approved public images are featured here/, "About page must not fabricate robot imagery when no approved media exists");
+assert.match(about, /View robot record/, "Featured robot imagery must link to its public detail page");
 assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");
 assert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
 assert.match(adminAuth, /if \(!\/\^\\d\{6\}\$\/\.test\(code\)\)/, "Admin MFA must validate exactly six numeric digits");
