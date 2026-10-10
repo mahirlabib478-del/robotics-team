@@ -1,6 +1,7 @@
 -- Optional approved cover image for public research articles.
 alter table public.research_posts
-  add column if not exists cover_image_url text;
+  add column if not exists cover_image_url text,
+  add column if not exists cover_image_alt text;
 
 do $$
 begin
@@ -12,6 +13,16 @@ begin
     alter table public.research_posts
       add constraint research_posts_cover_image_https
       check (cover_image_url is null or cover_image_url ~ '^https://') not valid;
+  end if;
+
+  if not exists (
+    select 1 from pg_catalog.pg_constraint
+    where conname = 'research_posts_cover_image_alt_required'
+      and conrelid = 'public.research_posts'::regclass
+  ) then
+    alter table public.research_posts
+      add constraint research_posts_cover_image_alt_required
+      check (cover_image_url is null or (cover_image_alt is not null and length(trim(cover_image_alt)) > 0)) not valid;
   end if;
 end;
 $$;
