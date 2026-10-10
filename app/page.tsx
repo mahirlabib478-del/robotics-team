@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
@@ -16,6 +17,8 @@ const capabilityCards = [
 export default async function Home() {
   const [robots, competitions, members] = await Promise.all([getPublicRobots(), getPublicCompetitions(), getPublicTeamMembers()]);
   const stats = await getPublicStats(robots, competitions, members);
+  const featuredRobot = robots.find((robot) => robot.media?.some((media) => media.type === "image"));
+  const featuredRobotImage = featuredRobot?.media?.find((media) => media.type === "image");
   const recentAchievements = competitions.filter((record) => record.result !== "Participation").slice(0, 3);
   const statCards = [
     ["Robots Built", stats.robots],
@@ -41,8 +44,8 @@ export default async function Home() {
               Team Stellar designs, builds, tests and documents robotics systems across mechanical engineering, embedded electronics, software, AI and autonomous control.
             </p>
           </div>
-          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative z-0 mt-4 isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 sm:mt-0 bg-[#07111f] shadow-2xl shadow-blue-950/40 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:-translate-y-4">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(20,121,255,.28),transparent_42%),linear-gradient(145deg,rgba(25,211,255,.07),transparent_45%)]" />
+          <div aria-label={featuredRobotImage ? `Published image of ${featuredRobot?.name}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"} role="img" className="relative z-0 mt-4 isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 sm:mt-0 bg-[#07111f] shadow-2xl shadow-blue-950/40 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:-translate-y-4">
+            {featuredRobotImage ? <><Image src={featuredRobotImage.src} alt={featuredRobotImage.alt || `${featuredRobot?.name} robot`} fill priority sizes="(min-width: 1024px) 42vw, 100vw" className="object-cover" /><div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#07111f]/95 via-[#07111f]/10 to-[#07111f]/15" /><div className="absolute inset-x-6 bottom-6 rounded-2xl border border-white/15 bg-[#07111f]/85 p-5 backdrop-blur"><p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#19d3ff]">Published robot record</p><p className="mt-2 text-xl font-bold">{featuredRobot?.name}</p><p className="mt-2 text-xs leading-5 text-slate-300">Approved media from the public engineering archive.</p></div></> : <>
             <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(125,211,252,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,.18)_1px,transparent_1px)] [background-size:34px_34px]" />
             <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-[#19d3ff]/20 bg-[#07111f]/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#8deaff]"><span className="h-2 w-2 rounded-full bg-[#19d3ff] shadow-[0_0_12px_#19d3ff]" /> Engineering systems</div>
             <div className="absolute inset-x-0 top-[17%] flex justify-center">
@@ -64,6 +67,7 @@ export default async function Home() {
               <p className="mt-2 text-xl font-bold">Design. Build. Test. Compete.</p>
               <p className="mt-2 text-xs leading-5 text-slate-400">Concept illustration — actual team robot imagery can replace this artwork when approved media is available.</p>
             </div>
+            </>}
           </div>
           <div className="relative z-10 min-w-0 lg:col-start-1 lg:row-start-2">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
