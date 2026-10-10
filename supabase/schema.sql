@@ -490,6 +490,60 @@ create table if not exists public.engineering_task_events (
   created_at timestamptz not null default now()
 );
 
+create or replace function private.protect_engineering_project_creator()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  if new.created_by is distinct from old.created_by then
+    raise exception 'Engineering project creator attribution is immutable' using errcode = '42501';
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.protect_engineering_project_creator() from public, anon, authenticated;
+
+create or replace function private.protect_engineering_task_identity()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  if new.project_id is distinct from old.project_id or new.created_by is distinct from old.created_by then
+    raise exception 'Engineering task project and creator attribution are immutable' using errcode = '42501';
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.protect_engineering_task_identity() from public, anon, authenticated;
+
+create or replace function private.protect_engineering_membership_identity()
+returns trigger
+language plpgsql
+set search_path = ''
+as $
+begin
+  if new.project_id is distinct from old.project_id
+     or new.user_id is distinct from old.user_id
+     or new.added_by is distinct from old.added_by then
+    raise exception 'Engineering membership identity and attribution are immutable' using errcode = '42501';
+  end if;
+  return new;
+end;
+$;
+revoke all on function private.protect_engineering_membership_identity() from public, anon, authenticated;
+
+drop trigger if exists engineering_project_creator_immutable on public.engineering_projects;
+create trigger engineering_project_creator_immutable before update on public.engineering_projects
+for each row execute function private.protect_engineering_project_creator();
+drop trigger if exists engineering_task_identity_immutable on public.engineering_tasks;
+create trigger engineering_task_identity_immutable before update on public.engineering_tasks
+for each row execute function private.protect_engineering_task_identity();
+drop trigger if exists engineering_membership_identity_immutable on public.engineering_project_members;
+create trigger engineering_membership_identity_immutable before update on public.engineering_project_members
+for each row execute function private.protect_engineering_membership_identity();
+
 create index if not exists engineering_projects_status_due_idx on public.engineering_projects(status, due_date);
 create index if not exists engineering_project_members_user_idx on public.engineering_project_members(user_id, project_id);
 create index if not exists engineering_tasks_project_status_idx on public.engineering_tasks(project_id, status, due_date);
