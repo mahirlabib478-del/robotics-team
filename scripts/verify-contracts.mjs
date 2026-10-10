@@ -431,6 +431,7 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
 }
 assert.doesNotMatch(preflightSql, /\b(?:insert into|update public\.|delete from|alter table|drop table)\b/i, "Data-integrity preflight must not mutate the database");
 assert.match(stagingSecuritySql, /from pg_trigger/, "Staging verification must inspect installed database triggers");
+assert.match(stagingSecuritySql, /g\.tgenabled <> 'D'/, "Staging verification must fail when required triggers are disabled");
 assert.match(stagingSecuritySql, /from pg_policies/, "Staging verification must inspect applied RLS policies");
 assert.match(stagingSecuritySql, /has_function_privilege\('service_role'/, "Staging verification must inspect service-role RPC access");
 assert.match(stagingSecuritySql, /'robots'.*'competitions'.*'team_members'/s, "Staging verification must cover all content workflow tables");
