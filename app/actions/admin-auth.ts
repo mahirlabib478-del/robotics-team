@@ -71,7 +71,7 @@ export async function signOutAdmin() {
 
 export async function verifyAdminMfa(formData: FormData) {
   const code = field(formData, "code", 12);
-  if (!/^\\d{6}$/.test(code)) redirect("/admin/mfa?error=invalid");
+  if (!/^\d{6}$/.test(code)) redirect("/admin/mfa?error=invalid");
 
   const { supabase } = await requireAdminSession();
   const { data: factors } = await supabase.auth.mfa.listFactors();
