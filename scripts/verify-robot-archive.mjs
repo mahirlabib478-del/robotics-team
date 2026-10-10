@@ -57,6 +57,8 @@ assert.match(adminContentActions, /export async function addRobotMedia/, "Server
 assert.match(adminContentActions, /export async function updateRobotMedia/, "Server action must implement robot media updates");
 assert.match(adminContentActions, /validHttpsUrl\(sourceUrl\)/, "Robot media sources must be validated as credential-free HTTPS URLs");
 assert.match(adminContentActions, /action: "add_robot_media"/, "Robot media creation must write audit attribution");
+assert.match(adminContentActions, /visibility === "public" && !\["team_lead", "super_admin"\]\.includes\(profile\.role\)/, "Only leadership may approve public robot media visibility");
+assert.match(adminRobotsPage, /Public \(leadership approval\)/, "Robot media editor must communicate leadership-only publication");
 assert.match(schema, /create policy public_robot_media_read/, "Public robot media must remain scoped to published public robots");
 assert.match(schema, /create policy media_robot_media_write/, "Robot media writes must remain role-restricted by RLS");
 assert.match(homepage, /featuredRobotImage \? `Published image of \$\{featuredRobot\?\.name\}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage must label approved robot imagery accurately and identify fallback concept art as illustrative");
