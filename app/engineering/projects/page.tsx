@@ -3,6 +3,7 @@ import Link from "next/link";
 import { addEngineeringProjectMember, createEngineeringProject, createEngineeringTask, updateEngineeringTaskStatus } from "@/app/actions/engineering";
 import { signOutAdmin } from "@/app/actions/admin-auth";
 import { EmptyState } from "@/components/empty-state";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
@@ -103,6 +104,20 @@ export default async function EngineeringProjectsPage({ searchParams }: { search
   }
   const eventsByTask = new Map<string, typeof eventResult.data>();
   for (const event of eventResult.data ?? []) eventsByTask.set(event.task_id, [...(eventsByTask.get(event.task_id) ?? []), event]);
+  const assigneeIds = [...new Set(tasks.map((task) => task.assignee_id).filter((id): id is string => Boolean(id)))];
+  const assigneeNames = new Map<string, string>();
+  if (assigneeIds.length) {
+    try {
+      const admin = createSupabaseAdminClient();
+      const { data: profiles, error: profileError } = await admin.from("profiles").select("id,display_name").in("id", assigneeIds);
+      if (profileError) console.warn("[engineering] Task assignee display names are unavailable.", profileError);
+      for (const assignedProfile of profiles ?? []) {
+        if (assignedProfile.display_name?.trim()) assigneeNames.set(assignedProfile.id, assignedProfile.display_name.trim());
+      }
+    } catch (error) {
+      console.warn("[engineering] Task assignee display names are unavailable.", error);
+    }
+  }
   const membershipByProject = new Map((membershipResult.data ?? []).map((membership) => [membership.project_id, membership.capability] as const));
   const tasksByProject = new Map<string, typeof tasks>();
   for (const task of tasks) tasksByProject.set(task.project_id, [...(tasksByProject.get(task.project_id) ?? []), task]);
@@ -159,7 +174,7 @@ export default async function EngineeringProjectsPage({ searchParams }: { search
                     {projectTasks.map((task) => <article key={task.id} className="rounded-2xl border border-white/10 bg-[#07111f]/70 p-4">
                       <div className="flex flex-wrap items-start justify-between gap-2"><h5 className="break-words font-semibold">{task.title}</h5><span className="rounded-full border border-white/10 px-2 py-1 text-[10px] uppercase tracking-wide text-slate-300">{task.status.replaceAll("_", " ")}</span></div>
                       {task.description ? <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-400">{task.description}</p> : null}
-                      <div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500"><span>Priority: {task.priority}</span><span>Due: {task.due_date ?? "Not set"}</span></div>
+                      <div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500"><span>Priority: {task.priority}</span><span>Owner: {task.assignee_id ? assigneeNames.get(task.assignee_id) ?? "Assigned member" : "Unassigned"}</span><span>Due: {task.due_date ?? "Not set"}</span></div>
                       {(eventsByTask.get(task.id) ?? []).length ? <details className="mt-4"><summary className="cursor-pointer text-xs font-semibold text-[#8deaff]">Task history ({(eventsByTask.get(task.id) ?? []).length})</summary><ol className="mt-3 grid gap-2 border-l border-white/10 pl-3">{(eventsByTask.get(task.id) ?? []).slice(0, 4).map((event) => <li key={event.id} className="text-xs leading-5 text-slate-500"><span className="font-semibold text-slate-300">{event.event_type.replaceAll("_", " ")}</span>{event.from_status || event.to_status ? <span> · {event.from_status ? event.from_status.replaceAll("_", " ") + " → " : ""}{event.to_status?.replaceAll("_", " ")}</span> : null}<span className="block">{String(event.created_at).slice(0, 16).replace("T", " ")}</span></li>)}</ol></details> : null}
                       {canEditTasks ? <form action={updateEngineeringTaskStatus} className="mt-4 flex gap-2"><input type="hidden" name="task_id" value={task.id} /><select name="status" defaultValue={task.status} className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-xs"><option value="backlog">Backlog</option><option value="todo">To do</option><option value="in_progress">In progress</option><option value="blocked">Blocked</option><option value="done">Done</option></select><button className="rounded-lg bg-[#1479ff] px-3 py-2 text-xs font-semibold">Update</button></form> : null}
                     </article>)}
