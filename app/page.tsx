@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
-import { getPublicRobots, getPublicStats } from "@/lib/public-data";
+import { getPublicCompetitions, getPublicRobots, getPublicStats } from "@/lib/public-data";
 
 const capabilityCards = [
   ["01", "Mechanical Engineering", "Chassis, mechanisms, fabrication and competition-ready mechanical systems."],
@@ -14,7 +14,8 @@ const capabilityCards = [
 // Keep the homepage hero responsive while prioritizing verified, database-backed content.
 // Images further down the page are lazy-loaded to reduce initial transfer cost.
 export default async function Home() {
-  const [robots, stats] = await Promise.all([getPublicRobots(), getPublicStats()]);
+  const [robots, stats, competitions] = await Promise.all([getPublicRobots(), getPublicStats(), getPublicCompetitions()]);
+  const recentAchievements = competitions.filter((record) => record.result !== "Participation").slice(0, 3);
   const statCards = [
     ["Robots Built", stats.robots],
     ["National Awards", stats.nationalAwards],
@@ -111,6 +112,36 @@ export default async function Home() {
 
       <section className="border-y border-white/10 bg-[#0b1727]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+
+          <SectionHeading eyebrow="Recent achievements" title="Results with a record behind them." description="Published competition outcomes are drawn from the archive. Open each record to review the event details and any available evidence." />
+          {recentAchievements.length ? (
+            <div className="mt-8 grid gap-5 md:grid-cols-3">
+              {recentAchievements.map((record) => (
+                <article key={record.slug} className="rounded-2xl border border-white/10 bg-[#07111f] p-6">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#19d3ff]">{record.level} · {record.segment}</p>
+                  <h3 className="mt-3 text-xl font-bold">{record.competition}</h3>
+                  <p className="mt-2 text-sm text-slate-400">{record.year} · {record.location}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <span className="rounded-full border border-[#19d3ff]/30 px-3 py-1 text-xs font-semibold text-[#8deaff]">{record.result}</span>
+                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-400">{record.robot}</span>
+                  </div>
+                  <Link href={"/competitions/" + record.slug} className="mt-5 inline-block text-sm font-semibold text-[#19d3ff] hover:text-white">Read record & evidence →</Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-[#07111f] p-7">
+              <p className="font-semibold">No published award results yet.</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">When the team approves competition results, they will appear here with event details and any available supporting evidence. Participation records remain in the full competition archive.</p>
+              <Link href="/competitions" className="mt-4 inline-block text-sm font-semibold text-[#19d3ff]">Browse all competition records →</Link>
+            </div>
+          )}
+          <div className="mt-6">
+            <Link href="/achievements" className="inline-flex rounded-full border border-white/15 px-5 py-3 text-sm font-semibold hover:border-[#19d3ff]/50">Explore all achievements</Link>
+          </div>
+        </div>
+      </section>
+
           <SectionHeading eyebrow="Capabilities" title="One team, multiple engineering disciplines." />
           <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2">
             {capabilityCards.map(([number, title, description]) => (
