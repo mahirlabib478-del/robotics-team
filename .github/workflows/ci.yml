@@ -30,6 +30,9 @@ jobs:
       - name: Contract checks
         run: npm run verify:contracts
 
+      - name: Competition archive filter checks
+        run: npm run verify:competition-filters
+
       - name: Homepage responsive layout checks
         run: node scripts/verify-homepage-responsive.mjs
 

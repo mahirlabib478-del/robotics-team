@@ -18,9 +18,13 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
   const [year, setYear] = useState("All years");
   const [result, setResult] = useState("All results");
   const [segment, setSegment] = useState("All segments");
+  const [country, setCountry] = useState("All countries");
+  const [robot, setRobot] = useState("All robots");
 
   const years = useMemo(() => [...new Set(records.map((record) => String(record.year)))].sort((a, b) => Number(b) - Number(a)), [records]);
   const segments = useMemo(() => [...new Set(records.map((record) => record.segment).filter(Boolean))].sort((a, b) => a.localeCompare(b)), [records]);
+  const countries = useMemo(() => [...new Set(records.map((record) => record.country).filter((item): item is string => Boolean(item?.trim())))].sort((a, b) => a.localeCompare(b)), [records]);
+  const robots = useMemo(() => [...new Set(records.map((record) => record.robot).filter((item) => item && item !== "Not published"))].sort((a, b) => a.localeCompare(b)), [records]);
   const filtered = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
     return records.filter((record) => {
@@ -29,9 +33,11 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
         && (level === "All levels" || record.level === level)
         && (year === "All years" || String(record.year) === year)
         && (result === "All results" || record.result === result)
-        && (segment === "All segments" || record.segment === segment);
+        && (segment === "All segments" || record.segment === segment)
+        && (country === "All countries" || record.country === country)
+        && (robot === "All robots" || record.robot === robot);
     });
-  }, [records, search, level, year, result, segment]);
+  }, [records, search, level, year, result, segment, country, robot]);
 
   function resetFilters() {
     setSearch("");
@@ -39,12 +45,14 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
     setYear("All years");
     setResult("All results");
     setSegment("All segments");
+    setCountry("All countries");
+    setRobot("All robots");
   }
 
   return (
     <div className="mt-10">
       <div className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <label className="grid min-w-0 gap-2 text-xs text-slate-400 lg:col-span-2">
             Search archive
             <input aria-label="Search competitions by event, organizer, location, robot, result, year, report or team member" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Competition, robot, organizer, result, member…" className={selectClass} />
@@ -67,6 +75,16 @@ export function CompetitionArchive({ records, achievementsOnly = false }: Compet
           <label className="grid gap-2 text-xs text-slate-400 sm:col-span-2 lg:col-span-3">Competition segment
             <select value={segment} onChange={(event) => setSegment(event.target.value)} className={selectClass}>
               <option>All segments</option>{segments.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-2 text-xs text-slate-400">Country
+            <select value={country} onChange={(event) => setCountry(event.target.value)} className={selectClass}>
+              <option>All countries</option>{countries.map((item) => <option key={item}>{item}</option>)}
+            </select>
+          </label>
+          <label className="grid gap-2 text-xs text-slate-400">Robot
+            <select value={robot} onChange={(event) => setRobot(event.target.value)} className={selectClass}>
+              <option>All robots</option>{robots.map((item) => <option key={item}>{item}</option>)}
             </select>
           </label>
           <div className="flex items-end justify-between gap-3 sm:col-span-2 lg:col-span-2">

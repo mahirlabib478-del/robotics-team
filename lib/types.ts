@@ -11,7 +11,7 @@ export interface Robot {
   competitionSlugs?: string[]; sensitiveFieldsHidden: string[];
 }
 export interface CompetitionRecord {
-  slug: string; competition: string; organizer: string; date?: string; year: number; location: string;
+  slug: string; competition: string; organizer: string; date?: string; year: number; location: string; country?: string;
   level: CompetitionLevel; segment: string; robot: string; result: AchievementResult; teamMembers: string[];
   evidence?: { label: string; href: string }[]; report?: string;
 }
