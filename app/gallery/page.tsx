@@ -46,7 +46,7 @@ export default async function GalleryPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading
+        <SectionHeading level="h1"
           eyebrow="Media archive"
           title="Gallery & Media"
           description="A curated visual archive organized around engineering work, competition, awards and team activity. YouTube is preferred for video delivery so the site does not become a large video-hosting server."
