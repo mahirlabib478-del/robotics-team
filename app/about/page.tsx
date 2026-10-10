@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
+import { getPublicRobots } from "@/lib/public-data";
 
 export const metadata: Metadata = {
   title: "About Team Stellar",
@@ -23,7 +26,16 @@ const future = [
   "A secure internal engineering portal",
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const robots = await getPublicRobots().catch((error) => {
+    console.error("[about] Approved robot media could not be loaded", error);
+    return [];
+  });
+  const featuredRobots = robots.flatMap((robot) => {
+    const image = robot.media?.find((media) => media.type === "image");
+    return image ? [{ robot, image }] : [];
+  }).slice(0, 3);
+
   return (
     <main className="min-h-screen">
       <SiteHeader />
