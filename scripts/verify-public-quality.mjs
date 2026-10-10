@@ -12,6 +12,8 @@ const [layout, header, footer, contact, join, sitemap, robots, home, notFound, e
   read("app/robots.ts"),
   read("app/page.tsx"),
   read("app/not-found.tsx"),
+  read("app/error.tsx"),
+  read("app/actions/admin-auth.ts"),
 ]);
 
 assert.match(layout, /<html lang="en">/, "Document must declare its language");
@@ -43,6 +45,8 @@ assert.doesNotMatch(sitemap, /\/admin|\/api\/|recruitment_applications|contact_m
 assert.match(robots, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must exclude admin and API routes");
 assert.match(robots, /server-side admin authentication remains the actual access control/, "Crawler rules must not be confused with authorization");
 assert.match(home, /focus-visible:outline/, "Homepage calls to action must retain visible keyboard focus");
-assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");\nassert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
+assert.match(notFound, /Return Home/, "Not-found page must provide a recovery path");
+assert.ok((errorPage.match(/focus-visible:outline/g) ?? []).length >= 2, "Error recovery actions must show visible keyboard focus");
+assert.match(adminAuth, /if \(!\/\^\\d\{6\}\$\/\.test\(code\)\)/, "Admin MFA must validate exactly six numeric digits");
 
 console.log("Public accessibility and metadata contract checks passed.");
