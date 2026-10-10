@@ -436,6 +436,8 @@ assert.match(stagingSecuritySql, /from pg_policies/, "Staging verification must 
 assert.match(stagingSecuritySql, /has_function_privilege\('service_role'/, "Staging verification must inspect service-role RPC access");
 assert.match(stagingSecuritySql, /'robots'.*'competitions'.*'team_members'/s, "Staging verification must cover all content workflow tables");
 assert.match(stagingSecuritySql, /Audit insert policy binds actor to auth\.uid\(\)/, "Staging verification must check audit actor binding");
+assert.match(stagingSecuritySql, /p\.cmd=\x27INSERT\x27/, "Staging verification must require an INSERT-only audit attribution policy");
+assert.match(stagingSecuritySql, /p\.cmd=\x27SELECT\x27/, "Staging verification must require a SELECT-only leadership audit read policy");
 assert.match(stagingSecuritySql, /lower\(coalesce\(p\.qual,\x27\x27\)\) like \x27%team_lead%\x27/, "Staging verification must inspect the audit policy predicate, not just the grantee role");
 assert.match(stagingSecuritySql, /Audit mutation guard uses empty search_path and blocks direct execution/, "Staging verification must inspect audit mutation-guard hardening");
 assert.match(stagingSecuritySql, /Public form tables reject direct anonymous inserts/, "Staging verification must reject direct anonymous writes to public-form tables");
