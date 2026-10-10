@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,7 +21,9 @@ export const dynamic = "force-dynamic";
 
 export default async function ResearchDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPublicResearchPost(slug);
+  let post: Awaited<ReturnType<typeof getPublicResearchPost>>;
+  try { post = await getPublicResearchPost(slug); }
+  catch (error) { console.error("[research-detail] Public post unavailable", error); return <PublicDataUnavailable resource="research post" />; }
   if (!post) notFound();
 
   return (
