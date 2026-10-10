@@ -49,7 +49,7 @@ Use test accounts representing a viewer, a non-lead privileged role, a team lead
 - [ ] Separately validate the migration path against a database created from the previous released schema with representative test records.
 - [ ] Compare trigger, constraint, RLS, grant, and provenance behavior between both paths.
 - [ ] Run `supabase/verify_staging_security.sql` after migrations and attach the output plus tested commit SHA to the release record.
-- [ ] Record the tested commit SHA, migration versions, test-account roles, and results in the release record.
+- [ ] Record the tested commit SHA, migration versions, test-account roles, and results in the release record. Use [the staging record template](PHASE2-STAGING-RECORD-TEMPLATE.md) to keep the evidence consistent.
 
 ## Release decision
 
