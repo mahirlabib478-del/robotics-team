@@ -10,9 +10,16 @@ function safeYouTube(value:string){try{const u=new URL(value);if(u.protocol!=="h
 export async function createResearchPost(f: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
-  const title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120);
+  const title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120), coverImageUrl = v(f, "cover_image_url", 1200);
   if (!title || !slug || !validSlug(slug) || !excerpt || !body || !category) go("/admin/research", "missing");
-  const { data: created, error } = await supabase.from("research_posts").insert({ title, slug, excerpt, body, category, publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id }).select("id").single();
+  if (coverImageUrl && !safeHttps(coverImageUrl)) go("/admin/research", "invalid-url");
+  const postPayload = { title, slug, excerpt, body, category, publish_status: "draft" as const, visibility: "public" as const, created_by: profile.id, updated_by: profile.id };
+  let createResult = await supabase.from("research_posts").insert({ ...postPayload, cover_image_url: coverImageUrl || null }).select("id").single();
+  if (createResult.error?.message?.includes("cover_image_url")) {
+    console.error("Research cover image migration is not available yet; apply it to enable article thumbnails.", createResult.error);
+    createResult = await supabase.from("research_posts").insert(postPayload).select("id").single();
+  }
+  const { data: created, error } = createResult;
   if (error || !created) { console.error("Research post insert failed:", error); go("/admin/research", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_research_post", entity_type: "research_posts", entity_id: created.id, metadata: { slug } });
   if (auditError) console.error("Research creation audit write failed:", auditError);
@@ -114,14 +121,20 @@ export async function transitionContent(f: FormData) {
 export async function updateResearchPost(f: FormData) {
   const { supabase, profile } = await requireAdmin();
   requireAnyRole(["super_admin", "team_lead", "technical_lead", "media"], profile.role);
-  const id = v(f, "id", 80), title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120);
+  const id = v(f, "id", 80), title = v(f, "title", 220), slug = v(f, "slug", 120).toLowerCase(), excerpt = v(f, "excerpt", 500), body = v(f, "body", 12000), category = v(f, "category", 120), coverImageUrl = v(f, "cover_image_url", 1200);
   if (!/^[0-9a-f-]{36}$/i.test(id) || !title || !validSlug(slug) || !excerpt || !body || !category) go("/admin/research", "invalid");
+  if (coverImageUrl && !safeHttps(coverImageUrl)) go("/admin/research", "invalid-url");
   const { data: current, error: readError } = await supabase.from("research_posts").select("publish_status").eq("id", id).maybeSingle();
   if (readError || !current) { go("/admin/research", "not-found"); return; }
   if (current.publish_status === "archived") go("/admin/research", "archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) go("/admin/research", "review-required");
-  const { error } = await supabase.from("research_posts").update({ title, slug, excerpt, body, category, publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
-  if (error) { console.error(error); go("/admin/research", "save"); }
+  const postUpdates = { title, slug, excerpt, body, category, publish_status: "draft" as const, updated_by: profile.id, updated_at: new Date().toISOString() };
+  let updateResult = await supabase.from("research_posts").update({ ...postUpdates, cover_image_url: coverImageUrl || null }).eq("id", id);
+  if (updateResult.error?.message?.includes("cover_image_url")) {
+    console.error("Research cover image migration is not available yet; apply it to enable article thumbnails.", updateResult.error);
+    updateResult = await supabase.from("research_posts").update(postUpdates).eq("id", id);
+  }
+  if (updateResult.error) { console.error(updateResult.error); go("/admin/research", "save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_research_post", entity_type: "research_posts", entity_id: id, metadata: { slug, from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Research audit write failed:", auditError);
   go("/admin/research");
