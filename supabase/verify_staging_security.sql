@@ -231,6 +231,101 @@ checks as (
     'Install or enable the ' || t.table_name || '_set_updated_at trigger'
   from (values ('profiles'),('robots'),('competitions'),('team_members'),('research_posts'),('sponsors'),('recruitment_settings')) as t(table_name)
 
+  union all
+  select
+    'Engineering RLS enabled: ' || t.table_name,
+    coalesce((select c.relrowsecurity from pg_class c where c.oid=to_regclass('public.' || t.table_name)), false),
+    'Apply the engineering project/task migration and enable RLS on public.' || t.table_name
+  from (values ('engineering_projects'),('engineering_project_members'),('engineering_tasks'),('engineering_task_events')) as t(table_name)
+
+  union all
+  select
+    'Engineering project access helper is SECURITY DEFINER with empty search_path',
+    exists (
+      select 1 from pg_proc p
+      where p.oid=to_regprocedure('private.can_access_engineering_project(uuid,text)')
+        and p.prosecdef
+        and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
+    ),
+    'Apply the project/task migration and harden private.can_access_engineering_project'
+
+  union all
+  select
+    'Engineering task history denies direct client writes',
+    to_regclass('public.engineering_task_events') is not null
+      and not has_table_privilege('anon','public.engineering_task_events','SELECT')
+      and not has_table_privilege('anon','public.engineering_task_events','INSERT')
+      and not has_table_privilege('authenticated','public.engineering_task_events','INSERT')
+      and not has_table_privilege('authenticated','public.engineering_task_events','UPDATE')
+      and not has_table_privilege('authenticated','public.engineering_task_events','DELETE'),
+    'Revoke direct client writes to engineering_task_events; only the database trigger should append history'
+
+  union all
+  select
+    'Engineering immutable-attribution triggers are enabled',
+    exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_projects') and g.tgname='engineering_project_creator_immutable' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_tasks') and g.tgname='engineering_task_identity_immutable' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_project_members') and g.tgname='engineering_membership_identity_immutable' and not g.tgisinternal and g.tgenabled <> 'D'),
+    'Apply the engineering migration and enable immutable project/task/membership attribution triggers'
+
+  union all
+  select
+    'Engineering audit triggers are enabled',
+    exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_projects') and g.tgname='engineering_projects_audit' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_project_members') and g.tgname='engineering_project_members_audit' and not g.tgisinternal and g.tgenabled <> 'D')
+      and exists (select 1 from pg_trigger g where g.tgrelid=to_regclass('public.engineering_tasks') and g.tgname='engineering_tasks_audit' and not g.tgisinternal and g.tgenabled <> 'D'),
+    'Apply and enable the database audit triggers for projects, memberships and tasks'
+
+  union all
+  select
+    'Engineering audit trigger function is hardened and not directly executable',
+    exists (
+      select 1 from pg_proc p
+      where p.oid=to_regprocedure('private.audit_engineering_mutation()')
+        and p.prosecdef
+        and coalesce(array_to_string(p.proconfig, ','),'') like '%search_path=""%'
+    )
+      and to_regprocedure('private.audit_engineering_mutation()') is not null
+      and not has_function_privilege('anon','private.audit_engineering_mutation()','EXECUTE')
+      and not has_function_privilege('authenticated','private.audit_engineering_mutation()','EXECUTE'),
+    'Recreate private.audit_engineering_mutation as SECURITY DEFINER with empty search_path and revoke direct execution'
+
+  union all
+  select
+    'Engineering task history trigger is enabled',
+    exists (
+      select 1 from pg_trigger g
+      where g.tgrelid=to_regclass('public.engineering_tasks')
+        and g.tgname='engineering_task_event_on_change'
+        and not g.tgisinternal
+        and g.tgenabled <> 'D'
+    ),
+    'Install and enable engineering_task_event_on_change'
+
+  union all
+  select
+    'Engineering tasks have no delete policy',
+    not exists (
+      select 1 from pg_policies p
+      where p.schemaname='public' and p.tablename='engineering_tasks'
+        and upper(p.cmd) in ('DELETE','ALL')
+        and (p.roles::text like '%authenticated%' or p.roles::text like '%anon%' or p.roles::text like '%public%')
+    ),
+    'Remove client delete policies from engineering_tasks to preserve task history'
+
+  union all
+  select
+    'Engineering membership policy prevents self-enrollment',
+    exists (
+      select 1 from pg_policies p
+      where p.schemaname='public' and p.tablename='engineering_project_members'
+        and p.policyname='engineering_project_members_add'
+        and p.cmd='INSERT'
+        and lower(coalesce(p.with_check,'')) like '%auth.uid%'
+        and lower(coalesce(p.with_check,'')) like '%user_id <>%'
+    ),
+    'Require lead membership and prevent users from adding themselves to engineering projects'
+
 )
 select
   case when passed then 'PASS' else 'FAIL' end as result,

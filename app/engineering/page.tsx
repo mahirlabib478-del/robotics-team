@@ -14,23 +14,27 @@ export const metadata: Metadata = {
 const modules = [
   {
     title: "Projects and task board",
-    description: "Project ownership, division, priority, due dates, task status and change history.",
-    status: "Not enabled",
+    description: "Create scoped projects, assign verified university accounts, manage task priority and status, and retain append-only change history.",
+    status: "Migration required",
+    href: "/engineering/projects",
   },
   {
     title: "Engineering documents",
     description: "Access-controlled files, document versions and archive history for approved team members.",
     status: "Not enabled",
+    href: undefined,
   },
   {
     title: "BOM and procurement",
     description: "Parts, quantities, supplier references, purchasing status and restricted cost records.",
     status: "Not enabled",
+    href: undefined,
   },
   {
     title: "Testing and readiness",
     description: "Timestamped test runs, robot versions, issues and competition-readiness checks.",
     status: "Not enabled",
+    href: undefined,
   },
 ] as const;
 
@@ -83,7 +87,7 @@ export default async function EngineeringPortalPage() {
           {modules.map((module) => (
             <article key={module.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <h4 className="text-lg font-semibold">{module.title}</h4>
+                {module.href ? <Link href={module.href} className="text-lg font-semibold text-[#b6f4ff] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">{module.title} →</Link> : <h4 className="text-lg font-semibold">{module.title}</h4>}
                 <span className="rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-xs font-medium text-amber-200">
                   {module.status}
                 </span>

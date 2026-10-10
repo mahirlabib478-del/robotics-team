@@ -1,6 +1,6 @@
 # Private Engineering Portal — Data and Access Design
 
-**Status:** Design proposal only. This document does not create tables, grant access, or prove production security. Do not enable Phase 3 modules until the design is reviewed and tested against a clean staging Supabase project.
+**Status:** Security baseline and design reference. The first project/task slice now has a versioned migration, server actions and a private UI, but source-level tests do not prove database security. Documents, BOM/procurement, testing/readiness and storage remain unimplemented. Do not treat any Phase 3 module as production-ready until migrations are applied and role/RLS tests pass against a clean staging Supabase project.
 
 ## Security boundary
 
@@ -13,9 +13,9 @@ The existing `profiles.role` and server-side `requireAdmin()` flow are the start
 - Keep engineering files in a private storage bucket. Issue short-lived signed URLs only after checking authorization server-side; do not persist public URLs for private files.
 - Keep private tables and files out of public queries, sitemap, metadata, analytics payloads, logs, and error messages.
 
-## Proposed data model (not yet migrated)
+## Data model status
 
-Use UUID primary keys, `created_at` / `updated_at` timestamps, foreign keys, and indexes on ownership, membership, status, and parent IDs. Final column types and constraints must be reviewed against actual workflows before a migration is written.
+The project, membership, task and task-event tables are implemented in `supabase/migrations/20261010_engineering_project_task_board.sql`; they are not yet staging-verified. Documents, document versions, BOM/procurement, test runs and readiness items below remain proposed. Use UUID primary keys, timestamps, foreign keys and indexes, and review each remaining module against actual workflows before writing its migration.
 
 | Entity | Purpose | Important controls |
 | --- | --- | --- |
