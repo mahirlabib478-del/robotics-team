@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -23,7 +24,9 @@ export async function generateMetadata({ params }: CompetitionDetailPageProps): 
 
 export default async function CompetitionDetailPage({ params }: CompetitionDetailPageProps) {
   const { slug } = await params;
-  const record = await getPublicCompetition(slug);
+  let record: Awaited<ReturnType<typeof getPublicCompetition>>;
+  try { record = await getPublicCompetition(slug); }
+  catch (error) { console.error("[competition-detail] Public record unavailable", error); return <PublicDataUnavailable resource="competition record" />; }
   if (!record) notFound();
 
   return (
