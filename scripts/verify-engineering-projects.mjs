@@ -27,6 +27,10 @@ assert.match(page, /requireAdmin\(\)/, "Project board must require a confirmed a
 assert.match(page, /robots: \{ index: false, follow: false, noarchive: true \}/, "Project board must not be indexed");
 assert.match(page, /Project permissions could not be verified/, "Project board must fail closed when membership/task queries fail");
 assert.match(page, /addEngineeringProjectMember/, "Project leads must be able to grant explicit membership to existing accounts");
+assert.match(page, /createSupabaseAdminClient\(\)[\s\S]*?select\("id,display_name"\)\.in\("id", assigneeIds\)/, "Service-role profile lookup must be limited to IDs of tasks already visible through RLS");
+assert.match(actions, /assignee-not-member/, "Task assignment must reject users who are not project members");
+assert.match(actions, /assignee_id: assigneeId/, "Task records must persist the validated project-member assignment");
+assert.match(migration, /assignee_id is null or exists \([\s\S]*?m\.project_id = engineering_tasks\.project_id and m\.user_id = engineering_tasks\.assignee_id/, "Database policy must prevent assigning tasks to non-members");
 assert.match(page, /No projects assigned yet/, "Users without membership must see an empty state, not other projects");
 assert.match(actions, /requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Only approved leads can create projects and manage memberships");
 assert.match(actions, /export async function createEngineeringTask/, "Authorized project members must be able to create tasks");
