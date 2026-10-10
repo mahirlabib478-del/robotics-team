@@ -36,12 +36,18 @@ export async function createRobot(formData: FormData) {
   const weightInput = value(formData, "weight_kg", 20), weight = weightInput === "" ? null : Number(weightInput);
   if (weight !== null && (!Number.isFinite(weight) || weight < 0)) redirect("/admin/robots?error=invalid-weight");
   if (!name || !slug || !validSlug(slug) || !category || !version || !robotStatuses.includes(status as (typeof robotStatuses)[number]) || !Number.isInteger(year) || year < 1900 || year > 2100 || !summary) redirect("/admin/robots?error=missing");
-  const { data: created, error } = await supabase.from("robots").insert({
+  const robotPayload = {
     name, slug, category, version, status, development_year: year, summary, weight_kg: weight,
-    dimensions: value(formData, "dimensions", 160) || null, specifications: {}, engineering: {}, public_engineering: publicEngineeringFromForm(formData),
+    dimensions: value(formData, "dimensions", 160) || null, specifications: {}, engineering: {},
     sensitive_fields_hidden: ["weapon geometry", "custom control code", "sensitive CAD", "firmware", "competition strategy"],
-    publish_status: "draft", visibility: "public", created_by: profile.id, updated_by: profile.id,
-  }).select("id").single();
+    publish_status: "draft" as const, visibility: "public" as const, created_by: profile.id, updated_by: profile.id,
+  };
+  let createResult = await supabase.from("robots").insert({ ...robotPayload, public_engineering: publicEngineeringFromForm(formData) }).select("id").single();
+  if (createResult.error?.message?.includes("public_engineering")) {
+    console.error("Public robot engineering column is not available yet; apply the public engineering migration to enable these fields.", createResult.error);
+    createResult = await supabase.from("robots").insert(robotPayload).select("id").single();
+  }
+  const { data: created, error } = createResult;
   if (error || !created) { console.error("Robot insert failed:", error); redirect("/admin/robots?error=save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_robot", entity_type: "robot", entity_id: created.id, metadata: { slug } });
   if (auditError) console.error("Robot creation audit write failed:", auditError);
@@ -107,8 +113,13 @@ export async function updateRobot(formData: FormData) {
   if (readError || !current) redirect("/admin/robots?error=not-found");
   if (current.publish_status === "archived") redirect("/admin/robots?error=archived");
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) redirect("/admin/robots?error=review-required");
-  const { error } = await supabase.from("robots").update({ name, slug, category, version, status, development_year: year, summary, weight_kg: weight, dimensions: value(formData, "dimensions", 160) || null, public_engineering: publicEngineeringFromForm(formData), publish_status: "draft", updated_by: profile.id, updated_at: new Date().toISOString() }).eq("id", id);
-  if (error) { console.error("Robot update failed:", error); redirect("/admin/robots?error=save"); }
+  const robotUpdates = { name, slug, category, version, status, development_year: year, summary, weight_kg: weight, dimensions: value(formData, "dimensions", 160) || null, publish_status: "draft" as const, updated_by: profile.id, updated_at: new Date().toISOString() };
+  let updateResult = await supabase.from("robots").update({ ...robotUpdates, public_engineering: publicEngineeringFromForm(formData) }).eq("id", id);
+  if (updateResult.error?.message?.includes("public_engineering")) {
+    console.error("Public robot engineering column is not available yet; apply the public engineering migration to enable these fields.", updateResult.error);
+    updateResult = await supabase.from("robots").update(robotUpdates).eq("id", id);
+  }
+  if (updateResult.error) { console.error("Robot update failed:", updateResult.error); redirect("/admin/robots?error=save"); }
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_robot", entity_type: "robot", entity_id: id, metadata: { from: current.publish_status, to: "draft" } });
   if (auditError) console.error("Robot audit write failed:", auditError);
   redirect("/admin/robots?saved=1");
