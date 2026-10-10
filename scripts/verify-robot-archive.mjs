@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage, sitemap, robots] = await Promise.all([
+const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage, sitemap, robots, robotDetail, heading, teamMembers] = await Promise.all([
   read("components/robot-archive.tsx"),
   read("app/robots/page.tsx"),
   read("lib/public-data.ts"),
@@ -12,6 +12,9 @@ const [archive, page, data, homepage, competitionArchive, competitionsPage, achi
   read("app/achievements/page.tsx"),
   read("app/sitemap.ts"),
   read("app/robots.ts"),
+  read("app/robots/[slug]/page.tsx"),
+  read("components/section-heading.tsx"),
+  read("app/team/page.tsx"),
 ]);
 
 assert.match(page, /<RobotArchive robots=\{robots\} \/>/, "Robots page must render the interactive archive");
@@ -23,6 +26,16 @@ assert.match(archive, /aria-live="polite"/, "Filtered record count must be annou
 assert.match(archive, /function clearFilters\(\)/, "Robot archive must provide a complete filter reset");
 assert.match(data, /\.eq\("publish_status","published"\)\.eq\("visibility","public"\)/, "Robot archive data must remain limited to published public records");
 assert.match(data, /engineering:undefined/, "Private engineering content must not be projected into public robot records");
+assert.match(data, /robot_media\(media_type,source_url,alt_text,caption,sort_order,visibility\)/, "Published robot records must fetch their associated media metadata");
+assert.match(data, /safePublicUrl\(item\.source_url\)/, "Robot media sources must be restricted to safe HTTPS URLs");
+assert.match(data, /sort\(\(a,b\)=>\(a\.sort_order\?\?0\)-\(b\.sort_order\?\?0\)\)/, "Robot media must respect the CMS display order");
+assert.match(archive, /robot\.media\?\.find\(\(media\) => media\.type === "image"\)/, "Robot archive cards must display approved robot images when available");
+assert.match(robotDetail, /aria-labelledby="robot-media-heading"/, "Robot detail pages must include an accessible media section");
+assert.match(robotDetail, /media\.type === "image" \? <Image/, "Robot detail pages must render published images and link other public media");
+assert.match(heading, /level = "h2"/, "Section headings must preserve h2 as the default for in-page sections");
+assert.match(heading, /level === "h1" \? <h1/, "Section headings must support semantic page-level h1 headings");
+assert.match(teamMembers, /<SectionHeading level="h1"/, "Team listing must use a page-level heading");
+assert.match(homepage, /getPublicStats\(robots, competitions, members\)/, "Homepage statistics must reuse already-loaded public data rather than duplicate database queries");
 assert.match(homepage, /aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage hero concept art must be clearly identified as illustrative, not documentary media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
 assert.doesNotMatch(homepage, /Hero Media Placeholder/, "Homepage must not display the old plain-text media placeholder");
