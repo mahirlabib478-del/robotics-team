@@ -17,7 +17,7 @@ export default async function CompetitionsPage() {
     <main className="min-h-screen">
       <SiteHeader />
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <SectionHeading eyebrow="Structured results database" title="Competitions" description="Search and filter public competition records by event, year, level, result, segment, robot or team member. Each record connects the official event, organizer, result and available evidence." />
+        <SectionHeading level="h1" eyebrow="Structured results database" title="Competitions" description="Search and filter public competition records by event, year, level, result, segment, robot or team member. Each record connects the official event, organizer, result and available evidence." />
         {competitions.length ? (
           <CompetitionArchive records={competitions} />
         ) : (
