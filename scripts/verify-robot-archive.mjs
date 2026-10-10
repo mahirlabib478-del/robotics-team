@@ -58,6 +58,7 @@ assert.match(adminContentActions, /export async function updateRobotMedia/, "Ser
 assert.match(adminContentActions, /validHttpsUrl\(sourceUrl\)/, "Robot media sources must be validated as credential-free HTTPS URLs");
 assert.match(adminContentActions, /action: "add_robot_media"/, "Robot media creation must write audit attribution");
 assert.match(adminContentActions, /visibility === "public" && !\["team_lead", "super_admin"\]\.includes\(profile\.role\)/, "Only leadership may approve public robot media visibility");
+assert.match(adminContentActions, /parentRobot\.publish_status === "archived"/, "Robot media cannot be changed after the parent robot is archived");
 assert.match(adminRobotsPage, /Public \(leadership approval\)/, "Robot media editor must communicate leadership-only publication");
 assert.match(adminRobotsPage, /does not make an external URL private/, "Media CMS must not imply external URLs become private through a visibility flag");
 assert.match(schema, /create policy public_robot_media_read/, "Public robot media must remain scoped to published public robots");
