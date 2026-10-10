@@ -9,6 +9,19 @@ class PublicDataUnavailableError extends Error {
   }
 }
 
+const publicEngineeringFields = ["problem", "mechanicalDesign", "electronicsArchitecture", "controlLogic", "componentChoices", "limitations", "futureImprovements"] as const;
+
+function safePublicEngineering(value: unknown): NonNullable<Robot["engineering"]> | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const source = value as Record<string, unknown>;
+  const result: Partial<NonNullable<Robot["engineering"]>> = {};
+  for (const field of publicEngineeringFields) {
+    const entry = source[field];
+    if (typeof entry === "string" && entry.trim()) result[field] = entry.trim().slice(0, 4000);
+  }
+  return Object.keys(result).length ? result : undefined;
+}
+
 function safePublicLink(value: unknown): { label: string; href: string } | null {
   if (!value || typeof value !== "object") return null;
   const item = value as Record<string, unknown>;
@@ -64,7 +77,10 @@ export async function getPublicRobots(): Promise<Robot[]> {
       throw new PublicDataUnavailableError("robot");
     }
     if (!data) return fallbackRobots;
-    return data.map((r)=>({slug:r.slug,name:r.name,category:r.category,version:r.version,weightKg:r.weight_kg==null?undefined:Number(r.weight_kg),dimensions:r.dimensions??undefined,status:r.status as Robot["status"],developmentYear:r.development_year,summary:r.summary,specifications:(r.specifications??{}) as Record<string,string>,engineering:undefined,media:(Array.isArray(r.robot_media)?r.robot_media:[]).filter((item)=>item.visibility==="public"&&["image","video","cad"].includes(item.media_type)&&Boolean(safePublicUrl(item.source_url))&&typeof item.alt_text==="string").sort((a,b)=>(a.sort_order??0)-(b.sort_order??0)).map((item)=>({type:item.media_type as "image"|"video"|"cad",src:safePublicUrl(item.source_url)!,alt:item.alt_text,caption:typeof item.caption==="string"?item.caption:undefined})),sensitiveFieldsHidden:r.sensitive_fields_hidden??[]}));
+    const { data: publicEngineeringRows, error: publicEngineeringError } = data.length ? await supabase.from("robots").select("slug,public_engineering").in("slug", data.map((robot) => robot.slug)).eq("publish_status", "published").eq("visibility", "public") : { data: [], error: null };
+    if (publicEngineeringError) console.error("[public-data] Public engineering summaries are unavailable; apply the public engineering migration to enable this section.", publicEngineeringError);
+    const publicEngineeringBySlug = new Map((publicEngineeringRows ?? []).map((robot) => [robot.slug, safePublicEngineering(robot.public_engineering)] as const));
+    return data.map((r)=>({slug:r.slug,name:r.name,category:r.category,version:r.version,weightKg:r.weight_kg==null?undefined:Number(r.weight_kg),dimensions:r.dimensions??undefined,status:r.status as Robot["status"],developmentYear:r.development_year,summary:r.summary,specifications:(r.specifications??{}) as Record<string,string>,engineering:publicEngineeringBySlug.get(r.slug),media:(Array.isArray(r.robot_media)?r.robot_media:[]).filter((item)=>item.visibility==="public"&&["image","video","cad"].includes(item.media_type)&&Boolean(safePublicUrl(item.source_url))&&typeof item.alt_text==="string").sort((a,b)=>(a.sort_order??0)-(b.sort_order??0)).map((item)=>({type:item.media_type as "image"|"video"|"cad",src:safePublicUrl(item.source_url)!,alt:item.alt_text,caption:typeof item.caption==="string"?item.caption:undefined})),sensitiveFieldsHidden:r.sensitive_fields_hidden??[]}));
   } catch (error) {
     if (error instanceof PublicDataUnavailableError) throw error;
     console.error("[public-data] Unable to query published robots", error);
