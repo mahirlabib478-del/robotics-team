@@ -15,7 +15,7 @@ export async function createResearchPost(f: FormData) {
   if (coverImageUrl && (!safeHttps(coverImageUrl) || !coverImageAlt)) go("/admin/research", "invalid-url");
   const postPayload = { title, slug, excerpt, body, category, publish_status: "draft" as const, visibility: "public" as const, created_by: profile.id, updated_by: profile.id };
   let createResult = await supabase.from("research_posts").insert({ ...postPayload, cover_image_url: coverImageUrl || null, cover_image_alt: coverImageUrl ? coverImageAlt : null }).select("id").single();
-  if (createResult.error?.message?.includes("cover_image_url")) {
+  if (createResult.error?.message?.includes("cover_image_")) {
     console.error("Research cover image migration is not available yet; apply it to enable article thumbnails.", createResult.error);
     createResult = await supabase.from("research_posts").insert(postPayload).select("id").single();
   }
@@ -130,7 +130,7 @@ export async function updateResearchPost(f: FormData) {
   if (current.publish_status === "published" && !["team_lead", "super_admin"].includes(profile.role)) go("/admin/research", "review-required");
   const postUpdates = { title, slug, excerpt, body, category, publish_status: "draft" as const, updated_by: profile.id, updated_at: new Date().toISOString() };
   let updateResult = await supabase.from("research_posts").update({ ...postUpdates, cover_image_url: coverImageUrl || null, cover_image_alt: coverImageUrl ? coverImageAlt : null }).eq("id", id);
-  if (updateResult.error?.message?.includes("cover_image_url")) {
+  if (updateResult.error?.message?.includes("cover_image_")) {
     console.error("Research cover image migration is not available yet; apply it to enable article thumbnails.", updateResult.error);
     updateResult = await supabase.from("research_posts").update(postUpdates).eq("id", id);
   }
