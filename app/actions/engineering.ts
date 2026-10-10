@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireAdmin, requireAnyRole } from "@/lib/admin-auth";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 function value(formData: FormData, name: string, max = 3000) {
   const raw = formData.get(name);
@@ -74,11 +75,28 @@ export async function createEngineeringTask(formData: FormData) {
   const description = value(formData, "description", 3000);
   const priority = value(formData, "priority", 20);
   const dueDate = value(formData, "due_date", 10);
-  if (!validId(projectId) || !title || !["low", "normal", "high", "urgent"].includes(priority) || !validDate(dueDate)) {
+  const assigneeEmail = value(formData, "assignee_email", 254).toLowerCase();
+  if (!validId(projectId) || !title || !["low", "normal", "high", "urgent"].includes(priority) || !validDate(dueDate) || (assigneeEmail && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(assigneeEmail))) {
     redirect("/engineering/projects?error=invalid-task");
   }
+  let assigneeId: string | null = null;
+  if (assigneeEmail) {
+    let targetProfile: { id: string } | null = null;
+    try {
+      const admin = createSupabaseAdminClient();
+      const lookup = await admin.from("profiles").select("id").ilike("university_email", assigneeEmail).maybeSingle();
+      if (!lookup.error) targetProfile = lookup.data;
+    } catch (error) {
+      console.error("Engineering task assignee lookup failed:", error);
+      redirect("/engineering/projects?error=assignee-lookup");
+    }
+    if (!targetProfile) redirect("/engineering/projects?error=assignee-not-found");
+    const { data: membership, error: membershipError } = await supabase.from("engineering_project_members").select("user_id").eq("project_id", projectId).eq("user_id", targetProfile.id).maybeSingle();
+    if (membershipError || !membership) redirect("/engineering/projects?error=assignee-not-member");
+    assigneeId = targetProfile.id;
+  }
   const { error } = await supabase.from("engineering_tasks").insert({
-    project_id: projectId, title, description, priority, due_date: dueDate || null,
+    project_id: projectId, title, description, priority, due_date: dueDate || null, assignee_id: assigneeId,
     status: "todo", created_by: profile.id, updated_by: profile.id,
   });
   if (error) {
