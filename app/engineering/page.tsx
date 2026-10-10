@@ -22,6 +22,7 @@ const modules = [
     title: "Engineering documents",
     description: "Access-controlled files, document versions and archive history for approved team members.",
     status: "Not enabled",
+    href: undefined,
   },
   {
     title: "BOM and procurement",
