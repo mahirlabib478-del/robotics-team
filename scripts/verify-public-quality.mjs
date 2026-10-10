@@ -66,6 +66,8 @@ assert.match(about, /View robot record/, "Featured robot imagery must link to it
 assert.match(researchAdmin, /name="cover_image_url"/, "Research CMS must support approved cover image URLs");
 assert.match(researchAdmin, /name="cover_image_alt"/, "Research CMS must require descriptive cover image alt text");
 assert.match(researchActions, /safeHttps\(coverImageUrl\)/, "Research cover images must use HTTPS URLs");
+assert.match(researchActions, /value\.trim\(\)\.startsWith\("https:\/\/"\).*?!url\.username&&!url\.password/, "Research media URLs must be canonical HTTPS links without embedded credentials");
+assert.match(publicData, /!url\.username && !url\.password/, "Public media projections must reject URLs with embedded credentials");
 assert.match(researchActions, /cover_image_alt: coverImageUrl \? coverImageAlt : null/, "Research cover image alt text must be saved with the image");
 assert.match(publicData, /safePublicUrl\(result\.data\.cover_image_url\)/, "Research cover URLs must be sanitized before public rendering");
 assert.match(researchPage, /post\.cover_image_url \? <Image/, "Research listing cards must render approved cover images");
