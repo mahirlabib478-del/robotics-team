@@ -13,7 +13,7 @@ export function PublicDataUnavailable({ resource = "public records" }: { resourc
           This is a data service issue, not an empty archive. Please try again later. Published records will appear when the data service is available.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <a href="" className="rounded-full bg-[#1479ff] px-5 py-3 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]" onClick={(event) => { event.preventDefault(); window.location.reload(); }}>Try again</a>
+          <a href="" className="rounded-full bg-[#1479ff] px-5 py-3 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Try again</a>
           <Link href="/" className="rounded-full border border-white/15 px-5 py-3 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#19d3ff]">Home</Link>
         </div>
       </section>
