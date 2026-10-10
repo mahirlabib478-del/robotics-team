@@ -36,6 +36,7 @@ assert.match(page, /No projects assigned yet/, "Users without membership must se
 assert.match(actions, /requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Only approved leads can create projects and manage memberships");
 assert.match(actions, /export async function createEngineeringTask/, "Authorized project members must be able to create tasks");
 assert.match(actions, /export async function updateEngineeringTaskStatus/, "Authorized project members must be able to update task status");
+assert.match(actions, /\.eq\("id", taskId\)\.select\("id"\)\.maybeSingle\(\)/, "Task status updates must confirm a row was changed before reporting success");
 assert.match(actions, /\["backlog", "todo", "in_progress", "blocked", "done"\]/, "Task status updates must use an explicit allowlist");
 assert.match(overview, /href: "\/engineering\/projects"/, "Engineering overview must link to the project/task module");
 assert.match(stagingSecurity, /Engineering RLS enabled: /, "Staging verification must check RLS on the private engineering tables");
