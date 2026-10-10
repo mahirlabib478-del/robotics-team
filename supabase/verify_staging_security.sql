@@ -21,6 +21,7 @@ checks as (
       where g.tgrelid = to_regclass('public.' || t.table_name)
         and g.tgname = t.table_name || '_publish_workflow_guard'
         and not g.tgisinternal
+        and g.tgenabled <> 'D'
     ),
     'Apply the database publish-workflow guard migration for public.' || t.table_name
   from content_tables t
