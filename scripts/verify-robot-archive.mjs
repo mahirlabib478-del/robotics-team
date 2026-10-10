@@ -36,7 +36,8 @@ assert.match(heading, /level = "h2"/, "Section headings must preserve h2 as the 
 assert.match(heading, /level === "h1" \? <h1/, "Section headings must support semantic page-level h1 headings");
 assert.match(teamMembers, /<SectionHeading level="h1"/, "Team listing must use a page-level heading");
 assert.match(homepage, /getPublicStats\(robots, competitions, members\)/, "Homepage statistics must reuse already-loaded public data rather than duplicate database queries");
-assert.match(homepage, /aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage hero concept art must be clearly identified as illustrative, not documentary media");
+assert.match(homepage, /featuredRobotImage \? `Published image of \$\{featuredRobot\?\.name\}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage must label approved robot imagery accurately and identify fallback concept art as illustrative");
+assert.match(homepage, /Approved media from the public engineering archive/, "Homepage featured photography must be sourced from published robot media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
 assert.doesNotMatch(homepage, /Hero Media Placeholder/, "Homepage must not display the old plain-text media placeholder");
 assert.match(competitionArchive, /record\.competition, record\.organizer, record\.location, record\.robot, record\.segment, record\.result, String\(record\.year\), record\.date, record\.report, \.\.\.record\.teamMembers/, "Competition search must index event details, outcomes, year, dates, reports and team members");
