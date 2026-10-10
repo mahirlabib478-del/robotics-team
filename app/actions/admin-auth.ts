@@ -35,11 +35,20 @@ export async function signInAdmin(formData: FormData) {
     redirect("/admin/login?error=domain");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", userData.user.id)
     .maybeSingle();
+
+  if (profileError) {
+    console.error("Admin profile lookup failed:", {
+      code: profileError.code,
+      message: profileError.message,
+    });
+    await supabase.auth.signOut();
+    redirect("/admin/login?error=profile_lookup");
+  }
 
   if (!profile) {
     await supabase.auth.signOut();
