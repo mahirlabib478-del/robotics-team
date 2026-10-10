@@ -15,8 +15,21 @@ const metadataBase = (() => {
 
 export const metadata: Metadata = {
   title: { default: "Team Stellar | BRAC University Robotics Team", template: "%s | Team Stellar" },
-  description: "Team Stellar — engineering robots, competing beyond borders.",
+  applicationName: "Team Stellar",
+  description: "Team Stellar — the BRAC University Robotics Team. Explore robotics engineering, published robot records, competition results, research, and partnership opportunities.",
   ...(metadataBase ? { metadataBase } : {}),
+  openGraph: {
+    type: "website",
+    siteName: "Team Stellar",
+    title: "Team Stellar | BRAC University Robotics Team",
+    description: "Engineering robots. Competing beyond borders. Explore Team Stellar's public engineering archive and verified competition records.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    title: "Team Stellar | BRAC University Robotics Team",
+    description: "Engineering robots. Competing beyond borders.",
+  },
   robots: { index: true, follow: true },
 };
 
