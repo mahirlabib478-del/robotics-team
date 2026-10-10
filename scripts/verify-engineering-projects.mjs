@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [migration, schema, page, actions, overview] = await Promise.all([
+const [migration, schema, page, actions, overview, stagingSecurity] = await Promise.all([
   read("supabase/migrations/20261010_engineering_project_task_board.sql"),
   read("supabase/schema.sql"),
   read("app/engineering/projects/page.tsx"),
   read("app/actions/engineering.ts"),
   read("app/engineering/page.tsx"),
+  read("supabase/verify_staging_security.sql"),
 ]);
 
 for (const table of ["engineering_projects", "engineering_project_members", "engineering_tasks", "engineering_task_events"]) {
@@ -37,4 +38,8 @@ assert.match(actions, /export async function createEngineeringTask/, "Authorized
 assert.match(actions, /export async function updateEngineeringTaskStatus/, "Authorized project members must be able to update task status");
 assert.match(actions, /\["backlog", "todo", "in_progress", "blocked", "done"\]/, "Task status updates must use an explicit allowlist");
 assert.match(overview, /href: "\/engineering\/projects"/, "Engineering overview must link to the project/task module");
+assert.match(stagingSecurity, /Engineering RLS enabled: /, "Staging verification must check RLS on the private engineering tables");
+assert.match(stagingSecurity, /Engineering task history denies direct client writes/, "Staging verification must test task-history grants");
+assert.match(stagingSecurity, /Engineering membership policy prevents self-enrollment/, "Staging verification must check project membership policy");
+assert.match(page, /assigneeIds[\s\S]*?createSupabaseAdminClient\(\)[\s\S]*?in\("id", assigneeIds\)/, "Private profile names may only be resolved for task assignees already returned by RLS");
 console.log("Engineering project/task board access-boundary checks passed.");
