@@ -9,10 +9,10 @@
 
 ## Local verification
 
-Run the same checks used by CI before opening a pull request:
+Run the same checks used by CI before opening a pull request. This repository does not yet commit a package lockfile, so use `npm install` until the roadmap's lockfile task is completed:
 
 ```bash
-npm ci
+npm install --no-audit --no-fund
 npm run lint
 npm run verify:contracts
 npm run build
