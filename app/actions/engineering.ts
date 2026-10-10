@@ -18,9 +18,11 @@ function validSlug(value: string) {
 }
 
 function validDate(value: string) {
-  return !value || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)));
+  if (!value) return true;
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
-
 function requireEngineeringDomain(email?: string) {
   const domain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
   if (!domain || !email || !email.toLowerCase().endsWith(`@${domain}`)) redirect("/engineering/projects?error=domain-required");
