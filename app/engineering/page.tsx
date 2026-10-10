@@ -23,16 +23,19 @@ const modules = [
     description: "Access-controlled files, document versions and archive history for approved team members.",
     status: "Not enabled",
     href: undefined,
+    href: undefined,
   },
   {
     title: "BOM and procurement",
     description: "Parts, quantities, supplier references, purchasing status and restricted cost records.",
     status: "Not enabled",
+    href: undefined,
   },
   {
     title: "Testing and readiness",
     description: "Timestamped test runs, robot versions, issues and competition-readiness checks.",
     status: "Not enabled",
+    href: undefined,
   },
 ] as const;
 
