@@ -29,8 +29,10 @@ const future = [
 ];
 
 export default async function AboutPage() {
+  let robotMediaUnavailable = false;
   const robots = await getPublicRobots().catch((error) => {
     console.error("[about] Approved robot media could not be loaded", error);
+    robotMediaUnavailable = true;
     return [];
   });
   const featuredRobots = robots.flatMap((robot) => {
@@ -41,6 +43,7 @@ export default async function AboutPage() {
   return (
     <main className="min-h-screen">
       <SiteHeader />
+      {robotMediaUnavailable ? <p role="status" className="mx-auto mt-6 max-w-7xl px-4 text-sm text-amber-300 sm:px-6">Approved robot media is temporarily unavailable. This does not mean the archive is empty.</p> : null}
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
         <SectionHeading level="h1"
           eyebrow="About Team Stellar"
