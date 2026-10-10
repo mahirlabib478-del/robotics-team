@@ -53,6 +53,8 @@ assert.match(actions, /\["backlog", "todo", "in_progress", "blocked", "done"\]/,
 assert.match(overview, /href: "\/engineering\/projects"/, "Engineering overview must link to the project/task module");
 assert.match(stagingSecurity, /Engineering RLS enabled: /, "Staging verification must check RLS on the private engineering tables");
 assert.match(stagingSecurity, /Engineering task history denies direct client writes/, "Staging verification must test task-history grants");
+assert.match(stagingSecurity, /Engineering audit triggers are enabled/, "Staging verification must confirm transactional audit triggers");
+assert.match(stagingSecurity, /Engineering audit trigger function is hardened and not directly executable/, "Staging verification must confirm the audit trigger cannot be called directly by client roles");
 assert.match(stagingSecurity, /Engineering membership policy prevents self-enrollment/, "Staging verification must check project membership policy");
 assert.match(page, /assigneeIds[\s\S]*?createSupabaseAdminClient\(\)[\s\S]*?in\("id", assigneeIds\)/, "Private profile names may only be resolved for task assignees already returned by RLS");
 console.log("Engineering project/task board access-boundary checks passed.");
