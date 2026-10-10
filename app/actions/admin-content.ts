@@ -129,6 +129,9 @@ export async function updateRobotMedia(formData: FormData) {
 
   const { data: current, error: readError } = await supabase.from("robot_media").select("robot_id").eq("id", id).maybeSingle();
   if (readError || !current || current.robot_id !== robotId) redirect("/admin/robots?error=not-found");
+  const { data: parentRobot, error: parentError } = await supabase.from("robots").select("publish_status").eq("id", robotId).maybeSingle();
+  if (parentError || !parentRobot) redirect("/admin/robots?error=not-found");
+  if (parentRobot.publish_status === "archived") redirect("/admin/robots?error=archived");
   const { error } = await supabase.from("robot_media").update({
     media_type: mediaType,
     source_url: sourceUrl,
