@@ -431,6 +431,8 @@ for (const table of ["robots", "competitions", "team_members", "research_posts",
   assert.ok(preflightSql.includes(`from public.${table}`), `Data-integrity preflight must check existing rows in ${table}`);
 }
 assert.doesNotMatch(preflightSql, /\b(?:insert into|update public\.|delete from|alter table|drop table)\b/i, "Data-integrity preflight must not mutate the database");
+assert.match(preflightSql, /select 'robot_media', id::text, 'alt_text must not be empty'[\s\S]*?length\(trim\(alt_text\)\) = 0/, "Preflight must identify legacy robot media without descriptive alt text");
+assert.match(preflightSql, /select 'robot_media', id::text, 'sort_order must be non-negative'[\s\S]*?sort_order < 0/, "Preflight must identify legacy robot media with invalid display order");
 assert.match(stagingSecuritySql, /from pg_trigger/, "Staging verification must inspect installed database triggers");
 assert.match(stagingSecuritySql, /g\.tgenabled <> 'D'/, "Staging verification must fail when required triggers are disabled");
 assert.match(stagingSecuritySql, /from pg_policies/, "Staging verification must inspect applied RLS policies");
