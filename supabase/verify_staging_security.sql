@@ -148,8 +148,8 @@ checks as (
     exists (
       select 1 from pg_policies p
       where p.schemaname='public' and p.tablename='audit_logs' and p.policyname='internal_audit_read'
-        and p.roles::text like '%team_lead%'
-        and p.roles::text like '%super_admin%'
+        and lower(coalesce(p.qual,'')) like '%team_lead%'
+        and lower(coalesce(p.qual,'')) like '%super_admin%'
     ),
     'Restrict internal_audit_read to team_lead and super_admin'
 
