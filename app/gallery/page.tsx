@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { EmptyState } from "@/components/empty-state";
+import { GalleryArchive } from "@/components/gallery-archive";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -10,35 +9,6 @@ export const metadata: Metadata = {
   title: "Gallery",
   description: "View approved public photos and videos documenting Team Stellar’s robotics work and activities.",
 };
-
-function youtubeEmbedUrl(source: string) {
-  try {
-    const url = new URL(source);
-    if (url.protocol !== "https:") return null;
-    const host = url.hostname.toLowerCase();
-    let videoId = "";
-    if (host === "youtu.be" || host === "www.youtu.be") {
-      videoId = url.pathname.split("/").filter(Boolean)[0] ?? "";
-    } else if (host === "youtube.com" || host === "www.youtube.com") {
-      if (url.pathname === "/watch") videoId = url.searchParams.get("v") ?? "";
-      else if (/^\/(embed|shorts|live)\//.test(url.pathname)) videoId = url.pathname.split("/").filter(Boolean)[1] ?? "";
-    }
-    return /^[A-Za-z0-9_-]{11}$/.test(videoId) ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
-  } catch {
-    return null;
-  }
-}
-
-const categories = [
-  ["Robot Development", "Build stages, fabrication and assembly."],
-  ["Workshop", "Hands-on engineering and team learning."],
-  ["Testing", "Bench tests, field tests and controlled trials."],
-  ["National Competitions", "Verified competition media from Bangladesh."],
-  ["International Competitions", "International event footage and team moments."],
-  ["Awards", "Podiums, certificates and official recognition."],
-  ["Team Activities", "Training, planning and team culture."],
-  ["Media Coverage", "Published coverage from verified media sources."],
-];
 
 export default async function GalleryPage() {
   const items = await getPublicGallery();
@@ -51,52 +21,7 @@ export default async function GalleryPage() {
           title="Gallery & Media"
           description="A curated visual archive organized around engineering work, competition, awards and team activity. YouTube is preferred for video delivery so the site does not become a large video-hosting server."
         />
-        <div className="mt-8 flex flex-wrap gap-2" aria-label="Gallery archive categories">
-          {categories.map(([title, description]) => (
-            <span key={title} title={description} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#0b1727]/80 px-3 py-2 text-xs font-medium text-slate-300">
-              <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#19d3ff]" />{title}
-            </span>
-          ))}
-        </div>
-        <div className="mt-8">
-          {items.length ? (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {items.map((item) => {
-                if (!item.source_url) return null;
-                const embedUrl = item.source_type === "youtube" ? youtubeEmbedUrl(item.source_url) : null;
-                return (
-                  <article key={item.id} className="overflow-hidden rounded-2xl border border-white/10 bg-[#0b1727]">
-                    {item.source_type === "image" ? (
-                      <Image src={item.source_url} alt={item.alt_text} width={1280} height={720} unoptimized loading="lazy" className="aspect-video w-full object-cover" />
-                    ) : embedUrl ? (
-                      <iframe
-                        src={embedUrl}
-                        title={item.title}
-                        loading="lazy"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="aspect-video w-full border-b border-white/10"
-                      />
-                    ) : (
-                      <div className="flex aspect-video items-center justify-center border-b border-white/10 bg-[#07111f] px-6 text-center text-sm text-slate-500">
-                        Video unavailable: the saved YouTube URL is invalid.
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <p className="text-xs uppercase tracking-[0.16em] text-[#19d3ff]">{item.category}</p>
-                      <h2 className="mt-2 font-bold">{item.title}</h2>
-                      {item.caption ? <p className="mt-2 text-sm text-slate-400">{item.caption}</p> : null}
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ): <EmptyState
-            title="Media archive is ready for approved assets."
-            description="Images, YouTube embeds, captions, alt text and publication status are supported. Large videos should remain on YouTube or another approved media host rather than being stored directly on the web server."
-          />}
-        </div>
+        <GalleryArchive items={items} />
       </section>
       <SiteFooter />
     </main>

@@ -50,8 +50,8 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 - [ ] Member profiles support approved photo, full name, role, department/semester, skills, projects/robots, LinkedIn/GitHub and active tenure.
 - [ ] Preserve former members in an Alumni section rather than deleting team history.
 - [ ] Research/knowledge supports technical articles, development reports, competition post-mortems, CAD/design summaries, embedded tutorials, AI-vision experiments, papers/posters and workshop materials.
-- [ ] Gallery categories: robot development, workshop, testing, national competitions, international competitions, awards, team activities and media coverage.
-- [ ] Prefer YouTube embeds for large videos rather than serving large video files directly.
+- [x] Gallery categories: robot development, workshop, testing, national competitions, international competitions, awards, team activities and media coverage; category filtering and search are interactive.
+- [x] Prefer YouTube embeds for large videos rather than serving large video files directly.
 
 ### Sponsors, recruitment and contact
 - [ ] Sponsor page covers team impact, past achievements, upcoming international targets, audience/reach, opportunities, benefits, current partners, approved proposal download and direct contact.

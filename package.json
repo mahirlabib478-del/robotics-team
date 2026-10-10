@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "verify:contracts": "node scripts/verify-contracts.mjs",
     "verify:smoke": "node scripts/smoke-production-routes.mjs",
-    "verify:competition-filters": "node scripts/verify-competition-filters.mjs"
+    "verify:competition-filters": "node scripts/verify-competition-filters.mjs",
+    "verify:gallery": "node scripts/verify-gallery-archive.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

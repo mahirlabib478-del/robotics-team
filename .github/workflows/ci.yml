@@ -33,6 +33,9 @@ jobs:
       - name: Competition archive filter checks
         run: npm run verify:competition-filters
 
+      - name: Gallery archive filter checks
+        run: npm run verify:gallery
+
       - name: Homepage responsive layout checks
         run: node scripts/verify-homepage-responsive.mjs
 
