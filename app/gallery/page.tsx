@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import { GalleryArchive } from "@/components/gallery-archive";
 import { SectionHeading } from "@/components/section-heading";
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const items = await getPublicGallery();
+  let items: Awaited<ReturnType<typeof getPublicGallery>>;
+  try { items = await getPublicGallery(); }
+  catch (error) { console.error("[gallery] Public gallery is unavailable", error); return <PublicDataUnavailable resource="gallery media" />; }
   return (
     <main className="min-h-screen">
       <SiteHeader />
