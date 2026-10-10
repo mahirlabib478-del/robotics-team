@@ -8,6 +8,13 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
   const { supabase, profile } = await requireAdmin();
   requireRole("technical_lead", profile.role);
   const { data: robots } = await supabase.from("robots").select("id,name,slug,category,version,status,development_year,weight_kg,dimensions,summary,publish_status").order("updated_at", { ascending: false });
+  let publicEngineeringById = new Map<string, Record<string, string>>();
+  if (robots?.length) {
+    const { data: publicEngineeringRows, error: publicEngineeringError } = await supabase.from("robots").select("id,public_engineering").in("id", robots.map((robot) => robot.id));
+    if (publicEngineeringError) console.error("Public robot engineering fields could not be loaded. Apply the public engineering migration before editing these fields.", publicEngineeringError);
+    else publicEngineeringById = new Map((publicEngineeringRows ?? []).map((robot) => [robot.id, robot.public_engineering ?? {}] as const));
+  }
+  const robotRecords = (robots ?? []).map((robot) => ({ ...robot, public_engineering: publicEngineeringById.get(robot.id) ?? {} }));
   const params = await searchParams;
 
   return (
@@ -33,11 +40,14 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
             ))}
             <label className="grid gap-2 text-sm text-slate-300">Status<select name="status" required defaultValue="In Development" className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3"><option>Competition Ready</option><option>In Development</option><option>Retired</option><option>Prototype</option></select></label>
             <label className="grid gap-2 text-sm text-slate-300">Summary<textarea name="summary" required rows={5} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" /></label>
+            <fieldset className="grid gap-3 rounded-2xl border border-white/10 p-4"><legend className="px-2 text-sm font-semibold text-[#8deaff]">Public engineering summary</legend><p className="text-xs leading-5 text-slate-500">Only include approved public explanations. Never add source code, detailed CAD, firmware, sensitive strategy or confidential costs.</p>{[
+              ["problem", "Problem solved"], ["mechanicalDesign", "Mechanical design"], ["electronicsArchitecture", "Electronics architecture"], ["controlLogic", "Control logic"], ["componentChoices", "Component choices"], ["limitations", "Limitations"], ["futureImprovements", "Future improvements"],
+            ].map(([field, label]) => <label key={field} className="grid gap-2 text-sm text-slate-300">{label}<textarea name={`public_engineering_${field}`} rows={2} maxLength={2000} className="rounded-xl border border-white/10 bg-[#07111f] px-4 py-3 outline-none focus:border-[#19d3ff]/50" /></label>)}</fieldset>
             <button className="rounded-full bg-[#1479ff] px-5 py-3 font-semibold">Create draft</button>
           </form>
 
           <div className="grid content-start gap-3">
-            {(robots ?? []).map((robot) => (
+            {robotRecords.map((robot) => (
               <article key={robot.id} className="min-w-0 rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-5">
                 <div className="flex justify-between gap-4">
                   <div><h2 className="font-bold">{robot.name}</h2><p className="mt-1 text-xs text-slate-500">{robot.category} · {robot.version} · {robot.development_year}</p></div>
@@ -57,6 +67,9 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                     <input name="weight_kg" type="number" min="0" step="0.01" defaultValue={robot.weight_kg ?? ""} placeholder="Weight (kg)" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <input name="dimensions" defaultValue={robot.dimensions ?? ""} placeholder="Dimensions" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
                     <textarea name="summary" required rows={3} defaultValue={robot.summary ?? ""} placeholder="Summary" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm" />
+                    <fieldset className="grid gap-3 rounded-xl border border-white/10 p-3"><legend className="px-1 text-xs font-semibold text-[#8deaff]">Public engineering summary</legend><p className="text-xs leading-5 text-slate-500">Approved public-safe explanations only. Restricted design details remain in private engineering records.</p>{[
+                      ["problem", "Problem solved"], ["mechanicalDesign", "Mechanical design"], ["electronicsArchitecture", "Electronics architecture"], ["controlLogic", "Control logic"], ["componentChoices", "Component choices"], ["limitations", "Limitations"], ["futureImprovements", "Future improvements"],
+                    ].map(([field, label]) => <label key={field} className="grid gap-1 text-xs text-slate-400">{label}<textarea name={`public_engineering_${field}`} defaultValue={robot.public_engineering?.[field] ?? ""} rows={2} maxLength={2000} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200" /></label>)}</fieldset>
                     <div className="flex flex-wrap gap-2">
                       <button className="rounded-full bg-[#1479ff] px-3 py-2 text-xs font-semibold">Save edits</button>
                       {robot.publish_status === "draft" ? <button formAction={submitRobotForReview} className="rounded-full border px-3 py-2 text-xs">Submit review</button> : null}
