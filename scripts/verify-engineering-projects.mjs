@@ -29,6 +29,9 @@ assert.match(stagingSecurity, /Engineering immutable-attribution triggers are en
 assert.match(migration, /revoke all on public\.engineering_projects,[\s\S]*?grant select on public\.engineering_task_events to authenticated/, "Task history must be read-only to authenticated clients");
 assert.doesNotMatch(migration, /create policy engineering_tasks_delete/, "Tasks must not be silently deleted; preserve task history");
 assert.match(page, /requireAdmin\(\)/, "Project board must require a confirmed authenticated session");
+assert.match(page, /if \(!allowedDomain \|\| !user\.email \|\| !user\.email\.toLowerCase\(\)\.endsWith\(`@\$\{allowedDomain\}`\)\)/, "Project board must fail closed until the university domain is configured");
+assert.match(actions, /function requireEngineeringDomain\(email\?: string\)/, "Engineering server actions must enforce the configured university domain");
+assert.match(actions, /if \(!domain \|\| !email \|\| !email\.toLowerCase\(\)\.endsWith\(`@\$\{domain\}`\)\)/, "Engineering mutations must fail closed when the university domain is missing");
 assert.match(page, /robots: \{ index: false, follow: false, noarchive: true \}/, "Project board must not be indexed");
 assert.match(page, /Project permissions could not be verified/, "Project board must fail closed when membership/task queries fail");
 assert.match(page, /addEngineeringProjectMember/, "Project leads must be able to grant explicit membership to existing accounts");
