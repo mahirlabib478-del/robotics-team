@@ -45,6 +45,8 @@ export async function createEngineeringProject(formData: FormData) {
     console.error("Engineering project creation failed:", error);
     redirect("/engineering/projects?error=project-save");
   }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_engineering_project", entity_type: "engineering_project", entity_id: data.id, metadata: { slug, division } });
+  if (auditError) console.error("Engineering project audit write failed:", auditError);
   redirect("/engineering/projects?saved=project");
 }
 
@@ -83,6 +85,8 @@ export async function addEngineeringProjectMember(formData: FormData) {
     console.error("Engineering project membership update failed:", error);
     redirect("/engineering/projects?error=member-save");
   }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "add_engineering_project_member", entity_type: "engineering_project", entity_id: projectId, metadata: { capability } });
+  if (auditError) console.error("Engineering membership audit write failed:", auditError);
   redirect("/engineering/projects?saved=member");
 }
 
@@ -114,14 +118,16 @@ export async function createEngineeringTask(formData: FormData) {
     if (membershipError || !membership) redirect("/engineering/projects?error=assignee-not-member");
     assigneeId = targetProfile.id;
   }
-  const { error } = await supabase.from("engineering_tasks").insert({
+  const { data: created, error } = await supabase.from("engineering_tasks").insert({
     project_id: projectId, title, description, priority, due_date: dueDate || null, assignee_id: assigneeId,
     status: "todo", created_by: profile.id, updated_by: profile.id,
-  });
-  if (error) {
+  }).select("id").single();
+  if (error || !created) {
     console.error("Engineering task creation failed:", error);
     redirect("/engineering/projects?error=task-save");
   }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_engineering_task", entity_type: "engineering_task", entity_id: created.id, metadata: { project_id: projectId, priority } });
+  if (auditError) console.error("Engineering task audit write failed:", auditError);
   redirect("/engineering/projects?saved=task");
 }
 
@@ -140,5 +146,7 @@ export async function updateEngineeringTaskStatus(formData: FormData) {
     console.error("Engineering task status update failed:", error);
     redirect("/engineering/projects?error=task-update");
   }
+  const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "update_engineering_task_status", entity_type: "engineering_task", entity_id: updated.id, metadata: { status } });
+  if (auditError) console.error("Engineering task status audit write failed:", auditError);
   redirect("/engineering/projects?saved=status");
 }
