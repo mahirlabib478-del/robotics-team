@@ -117,6 +117,8 @@ checks as (
     exists (
       select 1 from pg_policies p
       where p.schemaname='public' and p.tablename='audit_logs' and p.policyname='admin_audit_insert'
+        and p.cmd='INSERT'
+        and p.roles::text like '%authenticated%'
         and lower(coalesce(p.with_check,'')) like '%auth.uid%'
     ),
     'Recreate admin_audit_insert so actor_id must equal auth.uid()'
@@ -149,6 +151,8 @@ checks as (
     exists (
       select 1 from pg_policies p
       where p.schemaname='public' and p.tablename='audit_logs' and p.policyname='internal_audit_read'
+        and p.cmd='SELECT'
+        and p.roles::text like '%authenticated%'
         and lower(coalesce(p.qual,'')) like '%team_lead%'
         and lower(coalesce(p.qual,'')) like '%super_admin%'
     ),
