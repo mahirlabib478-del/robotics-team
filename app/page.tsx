@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SectionHeading } from "@/components/section-heading";
-import { getPublicCompetitions, getPublicRobots, getPublicStats } from "@/lib/public-data";
+import { getPublicCompetitions, getPublicRobots, getPublicStats, getPublicTeamMembers } from "@/lib/public-data";
 
 const capabilityCards = [
   ["01", "Mechanical Engineering", "Chassis, mechanisms, fabrication and competition-ready mechanical systems."],
@@ -14,7 +14,8 @@ const capabilityCards = [
 // Keep the homepage hero responsive while prioritizing verified, database-backed content.
 // Images further down the page are lazy-loaded to reduce initial transfer cost.
 export default async function Home() {
-  const [robots, stats, competitions] = await Promise.all([getPublicRobots(), getPublicStats(), getPublicCompetitions()]);
+  const [robots, competitions, members] = await Promise.all([getPublicRobots(), getPublicCompetitions(), getPublicTeamMembers()]);
+  const stats = await getPublicStats(robots, competitions, members);
   const recentAchievements = competitions.filter((record) => record.result !== "Participation").slice(0, 3);
   const statCards = [
     ["Robots Built", stats.robots],
