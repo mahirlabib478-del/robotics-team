@@ -52,11 +52,24 @@ export async function addEngineeringProjectMember(formData: FormData) {
     redirect("/engineering/projects?error=invalid-member");
   }
 
-  const { data: member, error: profileError } = await supabase.from("profiles").select("id").ilike("university_email", email).maybeSingle();
-  if (profileError || !member) {
-    console.error("Engineering project member lookup failed:", profileError);
-    redirect("/engineering/projects?error=member-not-found");
+  let member: { id: string; university_email: string | null } | null = null;
+  try {
+    const admin = createSupabaseAdminClient();
+    const lookup = await admin.from("profiles").select("id,university_email").ilike("university_email", email).maybeSingle();
+    if (!lookup.error) member = lookup.data;
+    if (member) {
+      const { data: authRecord, error: authError } = await admin.auth.admin.getUserById(member.id);
+      const allowedDomain = process.env.ADMIN_EMAIL_DOMAIN?.trim().toLowerCase();
+      const confirmedEmail = authRecord.user?.email?.toLowerCase();
+      if (authError || !authRecord.user?.email_confirmed_at || !confirmedEmail || (allowedDomain && !confirmedEmail.endsWith(`@${allowedDomain}`))) {
+        member = null;
+      }
+    }
+  } catch (error) {
+    console.error("Engineering project member lookup failed:", error);
+    redirect("/engineering/projects?error=member-lookup");
   }
+  if (!member?.university_email) redirect("/engineering/projects?error=member-not-found");
   const { error } = await supabase.from("engineering_project_members").insert({
     project_id: projectId, user_id: member.id, capability, added_by: profile.id,
   });
