@@ -28,6 +28,7 @@ The build may require the same non-secret public configuration expected by the d
 - Test both a fresh database and an upgrade from the previous migration state.
 - Before applying constraints to an existing database, run `supabase/preflight_data_integrity.sql` against staging, review every returned row, and correct invalid data before continuing.
 - Verify RLS through direct database/API requests as anonymous and authenticated users; UI hiding is not an authorization control.
+- After applying migrations to staging, run `supabase/verify_staging_security.sql` and retain the PASS/FAIL output with the tested commit SHA; this catalog check complements, but does not replace, role-based API smoke tests.
 - Never grant anonymous direct writes to contact or recruitment tables as a shortcut around server actions and rate limiting.
 
 ## Content workflow
