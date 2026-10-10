@@ -48,6 +48,9 @@ jobs:
       - name: Private engineering portal access checks
         run: node scripts/verify-engineering-portal.mjs
 
+      - name: Engineering project/task access checks
+        run: npm run verify:engineering-projects
+
       - name: Private engineering design contract checks
         run: node scripts/verify-engineering-design.mjs
 
