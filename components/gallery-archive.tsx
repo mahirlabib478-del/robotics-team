@@ -9,8 +9,8 @@ interface GalleryItem {
   title: string;
   category: string;
   source_type: "image" | "youtube";
-  source_url: string | null;
-  thumbnail_url: string | null;
+  source_url?: string | null;
+  thumbnail_url?: string | null;
   alt_text: string;
   caption: string | null;
 }
