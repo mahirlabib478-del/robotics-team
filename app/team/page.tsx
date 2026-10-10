@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { EmptyState } from "@/components/empty-state";
@@ -15,7 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default async function TeamPage() {
-  const teamMembers = await getPublicTeamMembers();
+  let teamMembers: Awaited<ReturnType<typeof getPublicTeamMembers>>;
+  try { teamMembers = await getPublicTeamMembers(); }
+  catch (error) { console.error("[team] Public team records are unavailable", error); return <PublicDataUnavailable resource="team records" />; }
   const leadership = teamMembers.filter((member) => /advisor|captain|lead/i.test(member.role));
 
   return (
