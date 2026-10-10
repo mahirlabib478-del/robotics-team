@@ -40,7 +40,7 @@ export default async function Home() {
               Team Stellar designs, builds, tests and documents robotics systems across mechanical engineering, embedded electronics, software, AI and autonomous control.
             </p>
           </div>
-          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative z-0 mt-4 isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 sm:mt-0 bg-[#07111f] shadow-2xl shadow-blue-950/40 lg:col-start-2 lg:row-start-1 lg:row-span-2">
+          <div aria-label="Abstract robotics engineering illustration; not a photograph of a Team Stellar robot" role="img" className="relative z-0 mt-4 isolate aspect-[4/5] overflow-hidden rounded-3xl border border-[#19d3ff]/20 sm:mt-0 bg-[#07111f] shadow-2xl shadow-blue-950/40 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:-translate-y-4">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(20,121,255,.28),transparent_42%),linear-gradient(145deg,rgba(25,211,255,.07),transparent_45%)]" />
             <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(125,211,252,.18)_1px,transparent_1px),linear-gradient(90deg,rgba(125,211,252,.18)_1px,transparent_1px)] [background-size:34px_34px]" />
             <div className="absolute left-6 top-6 flex items-center gap-2 rounded-full border border-[#19d3ff]/20 bg-[#07111f]/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#8deaff]"><span className="h-2 w-2 rounded-full bg-[#19d3ff] shadow-[0_0_12px_#19d3ff]" /> Engineering systems</div>
