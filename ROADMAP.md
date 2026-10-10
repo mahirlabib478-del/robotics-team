@@ -83,6 +83,8 @@ First-time staging setup: follow [the Supabase staging bootstrap runbook](docs/S
 - [ ] Add/edit robot records and update specifications.
 - [ ] Create competition records and upload achievement evidence.
 - [ ] Add, edit, archive and restore member records according to policy.
+- [x] Manage robot media references, accessible alt text, captions, ordering and visibility through the CMS; leadership approval is required for public exposure.
+- [ ] Implement approved file uploads and verify private/public storage bucket policies in staging.
 - [ ] Manage gallery uploads, upcoming events and sponsor logos.
 - [ ] Review recruitment applications and contact messages.
 - [ ] Enforce Draft → Review → Publish workflow and record audit attribution.

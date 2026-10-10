@@ -54,6 +54,12 @@ union all
 select 'robot_media', id::text, 'source_url must use HTTPS'
 from public.robot_media where source_url !~ '^https://'
 union all
+select 'robot_media', id::text, 'alt_text must not be empty'
+from public.robot_media where length(trim(alt_text)) = 0
+union all
+select 'robot_media', id::text, 'sort_order must be non-negative'
+from public.robot_media where sort_order < 0
+union all
 select 'competition_evidence', id::text, 'href must use HTTPS'
 from public.competition_evidence where href !~ '^https://'
 order by table_name, row_id;
