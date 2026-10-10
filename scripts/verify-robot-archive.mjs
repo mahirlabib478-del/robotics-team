@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage] = await Promise.all([
+const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage, sitemap, robots] = await Promise.all([
   read("components/robot-archive.tsx"),
   read("app/robots/page.tsx"),
   read("lib/public-data.ts"),
@@ -10,6 +10,8 @@ const [archive, page, data, homepage, competitionArchive, competitionsPage, achi
   read("components/competition-archive.tsx"),
   read("app/competitions/page.tsx"),
   read("app/achievements/page.tsx"),
+  read("app/sitemap.ts"),
+  read("app/robots.ts"),
 ]);
 
 assert.match(page, /<RobotArchive robots=\{robots\} \/>/, "Robots page must render the interactive archive");
@@ -31,4 +33,14 @@ assert.match(competitionsPage, /<CompetitionArchive records=\{competitions\} \/>
 assert.match(achievementsPage, /result !== "Participation"/, "Achievements page must exclude participation-only records");
 assert.match(achievementsPage, /<CompetitionArchive records=\{achievements\} achievementsOnly \/>/, "Achievements must use the archive's achievements-only mode");
 
-console.log("Robot archive and homepage contract checks passed.");
+assert.match(sitemap, /getPublicRobots\(\)/, "Sitemap robot detail URLs must come from the public-safe data accessor");
+assert.match(sitemap, /getPublicCompetitions\(\)/, "Sitemap competition detail URLs must come from the public-safe data accessor");
+assert.match(sitemap, /getPublicResearch\(\)/, "Sitemap research detail URLs must come from the public-safe data accessor");
+assert.doesNotMatch(sitemap, /\/admin|\/api\/|recruitment_applications|contact_messages|audit_logs|engineering_portal/i, "Sitemap must not expose private/admin routes or operational records");
+assert.match(sitemap, /if \(!base\) return \[\]/, "Sitemap must remain empty when the canonical public site URL is not configured");
+assert.match(robots, /disallow: \["\/admin", "\/api"\]/, "Crawler guidance must disallow admin and API routes");
+assert.match(robots, /url\.protocol === "https:" \|\| url\.hostname === "localhost"/, "Robots sitemap URL must reject non-HTTPS production origins");
+assert.match(robots, /if \(raw\)/, "Robots sitemap URL must be omitted when canonical site configuration is missing");
+assert.match(robots, /server-side admin authentication remains the actual access control/, "Robots policy must explicitly distinguish crawler guidance from authorization");
+
+console.log("Robot archive, homepage and public sitemap contract checks passed.");

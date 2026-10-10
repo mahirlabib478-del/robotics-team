@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import type { UserRole } from "@/lib/types";
 
 const modules: { title: string; description: string; owner: string; href: string; roles: UserRole[] }[] = [
+  { title: "Engineering Portal", description: "Restricted Phase 3 workspace shell; private project and document modules remain disabled pending security verification.", owner: "Team / Technical Lead", href: "/engineering", roles: ["super_admin", "team_lead", "technical_lead"] },
   { title: "Robots", description: "Add and maintain approved robot specifications, development records and public media.", owner: "Technical Lead", href: "/admin/robots", roles: ["super_admin", "team_lead", "technical_lead"] },
   { title: "Competitions", description: "Create structured event records, results, evidence and competition reports.", owner: "Technical Lead", href: "/admin/competitions", roles: ["super_admin", "team_lead", "technical_lead"] },
   { title: "Achievements", description: "Publish verified result stories linked to official evidence.", owner: "Team Lead", href: "/admin/achievements", roles: ["super_admin", "team_lead"] },
