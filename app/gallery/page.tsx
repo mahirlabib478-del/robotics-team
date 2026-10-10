@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPublicGallery } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Gallery",
   description: "View approved public photos and videos documenting Team Stellar’s robotics work and activities.",
