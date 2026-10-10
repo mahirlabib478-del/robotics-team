@@ -12,6 +12,15 @@ function validSlug(slug: string) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
+function validHttpsUrl(raw: string) {
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
 const publicEngineeringFields = ["problem", "mechanicalDesign", "electronicsArchitecture", "controlLogic", "componentChoices", "limitations", "futureImprovements"] as const;
 
 function publicEngineeringFromForm(formData: FormData) {
@@ -52,6 +61,52 @@ export async function createRobot(formData: FormData) {
   const { error: auditError } = await supabase.from("audit_logs").insert({ actor_id: profile.id, action: "create_robot", entity_type: "robot", entity_id: created.id, metadata: { slug } });
   if (auditError) console.error("Robot creation audit write failed:", auditError);
   redirect("/admin/robots?saved=1");
+}
+
+export async function addRobotMedia(formData: FormData) {
+  const { supabase, profile } = await requireAdmin();
+  requireAnyRole(["super_admin", "team_lead", "technical_lead"], profile.role);
+
+  const robotId = value(formData, "robot_id", 80);
+  const mediaType = value(formData, "media_type", 20);
+  const sourceUrl = value(formData, "source_url", 1000);
+  const altText = value(formData, "alt_text", 300);
+  const caption = value(formData, "caption", 500);
+  const visibility = value(formData, "visibility", 20);
+  const sortOrderInput = value(formData, "sort_order", 10);
+  const sortOrder = sortOrderInput === "" ? 0 : Number(sortOrderInput);
+  const validId = /^[0-9a-f-]{36}$/i.test(robotId);
+  if (!validId || !["image", "video", "cad"].includes(mediaType) || !validHttpsUrl(sourceUrl) || !altText || !["public", "internal"].includes(visibility) || !Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 10000) {
+    redirect("/admin/robots?error=invalid-media");
+  }
+
+  const { data: robot, error: robotError } = await supabase.from("robots").select("id,publish_status").eq("id", robotId).maybeSingle();
+  if (robotError || !robot) redirect("/admin/robots?error=not-found");
+  if (robot.publish_status === "archived") redirect("/admin/robots?error=archived");
+
+  const { data: created, error } = await supabase.from("robot_media").insert({
+    robot_id: robotId,
+    media_type: mediaType,
+    source_url: sourceUrl,
+    alt_text: altText,
+    caption: caption || null,
+    sort_order: sortOrder,
+    visibility,
+  }).select("id").single();
+  if (error || !created) {
+    console.error("Robot media insert failed:", error);
+    redirect("/admin/robots?error=media-save");
+  }
+
+  const { error: auditError } = await supabase.from("audit_logs").insert({
+    actor_id: profile.id,
+    action: "add_robot_media",
+    entity_type: "robot_media",
+    entity_id: created.id,
+    metadata: { robot_id: robotId, media_type: mediaType, visibility, sort_order: sortOrder },
+  });
+  if (auditError) console.error("Robot media creation audit write failed:", auditError);
+  redirect("/admin/robots?saved=media");
 }
 
 export async function createCompetition(formData: FormData) {
