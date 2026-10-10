@@ -95,6 +95,35 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
                     </div>
                   </form>
                 </details>
+                <details className="mt-4 border-t border-white/10 pt-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-[#8deaff]">Manage media ({robot.media.length})</summary>
+                  <div className="mt-4 grid gap-4">
+                    {robot.media.map((media) => (
+                      <form key={media.id} action={updateRobotMedia} className="grid gap-3 rounded-xl border border-white/10 bg-[#07111f]/80 p-3 sm:p-4">
+                        <input type="hidden" name="media_id" value={media.id} />
+                        <input type="hidden" name="robot_id" value={robot.id} />
+                        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">{media.media_type} · order {media.sort_order}</p>
+                        <label className="grid gap-1 text-xs text-slate-400">Source URL<input name="source_url" type="url" required defaultValue={media.source_url} className="min-w-0 rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200" /></label>
+                        <label className="grid gap-1 text-xs text-slate-400">Media type<select name="media_type" defaultValue={media.media_type} className="rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200"><option value="image">Image</option><option value="video">Video</option><option value="cad">CAD / model</option></select></label>
+                        <label className="grid gap-1 text-xs text-slate-400">Alt text / accessible description<input name="alt_text" required maxLength={300} defaultValue={media.alt_text} className="min-w-0 rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200" /></label>
+                        <label className="grid gap-1 text-xs text-slate-400">Caption<input name="caption" maxLength={500} defaultValue={media.caption ?? ""} className="min-w-0 rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200" /></label>
+                        <div className="grid gap-3 sm:grid-cols-2"><label className="grid gap-1 text-xs text-slate-400">Sort order<input name="sort_order" type="number" min="0" max="10000" step="1" required defaultValue={media.sort_order} className="rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200" /></label><label className="grid gap-1 text-xs text-slate-400">Visibility<select name="visibility" defaultValue={media.visibility} className="rounded-lg border border-white/10 bg-[#0b1727] px-3 py-2 text-sm text-slate-200"><option value="public">Public (approved)</option><option value="internal">Internal only</option></select></label></div>
+                        <button className="justify-self-start rounded-full border border-[#19d3ff]/30 px-4 py-2 text-xs font-semibold text-[#8deaff] hover:bg-[#19d3ff]/10">Save media</button>
+                      </form>
+                    ))}
+                    <form action={addRobotMedia} className="grid gap-3 rounded-xl border border-dashed border-[#19d3ff]/30 bg-[#19d3ff]/[0.03] p-3 sm:p-4">
+                      <input type="hidden" name="robot_id" value={robot.id} />
+                      <p className="text-sm font-semibold text-slate-200">Add approved media URL</p>
+                      <p className="text-xs leading-5 text-slate-500">Use an HTTPS URL to an approved image, video, or CAD/model preview. Public visibility is shown only when the parent robot is published.</p>
+                      <label className="grid gap-1 text-xs text-slate-400">Source URL<input name="source_url" type="url" required placeholder="https://example.com/approved-media.jpg" className="min-w-0 rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200" /></label>
+                      <label className="grid gap-1 text-xs text-slate-400">Media type<select name="media_type" defaultValue="image" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200"><option value="image">Image</option><option value="video">Video</option><option value="cad">CAD / model</option></select></label>
+                      <label className="grid gap-1 text-xs text-slate-400">Alt text / accessible description<input name="alt_text" required maxLength={300} placeholder="Describe what the media shows" className="min-w-0 rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200" /></label>
+                      <label className="grid gap-1 text-xs text-slate-400">Caption (optional)<input name="caption" maxLength={500} className="min-w-0 rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200" /></label>
+                      <div className="grid gap-3 sm:grid-cols-2"><label className="grid gap-1 text-xs text-slate-400">Sort order<input name="sort_order" type="number" min="0" max="10000" step="1" defaultValue={robot.media.length} className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200" /></label><label className="grid gap-1 text-xs text-slate-400">Visibility<select name="visibility" defaultValue="internal" className="rounded-lg border border-white/10 bg-[#07111f] px-3 py-2 text-sm text-slate-200"><option value="internal">Internal only</option><option value="public">Public (approved)</option></select></label></div>
+                      <button className="justify-self-start rounded-full bg-[#1479ff] px-4 py-2 text-xs font-semibold text-white">Add media</button>
+                    </form>
+                  </div>
+                </details>
               </article>
             ))}
           </div>
