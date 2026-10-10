@@ -59,7 +59,7 @@ try {
   assert.equal(missing.status, 404, "Unknown public routes must render the not-found response");
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
-    for (const route of ["/admin", "/engineering"]) {
+    for (const route of ["/admin", "/engineering", "/engineering/projects"]) {
       const response = await fetch(`${base}${route}`, { redirect: "manual", signal: AbortSignal.timeout(5000) });
       assert.ok([302, 303, 307, 308].includes(response.status), `Unauthenticated route ${route} must redirect to authentication`);
     }
