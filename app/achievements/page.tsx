@@ -1,3 +1,4 @@
+import { PublicDataUnavailable } from "@/components/public-data-unavailable";
 import type { Metadata } from "next";
 import { EmptyState } from "@/components/empty-state";
 import { SectionHeading } from "@/components/section-heading";
@@ -14,7 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function AchievementsPage() {
-  const competitions = await getPublicCompetitions();
+  let competitions: Awaited<ReturnType<typeof getPublicCompetitions>>;
+  try { competitions = await getPublicCompetitions(); }
+  catch (error) { console.error("[achievements] Public competition records are unavailable", error); return <PublicDataUnavailable resource="achievement records" />; }
   const achievements = competitions.filter((item) => item.result !== "Participation");
 
   return (
