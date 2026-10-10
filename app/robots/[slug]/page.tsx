@@ -12,7 +12,7 @@ interface RobotDetailPageProps {
 
 export async function generateMetadata({ params }: RobotDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const robot = await getPublicRobot(slug);
+  const robot = await getPublicRobot(slug).catch((error) => { console.error("[robot-detail] Metadata data unavailable", error); return null; });
   if (!robot) return { title: "Robot Not Found" };
   return {
     title: robot.name,
