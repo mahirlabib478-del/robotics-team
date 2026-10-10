@@ -39,6 +39,10 @@ assert.match(page, /createSupabaseAdminClient\(\)[\s\S]*?select\("id,display_nam
 assert.match(actions, /assignee-not-member/, "Task assignment must reject users who are not project members");
 assert.match(actions, /\["super_admin", "team_lead", "technical_lead", "viewer"\]\.includes\(member\.role\)/, "HR and media roles must not be granted engineering project membership");
 assert.match(actions, /assignee_id: assigneeId/, "Task records must persist the validated project-member assignment");
+assert.match(actions, /action: "create_engineering_project"/, "Project creation must be attributed in audit logs");
+assert.match(actions, /action: "add_engineering_project_member"/, "Membership changes must be attributed in audit logs");
+assert.match(actions, /action: "create_engineering_task"/, "Task creation must be attributed in audit logs");
+assert.match(actions, /action: "update_engineering_task_status"/, "Task status changes must be attributed in audit logs");
 assert.match(migration, /assignee_id is null or exists \([\s\S]*?m\.project_id = engineering_tasks\.project_id and m\.user_id = engineering_tasks\.assignee_id/, "Database policy must prevent assigning tasks to non-members");
 assert.match(page, /No projects assigned yet/, "Users without membership must see an empty state, not other projects");
 assert.match(actions, /requireAnyRole\(\["super_admin", "team_lead"\], profile\.role\)/, "Only approved leads can create projects and manage memberships");
