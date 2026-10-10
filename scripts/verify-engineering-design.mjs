@@ -10,7 +10,7 @@ const [design, roadmap, portal, auth] = await Promise.all([
 ]);
 
 for (const requirement of [
-  "Design proposal only",
+  "Security baseline and design reference",
   "PostgreSQL RLS",
   "Never expose the Supabase service-role key",
   "private storage bucket",
