@@ -33,6 +33,9 @@ jobs:
       - name: Homepage responsive layout checks
         run: node scripts/verify-homepage-responsive.mjs
 
+      - name: Public accessibility and metadata checks
+        run: node scripts/verify-public-quality.mjs
+
       - name: Robot archive regression checks
         run: node scripts/verify-robot-archive.mjs
 
