@@ -27,8 +27,8 @@ create table public.robots (
 
 create table public.robot_media (
   id uuid primary key default gen_random_uuid(), robot_id uuid not null references public.robots(id) on delete cascade,
-  media_type text not null check (media_type in ('image','video','cad')), source_url text not null, alt_text text not null check (length(trim(alt_text)) > 0),
-  caption text, sort_order integer not null default 0 check (sort_order >= 0), visibility public.visibility not null default 'public'
+  media_type text not null check (media_type in ('image','video','cad')), source_url text not null, alt_text text not null constraint robot_media_alt_text_nonempty check (length(trim(alt_text)) > 0),
+  caption text, sort_order integer not null default 0 constraint robot_media_sort_order_nonnegative check (sort_order >= 0), visibility public.visibility not null default 'public'
 );
 
 create table public.competitions (
