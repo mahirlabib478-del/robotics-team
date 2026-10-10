@@ -471,4 +471,18 @@ assert.ok(stagingBootstrap.includes("Do not run every file in `supabase/migratio
 assert.ok(stagingBootstrap.includes("leave the decision **BLOCKED / NOT VERIFIED**"), "Staging runbook must not permit release approval while checks are pending");
 assert.ok(stagingBootstrap.includes("Never prefix a secret with `NEXT_PUBLIC_`"), "Staging runbook must preserve server-only secret guidance");
 
+const publicEngineeringMigration = await read("supabase/migrations/20261010_public_robot_engineering.sql");
+const robotAdminPage = await read("app/admin/robots/page.tsx");
+const adminContentActions = await read("app/actions/admin-content.ts");
+assert.match(publicEngineeringMigration, /add column if not exists public_engineering jsonb not null default '\{\}'::jsonb/, "Upgrade migration must add a separate public engineering field");
+assert.match(schema, /public_engineering jsonb not null default '\{\}'::jsonb check \(jsonb_typeof\(public_engineering\) = 'object'\)/, "Fresh schema must constrain public engineering content to a JSON object");
+assert.match(publicData, /safePublicEngineering\(robot\.public_engineering\)/, "Public projection must pass engineering content through an allowlist");
+assert.match(publicData, /engineering:publicEngineeringBySlug\.get\(r\.slug\)/, "Public robot pages must use the separate approved public engineering field");
+assert.match(adminContentActions, /publicEngineeringFields = \["problem", "mechanicalDesign", "electronicsArchitecture", "controlLogic", "componentChoices", "limitations", "futureImprovements"\]/, "Server actions must whitelist public engineering fields");
+assert.match(adminContentActions, /publicEngineeringFromForm\(formData\)/, "Robot CMS writes must use the public engineering field allowlist");
+assert.match(robotAdminPage, /Public engineering summary/, "CMS must clearly label public engineering fields");
+assert.match(robotAdminPage, /Restricted design details remain in private engineering records/, "CMS must warn editors not to place restricted data in public summaries");
+assert.match(adminContentActions, /createResult\.error\?\.message\?\.includes\("public_engineering"\)/, "Robot creation must remain functional before the optional migration is applied");
+assert.match(adminContentActions, /updateResult\.error\?\.message\?\.includes\("public_engineering"\)/, "Robot editing must remain functional before the optional migration is applied");
+
 console.log("Contract checks passed: recruitment statuses/deadlines and competition archive filters, server-side validation, honeypots, rate limits, service-role boundaries, RLS, and public projections.");
