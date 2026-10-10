@@ -20,11 +20,19 @@ export async function requireAdminSession() {
     redirect("/admin/login?error=domain");
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("id, display_name, role, university_email")
     .eq("id", user.id)
     .maybeSingle();
+
+  if (profileError) {
+    console.error("Admin session profile lookup failed:", {
+      code: profileError.code,
+      message: profileError.message,
+    });
+    redirect("/admin/login?error=profile_lookup");
+  }
 
   if (!profile || !privilegedRoles.includes(profile.role as UserRole)) {
     redirect("/admin/login?error=unauthorized");
