@@ -100,6 +100,7 @@ export default async function Home() {
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {robots.length ? robots.slice(0, 6).map((robot) => (
             <article key={robot.slug} className="rounded-2xl border border-white/10 bg-[#0b1727] p-4 sm:p-6">
+              {robot.media?.find((media) => media.type === "image") ? <Image src={robot.media.find((media) => media.type === "image")!.src} alt={robot.media.find((media) => media.type === "image")!.alt || `${robot.name} robot`} width={1280} height={800} unoptimized loading="lazy" className="mb-5 aspect-[16/10] w-full rounded-xl border border-white/10 object-cover" /> : <div aria-hidden="true" className="mb-5 flex aspect-[16/10] items-center justify-center rounded-xl border border-white/10 bg-[radial-gradient(circle_at_50%_30%,rgba(20,121,255,.22),transparent_50%),linear-gradient(145deg,#102033,#07111f)]"><span className="font-mono text-xs uppercase tracking-[0.25em] text-slate-500">Engineering archive</span></div>}
               <p className="text-xs uppercase tracking-[0.18em] text-[#19d3ff]">{robot.category}</p>
               <h3 className="mt-3 text-xl font-bold">{robot.name}</h3>
               <p className="mt-2 text-sm text-slate-400">{robot.summary}</p>
