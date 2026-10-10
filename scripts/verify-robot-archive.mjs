@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
-const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage, sitemap, robots, robotDetail, heading, teamMembers] = await Promise.all([
+const [archive, page, data, homepage, competitionArchive, competitionsPage, achievementsPage, sitemap, robots, robotDetail, heading, teamMembers, adminRobotsPage, adminContentActions, schema] = await Promise.all([
   read("components/robot-archive.tsx"),
   read("app/robots/page.tsx"),
   read("lib/public-data.ts"),
@@ -15,6 +15,9 @@ const [archive, page, data, homepage, competitionArchive, competitionsPage, achi
   read("app/robots/[slug]/page.tsx"),
   read("components/section-heading.tsx"),
   read("app/team/page.tsx"),
+  read("app/admin/robots/page.tsx"),
+  read("app/actions/admin-content.ts"),
+  read("supabase/schema.sql"),
 ]);
 
 assert.match(page, /<RobotArchive robots=\{robots\} \/>/, "Robots page must render the interactive archive");
@@ -45,6 +48,17 @@ assert.match(teamMembers, /<SectionHeading level="h1"/, "Team listing must use a
 assert.match(homepage, /getPublicStats\(robots, competitions, members\)/, "Homepage statistics must reuse already-loaded public data rather than duplicate database queries");
 assert.match(homepage, /statCards\.filter\(\(\[, value\]\) => value > 0\)/, "Homepage must not present unavailable metrics as confirmed zero values");
 assert.match(homepage, /Published public records/, "Homepage metrics must disclose that counts reflect published records only");
+assert.match(adminRobotsPage, /Manage media \(\{robot\.media\.length\}\)/, "Robot CMS must expose a per-robot media manager");
+assert.match(adminRobotsPage, /action=\{addRobotMedia\}/, "Robot CMS must allow adding approved media references");
+assert.match(adminRobotsPage, /action=\{updateRobotMedia\}/, "Robot CMS must allow updating media metadata and visibility");
+assert.match(adminRobotsPage, /name="alt_text" required/, "Robot media must require accessible alt text");
+assert.match(adminRobotsPage, /value="internal"/, "Robot media must default new assets to internal visibility");
+assert.match(adminContentActions, /export async function addRobotMedia/, "Server action must implement robot media creation");
+assert.match(adminContentActions, /export async function updateRobotMedia/, "Server action must implement robot media updates");
+assert.match(adminContentActions, /validHttpsUrl\(sourceUrl\)/, "Robot media sources must be validated as credential-free HTTPS URLs");
+assert.match(adminContentActions, /action: "add_robot_media"/, "Robot media creation must write audit attribution");
+assert.match(schema, /create policy public_robot_media_read/, "Public robot media must remain scoped to published public robots");
+assert.match(schema, /create policy media_robot_media_write/, "Robot media writes must remain role-restricted by RLS");
 assert.match(homepage, /featuredRobotImage \? `Published image of \$\{featuredRobot\?\.name\}` : "Abstract robotics engineering illustration; not a photograph of a Team Stellar robot"/, "Homepage must label approved robot imagery accurately and identify fallback concept art as illustrative");
 assert.match(homepage, /Approved media from the public engineering archive/, "Homepage featured photography must be sourced from published robot media");
 assert.match(homepage, /Design\. Build\. Test\. Compete\./, "Homepage hero must show the Team Stellar engineering message");
