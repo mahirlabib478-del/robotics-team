@@ -56,7 +56,7 @@ create table public.team_members (
 
 create table public.research_posts (
   id uuid primary key default gen_random_uuid(), slug text unique not null, title text not null, excerpt text not null, body text not null,
-  category text not null, author_name text, cover_image_url text check (cover_image_url is null or cover_image_url ~ '^https://'), created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id), publish_status public.publish_status not null default 'draft',
+  category text not null, author_name text, cover_image_url text check (cover_image_url is null or cover_image_url ~ '^https://'), cover_image_alt text, check (cover_image_url is null or (cover_image_alt is not null and length(trim(cover_image_alt)) > 0)), created_by uuid references public.profiles(id), updated_by uuid references public.profiles(id), publish_status public.publish_status not null default 'draft',
   visibility public.visibility not null default 'public', created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 
