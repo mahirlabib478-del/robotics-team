@@ -30,6 +30,9 @@ jobs:
       - name: Contract checks
         run: npm run verify:contracts
 
+      - name: Homepage responsive layout checks
+        run: node scripts/verify-homepage-responsive.mjs
+
       - name: Robot archive regression checks
         run: node scripts/verify-robot-archive.mjs
 
