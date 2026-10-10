@@ -83,8 +83,27 @@ export default async function EngineeringProjectsPage({ searchParams }: { search
       </main>
     );
   }
-  const membershipByProject = new Map((membershipResult.data ?? []).map((membership) => [membership.project_id, membership.capability] as const));
   const tasks = taskResult.data ?? [];
+  const eventResult = tasks.length
+    ? await supabase.from("engineering_task_events").select("id,task_id,event_type,from_status,to_status,created_at").in("task_id", tasks.map((task) => task.id)).order("created_at", { ascending: false })
+    : { data: [], error: null };
+  if (eventResult.error) {
+    console.error("[engineering] Task history query failed:", eventResult.error);
+    return (
+      <main className="min-h-screen bg-[#07111f] px-4 py-10 text-[#f5f8fc] sm:px-6 sm:py-12">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/engineering" className="text-sm text-[#19d3ff]">← Engineering workspace</Link>
+          <section role="alert" className="mt-8 rounded-3xl border border-[#ff7a00]/25 bg-[#0b1727] p-6 sm:p-8">
+            <h1 className="text-2xl font-bold">Task history could not be verified.</h1>
+            <p className="mt-4 leading-7 text-slate-300">The task audit trail is unavailable, so this page is not displaying task records or write controls.</p>
+          </section>
+        </div>
+      </main>
+    );
+  }
+  const eventsByTask = new Map<string, typeof eventResult.data>();
+  for (const event of eventResult.data ?? []) eventsByTask.set(event.task_id, [...(eventsByTask.get(event.task_id) ?? []), event]);
+  const membershipByProject = new Map((membershipResult.data ?? []).map((membership) => [membership.project_id, membership.capability] as const));
   const tasksByProject = new Map<string, typeof tasks>();
   for (const task of tasks) tasksByProject.set(task.project_id, [...(tasksByProject.get(task.project_id) ?? []), task]);
   const canCreateProjects = ["super_admin", "team_lead"].includes(profile.role);
