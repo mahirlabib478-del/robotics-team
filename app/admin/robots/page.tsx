@@ -1,8 +1,10 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { archiveRobot, createRobot, publishRobot, submitRobotForReview, updateRobot } from "@/app/actions/admin-content";
+import { addRobotMedia, archiveRobot, createRobot, publishRobot, submitRobotForReview, updateRobot, updateRobotMedia } from "@/app/actions/admin-content";
 import { requireAdmin, requireRole } from "@/lib/admin-auth";
+
+interface RobotMediaRecord { id: string; robot_id: string; media_type: "image" | "video" | "cad"; source_url: string; alt_text: string; caption: string | null; sort_order: number; visibility: "public" | "internal" }
 
 export default async function AdminRobotsPage({ searchParams }: { searchParams: Promise<{ error?: string; saved?: string }> }) {
   const { supabase, profile } = await requireAdmin();
@@ -15,7 +17,20 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
     if (publicEngineeringError) { publicEngineeringAvailable = false; console.error("Public robot engineering fields could not be loaded. Apply the public engineering migration before editing these fields.", publicEngineeringError); }
     else publicEngineeringById = new Map((publicEngineeringRows ?? []).map((robot) => [robot.id, robot.public_engineering ?? {}] as const));
   }
-  const robotRecords = (robots ?? []).map((robot) => ({ ...robot, public_engineering: publicEngineeringById.get(robot.id) ?? {} }));
+  const mediaByRobot = new Map<string, RobotMediaRecord[]>();
+  if (robots?.length) {
+    const { data: mediaRows, error: mediaError } = await supabase.from("robot_media").select("id,robot_id,media_type,source_url,alt_text,caption,sort_order,visibility").in("robot_id", robots.map((robot) => robot.id)).order("sort_order", { ascending: true });
+    if (mediaError) console.error("Robot media could not be loaded.", mediaError);
+    else {
+      for (const row of mediaRows ?? []) {
+        const media = row as RobotMediaRecord;
+        const items = mediaByRobot.get(media.robot_id) ?? [];
+        items.push(media);
+        mediaByRobot.set(media.robot_id, items);
+      }
+    }
+  }
+  const robotRecords = (robots ?? []).map((robot) => ({ ...robot, public_engineering: publicEngineeringById.get(robot.id) ?? {}, media: mediaByRobot.get(robot.id) ?? [] }));
   const params = await searchParams;
 
   return (
@@ -23,8 +38,8 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
       <div className="mx-auto max-w-7xl">
         <Link href="/admin" className="text-sm text-[#19d3ff]">← Admin</Link>
         <h1 className="mt-6 text-3xl font-black sm:text-4xl">Robot records</h1>
-        {params.error ? <p role="alert" className="mt-5 rounded-xl border border-[#ff7a00]/30 p-4 text-sm text-[#ffbd85]">{params.error === "invalid-weight" ? "Weight must be a valid number greater than or equal to zero." : params.error === "missing" ? "Required fields are missing or invalid. Check the slug, status, year and summary." : "Could not save this record. Check for duplicate slugs and your permissions."}</p> : null}
-        {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/20 p-4 text-sm text-emerald-300">Robot record saved successfully.</p> : null}
+        {params.error ? <p role="alert" className="mt-5 rounded-xl border border-[#ff7a00]/30 p-4 text-sm text-[#ffbd85]">{params.error === "invalid-weight" ? "Weight must be a valid number greater than or equal to zero." : params.error === "invalid-media" ? "Media fields are invalid. Use a valid HTTPS URL, descriptive alt text, supported media type, and a non-negative sort order." : params.error === "media-save" ? "Media could not be saved. Check the source URL, database permissions, and required fields." : params.error === "not-found" ? "The selected robot or media record could not be found." : params.error === "archived" ? "Media cannot be added to an archived robot." : params.error === "missing" ? "Required fields are missing or invalid. Check the slug, status, year and summary." : "Could not save this record. Check for duplicate slugs and your permissions."}</p> : null}
+        {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/20 p-4 text-sm text-emerald-300">{params.saved === "media" ? "Robot media saved successfully." : "Robot record saved successfully."}</p> : null}
         {!publicEngineeringAvailable ? <p role="status" className="mt-5 rounded-xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-4 text-sm leading-6 text-[#ffbd85]">Public engineering summaries are temporarily unavailable because the database migration has not been applied. Basic robot edits still work, but these summary fields will not be saved until the migration is applied.</p> : null}
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
