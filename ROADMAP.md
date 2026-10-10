@@ -31,6 +31,7 @@ This roadmap follows the agreed three-phase plan. Keep public portfolio work, co
 - [ ] Each robot has its own detail page.
 - [ ] Robot basic information: official name, category, version, weight, dimensions, status, development year and team members.
 - [ ] Technical specification fields: frame material, motor model/RPM, motor driver, battery type/voltage/capacity, microcontroller, communications, weapon mechanism when applicable, sensors, camera/vision, maximum speed, runtime, safety mechanism and manual/semi-autonomous/autonomous control type.
+- [x] Provide separate, allowlisted public engineering summary fields in the schema/CMS without exposing the private engineering JSON; migration application and verified content publication remain required.
 - [ ] Engineering explanation covers problem solved, mechanical design, electronics architecture, control logic, component-selection rationale, limitations and planned improvements.
 - [ ] Development media supports photos, CAD renders, internal-component views, testing footage, competition footage and optional 360-degree models.
 - [ ] Show the robot's competition history and results.

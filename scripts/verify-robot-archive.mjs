@@ -25,7 +25,8 @@ assert.match(archive, /robot\.specifications\["Control type"\]/, "Robot cards sh
 assert.match(archive, /aria-live="polite"/, "Filtered record count must be announced accessibly");
 assert.match(archive, /function clearFilters\(\)/, "Robot archive must provide a complete filter reset");
 assert.match(data, /\.eq\("publish_status","published"\)\.eq\("visibility","public"\)/, "Robot archive data must remain limited to published public records");
-assert.match(data, /engineering:undefined/, "Private engineering content must not be projected into public robot records");
+assert.match(data, /engineering:publicEngineeringBySlug\.get\(r\.slug\)/, "Public robot projection must use the separate approved engineering field");
+assert.match(data, /safePublicEngineering\(robot\.public_engineering\)/, "Public engineering content must be allowlisted before rendering");
 assert.match(data, /robot_media\(media_type,source_url,alt_text,caption,sort_order,visibility\)/, "Published robot records must fetch their associated media metadata");
 assert.match(data, /safePublicUrl\(item\.source_url\)/, "Robot media sources must be restricted to safe HTTPS URLs");
 assert.match(data, /throw new PublicDataUnavailableError\("robot"\)/, "Robot query failures must not masquerade as a legitimate empty archive");
