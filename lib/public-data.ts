@@ -115,8 +115,56 @@ export async function getPublicTeamMembers(): Promise<TeamMember[]>{
     return data.map((m)=>({slug:m.slug,name:m.name,role:m.role,division:m.division,department:m.department??undefined,semester:m.semester??undefined,skills:m.skills??[],projects:m.projects??[],tenure:m.tenure,alumni:m.alumni,photo:safePublicUrl(m.photo_url),links:Array.isArray(m.public_links)?m.public_links.map(safePublicLink).filter((x): x is {label:string;href:string} => Boolean(x)):[]}));
   }catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published team members",error); return fallbackTeamMembers;}
 }
-export async function getPublicResearchPost(slug:string){try{const supabase=await createSupabaseServerClient();let result=await supabase.from("research_posts").select("slug,title,excerpt,body,category,author_name,cover_image_url,cover_image_alt").eq("slug",slug).eq("publish_status","published").eq("visibility","public").maybeSingle();if(result.error?.message?.includes("cover_image_url")){console.warn("[public-data] Research cover image migration is not applied yet; continuing without thumbnails.",result.error);result=await supabase.from("research_posts").select("slug,title,excerpt,body,category,author_name").eq("slug",slug).eq("publish_status","published").eq("visibility","public").maybeSingle()}if(result.error){console.error("[public-data] Failed to load published research post",result.error);throw new PublicDataUnavailableError("research")}return result.data?{...result.data,cover_image_alt:typeof result.data.cover_image_alt==="string"?result.data.cover_image_alt.trim().slice(0,300):null,cover_image_url:typeof result.data.cover_image_alt==="string"&&result.data.cover_image_alt.trim()?safePublicUrl(result.data.cover_image_url):null}:null}catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published research post",error);return null}}
-export async function getPublicResearch(){try{const supabase=await createSupabaseServerClient();let result=await supabase.from("research_posts").select("slug,title,excerpt,category,author_name,cover_image_url,cover_image_alt").eq("publish_status","published").eq("visibility","public").order("created_at",{ascending:false});if(result.error?.message?.includes("cover_image_url")){console.warn("[public-data] Research cover image migration is not applied yet; continuing without thumbnails.",result.error);result=await supabase.from("research_posts").select("slug,title,excerpt,category,author_name").eq("publish_status","published").eq("visibility","public").order("created_at",{ascending:false})}if(result.error){console.error("[public-data] Failed to load published research",result.error);throw new PublicDataUnavailableError("research")}return (result.data??[]).map((post)=>({...post,cover_image_alt:typeof post.cover_image_alt==="string"?post.cover_image_alt.trim().slice(0,300):null,cover_image_url:typeof post.cover_image_alt==="string"&&post.cover_image_alt.trim()?safePublicUrl(post.cover_image_url):null}))}catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published research",error);return[]}}
+export async function getPublicResearchPost(slug: string) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const result = await supabase.from("research_posts").select("slug,title,excerpt,body,category,author_name,cover_image_url,cover_image_alt").eq("slug", slug).eq("publish_status", "published").eq("visibility", "public").maybeSingle();
+    if (result.error?.message?.includes("cover_image_")) {
+      console.warn("[public-data] Research cover image migration is not applied yet; continuing without thumbnails.", result.error);
+      const fallback = await supabase.from("research_posts").select("slug,title,excerpt,body,category,author_name").eq("slug", slug).eq("publish_status", "published").eq("visibility", "public").maybeSingle();
+      if (fallback.error) throw new PublicDataUnavailableError("research");
+      return fallback.data ? { ...fallback.data, cover_image_url: null, cover_image_alt: null } : null;
+    }
+    if (result.error) {
+      console.error("[public-data] Failed to load published research post", result.error);
+      throw new PublicDataUnavailableError("research");
+    }
+    return result.data ? {
+      ...result.data,
+      cover_image_alt: typeof result.data.cover_image_alt === "string" ? result.data.cover_image_alt.trim().slice(0, 300) : null,
+      cover_image_url: typeof result.data.cover_image_alt === "string" && result.data.cover_image_alt.trim() ? safePublicUrl(result.data.cover_image_url) : null,
+    } : null;
+  } catch (error) {
+    if (error instanceof PublicDataUnavailableError) throw error;
+    console.error("[public-data] Unable to query published research post", error);
+    return null;
+  }
+}
+export async function getPublicResearch() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const result = await supabase.from("research_posts").select("slug,title,excerpt,category,author_name,cover_image_url,cover_image_alt").eq("publish_status", "published").eq("visibility", "public").order("created_at", { ascending: false });
+    if (result.error?.message?.includes("cover_image_")) {
+      console.warn("[public-data] Research cover image migration is not applied yet; continuing without thumbnails.", result.error);
+      const fallback = await supabase.from("research_posts").select("slug,title,excerpt,category,author_name").eq("publish_status", "published").eq("visibility", "public").order("created_at", { ascending: false });
+      if (fallback.error) throw new PublicDataUnavailableError("research");
+      return (fallback.data ?? []).map((post) => ({ ...post, cover_image_url: null, cover_image_alt: null }));
+    }
+    if (result.error) {
+      console.error("[public-data] Failed to load published research", result.error);
+      throw new PublicDataUnavailableError("research");
+    }
+    return (result.data ?? []).map((post) => ({
+      ...post,
+      cover_image_alt: typeof post.cover_image_alt === "string" ? post.cover_image_alt.trim().slice(0, 300) : null,
+      cover_image_url: typeof post.cover_image_alt === "string" && post.cover_image_alt.trim() ? safePublicUrl(post.cover_image_url) : null,
+    }));
+  } catch (error) {
+    if (error instanceof PublicDataUnavailableError) throw error;
+    console.error("[public-data] Unable to query published research", error);
+    return [];
+  }
+}
 export async function getPublicGallery(){try{const supabase=await createSupabaseServerClient();const {data,error}=await supabase.from("gallery_items").select("id,title,category,source_type,source_url,thumbnail_url,alt_text,caption").eq("publish_status","published").eq("visibility","public").order("created_at",{ascending:false});if(error){console.error("[public-data] Failed to load published gallery",error);throw new PublicDataUnavailableError("gallery");}return (data??[]).map((item)=>({...item,source_url:item.source_type==="youtube"?safeYouTubeUrl(item.source_url):safePublicUrl(item.source_url),thumbnail_url:safePublicUrl(item.thumbnail_url)})).filter((item)=>Boolean(item.source_url));}catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published gallery",error);return[]}}
 export async function getPublicSponsors(){try{const supabase=await createSupabaseServerClient();const {data,error}=await supabase.from("sponsors").select("id,name,logo_url,website_url,partnership_type,description").eq("publish_status","published").eq("visibility","public").order("name",{ascending:true});if(error){console.error("[public-data] Failed to load published sponsors",error);throw new PublicDataUnavailableError("sponsor");}return (data??[]).map((item)=>({...item,logo_url:safePublicUrl(item.logo_url),website_url:safePublicUrl(item.website_url)}));}catch(error){if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published sponsors",error);return[]}}
 export async function getPublicStats(robotsInput?: Robot[], competitionsInput?: CompetitionRecord[], membersInput?: TeamMember[]){const [robots,competitions,members]=await Promise.all([robotsInput?Promise.resolve(robotsInput):getPublicRobots(),competitionsInput?Promise.resolve(competitionsInput):getPublicCompetitions(),membersInput?Promise.resolve(membersInput):getPublicTeamMembers()]);return{robots:robots.length,nationalAwards:competitions.filter((x)=>x.level==="National"&&["Champion","Runner-up","Podium"].includes(x.result)).length,internationalParticipations:competitions.filter((x)=>x.level==="International").length,activeMembers:members.filter((x)=>!x.alumni).length};}
