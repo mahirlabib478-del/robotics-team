@@ -9,9 +9,10 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
   requireRole("technical_lead", profile.role);
   const { data: robots } = await supabase.from("robots").select("id,name,slug,category,version,status,development_year,weight_kg,dimensions,summary,publish_status").order("updated_at", { ascending: false });
   let publicEngineeringById = new Map<string, Record<string, string>>();
+  let publicEngineeringAvailable = true;
   if (robots?.length) {
     const { data: publicEngineeringRows, error: publicEngineeringError } = await supabase.from("robots").select("id,public_engineering").in("id", robots.map((robot) => robot.id));
-    if (publicEngineeringError) console.error("Public robot engineering fields could not be loaded. Apply the public engineering migration before editing these fields.", publicEngineeringError);
+    if (publicEngineeringError) { publicEngineeringAvailable = false; console.error("Public robot engineering fields could not be loaded. Apply the public engineering migration before editing these fields.", publicEngineeringError); }
     else publicEngineeringById = new Map((publicEngineeringRows ?? []).map((robot) => [robot.id, robot.public_engineering ?? {}] as const));
   }
   const robotRecords = (robots ?? []).map((robot) => ({ ...robot, public_engineering: publicEngineeringById.get(robot.id) ?? {} }));
@@ -24,6 +25,7 @@ export default async function AdminRobotsPage({ searchParams }: { searchParams: 
         <h1 className="mt-6 text-3xl font-black sm:text-4xl">Robot records</h1>
         {params.error ? <p role="alert" className="mt-5 rounded-xl border border-[#ff7a00]/30 p-4 text-sm text-[#ffbd85]">{params.error === "invalid-weight" ? "Weight must be a valid number greater than or equal to zero." : params.error === "missing" ? "Required fields are missing or invalid. Check the slug, status, year and summary." : "Could not save this record. Check for duplicate slugs and your permissions."}</p> : null}
         {params.saved ? <p role="status" className="mt-5 rounded-xl border border-emerald-400/20 p-4 text-sm text-emerald-300">Robot record saved successfully.</p> : null}
+        {!publicEngineeringAvailable ? <p role="status" className="mt-5 rounded-xl border border-[#ff7a00]/30 bg-[#ff7a00]/5 p-4 text-sm leading-6 text-[#ffbd85]">Public engineering summaries are temporarily unavailable because the database migration has not been applied. Basic robot edits still work, but these summary fields will not be saved until the migration is applied.</p> : null}
 
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           <form action={createRobot} className="grid min-w-0 gap-4 rounded-3xl border border-white/10 bg-[#0b1727] p-4 sm:p-7">
