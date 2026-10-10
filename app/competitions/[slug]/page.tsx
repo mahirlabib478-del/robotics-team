@@ -9,6 +9,8 @@ interface CompetitionDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: CompetitionDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
   const record = await getPublicCompetition(slug);
