@@ -51,6 +51,9 @@ jobs:
       - name: Engineering project/task access checks
         run: npm run verify:engineering-projects
 
+      - name: Engineering project/task access checks
+        run: npm run verify:engineering-projects
+
       - name: Private engineering design contract checks
         run: node scripts/verify-engineering-design.mjs
 
