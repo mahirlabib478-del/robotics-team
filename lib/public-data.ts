@@ -76,7 +76,8 @@ export async function getPublicCompetitions(): Promise<CompetitionRecord[]> {
   try {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from("competitions").select("slug,official_name,organizer,event_date,year,city,country,level,segment,robot_name,result,team_members,report").eq("publish_status","published").eq("visibility","public").order("year",{ascending:false});
-    if (error || !data) return fallbackCompetitions;
+    if (error) { console.error("[public-data] Failed to load published competitions", error); throw new PublicDataUnavailableError("competition"); }
+    if (!data) return fallbackCompetitions;
     return data.map((r)=>({slug:r.slug,competition:r.official_name,organizer:r.organizer,date:r.event_date??undefined,year:r.year,location:[r.city,r.country].filter(Boolean).join(", ")||"Location not published",level:r.level as CompetitionRecord["level"],segment:r.segment,robot:r.robot_name,result:r.result as CompetitionRecord["result"],teamMembers:r.team_members??[],report:r.report??undefined}));
   } catch (error) { if(error instanceof PublicDataUnavailableError) throw error; console.error("[public-data] Unable to query published competitions",error); return fallbackCompetitions; }
 }
